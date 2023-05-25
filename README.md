@@ -4,8 +4,5 @@ add syntax highlighting to .4dm files.
 ```sh
 export PATH="$PATH:./node_modules/.bin/"
 tree-sitter generate
-```
-
-```sh
 ./compile_parser.sh . /Applications/Nova.app
 ```
