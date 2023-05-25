@@ -2,8 +2,9 @@
 add syntax highlighting to .4dm files.
 
 ```sh
-export PATH="$PATH:.tree-sitter-4dm/node_modules/.bin/"
-tree-sitter generate ./tree-sitter-4dm/grammar.js
+cd .tree-sitter-4dm
+export PATH="$PATH:./node_modules/.bin/"
+tree-sitter generate
 ```
 
 ```sh
