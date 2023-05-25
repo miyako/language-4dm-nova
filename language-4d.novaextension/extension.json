@@ -1,7 +1,7 @@
 {
-    "identifier": "org.language4dnova",
-    "name": "language-4d-nova",
-    "organization": "MyOrganization",
+    "identifier": "com.4d.4d",
+    "name": "language-4d",
+    "organization": "4D SAS",
     "description": "Lorem ipsum, dolor sit amet.",
     "version": "1.0",
     "categories": ["languages"]

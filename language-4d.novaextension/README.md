@@ -12,7 +12,7 @@ Let's get started!
 🎈 Include a brief description of the features your syntax extension provides. For example:
 -->
 
-**language-4d-nova** provides syntax highlighting and autocompletion for **An Important Language**.
+**language-4d** provides syntax highlighting and autocompletion for **An Important Language**.
 
 <!--
 🎈 It can also be helpful to include a screenshot or GIF showing your extension in action:
@@ -26,7 +26,7 @@ Let's get started!
 🎈 Whether your extension covers the entirety of a language's syntax or a subset, it can be helpful to describe that for users:
 -->
 
-language-4d-nova currently supports the following features of Important Language:
+language-4d currently supports the following features of Important Language:
 
 - Lorem
 - Ipsum
