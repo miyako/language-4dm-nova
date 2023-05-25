@@ -1,0 +1,29 @@
+{
+  "name": "tree-sitter-4dm",
+  "version": "0.0.1",
+  "description": "Adds syntax highlighting to .4dm files.",
+  "main": "bindings/node",
+  "scripts": {
+    "test": "tree-sitter test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miyako/tree-sitter-4dm-v2.git"
+  },
+  "keywords": [
+    "4D",
+    "ORDA"
+  ],
+  "author": "miyako",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/miyako/tree-sitter-4dm-v2/issues"
+  },
+  "homepage": "https://github.com/miyako/tree-sitter-4dm-v2#readme",
+  "dependencies": {
+    "nan": "^2.17.0"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.20.8"
+  }
+}
