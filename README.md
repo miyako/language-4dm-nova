@@ -15,3 +15,5 @@ language-4d currently supports the following features:
 
 * class member function declaration
 * project method declaration
+* local, process, interprocess variables
+* value types
