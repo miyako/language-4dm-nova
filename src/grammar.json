@@ -13,7 +13,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "function"
+          "name": "value"
         },
         {
           "type": "SYMBOL",
@@ -21,21 +21,42 @@
         },
         {
           "type": "SYMBOL",
-          "name": "class"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "local_variable"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "process_variable"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "interprocess_variable"
+          "name": "declare_block"
         }
       ]
+    },
+    "value": {
+      "type": "PREC",
+      "value": 2,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "declare"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "function"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "local_variable"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "process_variable"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "interprocess_variable"
+          }
+        ]
+      }
     },
     "_var": {
       "type": "PATTERN",
@@ -48,6 +69,14 @@
     "_return": {
       "type": "PATTERN",
       "value": "(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)"
+    },
+    "_break": {
+      "type": "PATTERN",
+      "value": "(b|B)(r|R)(e|E)(a|A)(k|K)"
+    },
+    "_continue": {
+      "type": "PATTERN",
+      "value": "(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)"
     },
     "_declare": {
       "type": "PATTERN",
@@ -396,6 +425,55 @@
             {
               "type": "SYMBOL",
               "name": "_attribute_name"
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_function_arguments"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_function_result"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "declare": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SYMBOL",
+        "name": "_declare"
+      }
+    },
+    "declare_block": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "PREC_RIGHT",
+        "value": 0,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "declare"
             },
             {
               "type": "CHOICE",
