@@ -1,2 +1,2 @@
 # language-4dm-nova
-Tree Sitter?
+Adds syntax highlighting to .4dm files.
