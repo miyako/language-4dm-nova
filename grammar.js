@@ -4,8 +4,10 @@ const PREC = {
   class_function:1,
   method_declaration:1,
   attribute_name: 2,
+  keyword: 2, 
   value: 2, 
   name: 3,
+  constant: 5, 
   variable: 10
 }
   
@@ -15,18 +17,30 @@ module.exports = grammar({
   rules: {
     source: $ => repeat($._token),
     _token: $ => choice(
+      $.keyword,
       $.value,
       $.function_block,
       $.declare_block  
     ),
+    keyword: $ => prec(PREC.keyword,
+      choice(
+      $.declare,
+      $.function
+    )),
+    constant: $ => prec(PREC.constant,
+      choice(
+      $.time,
+      $.date,
+      $.number,
+      $.string
+    )),
     value: $ => prec(PREC.value,
     choice(
-      $.declare,
-      $.function,
       $.class,
       $.local_variable,
       $.process_variable,  
-      $.interprocess_variable
+      $.interprocess_variable,
+      $.constant
     )),
     
     _var: $ => /(v|V)(a|A)(r|R)/,
@@ -115,8 +129,29 @@ module.exports = grammar({
     local_variable: $ => prec(PREC.variable, seq('$', $._name)),
     process_variable: $ => prec(PREC.variable, seq($._name)),
     interprocess_variable: $ => prec(PREC.variable, seq('<>', $._name)),
-    _variable: $ => choice($.local_variable, $.process_variable, $.interprocess_variable)
+    _variable: $ => choice($.local_variable, $.process_variable, $.interprocess_variable),
     
+    time: $ => prec(PREC.constant,
+      seq('?', /[0-9]{2}/, ':', /[0-9]{2}/, ':', /[0-9]{2}/, '?')
+    ),
+    
+    date: $ => prec(PREC.constant,
+      choice(
+      seq('!', /[0-9]{2,4}/, '-', /[0-9]{2}/, '-', /[0-9]{2}/, '!'),
+      seq('!', /[0-9]{2}/, '-', /[0-9]{2}/, '-', /[0-9]{2,4}/, '!'))
+    ),
+    _hex_literal: $ => seq(/[0][xX]/, /[0-9a-fA-F]+/),
+    _dec_literal: $ => /[0-9]+/,
+    _num_literal: $ => prec.right(seq(/[0-9]+/, choice('.', ','), /[0-9]+/)),
+    _exp_literal: $ => prec.right(seq(/[0-9]+/, choice('.', ','), /[0-9]+/, /[eE]/, /[+-]?/, /[0-9]+/)),
+    number : $ => prec(PREC.constant,
+      choice($._dec_literal, $._hex_literal, $._exp_literal, $._num_literal)
+    ),
+    string: $ => prec(PREC.constant,
+      seq('"',
+      repeat(choice('\\r', '\\n', '\\"', '\\t', '\\\\', '\\"', /[^"]/)), 
+      '"')
+    )
   }
   
 });

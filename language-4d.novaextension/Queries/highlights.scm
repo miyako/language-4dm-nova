@@ -13,6 +13,12 @@
 (function) @identifier.function
 (declare) @identifier.function
 
+; Constants
+(time) @identifier.constant
+(date) @identifier.constant
+(number) @identifier.constant
+(string) @identifier.constant
+
 ; Operators
 
 ;[
