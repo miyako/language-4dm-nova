@@ -19,3 +19,7 @@ language-4d currently supports the following features:
 * value types
 
 <img width="434" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/19182eab-eb51-4253-bad6-bf416b6abf3a">
+
+* literals
+
+<img width="143" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/0ae0a106-649a-4525-af82-8a10d85f5c26">
