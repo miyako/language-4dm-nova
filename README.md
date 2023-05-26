@@ -21,6 +21,7 @@ language-4d currently supports the following features:
 <img width="434" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/19182eab-eb51-4253-bad6-bf416b6abf3a">
 
 * literals
-* 
-<img width="138" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/ba6b9491-dc77-457f-9de6-9a74990aced6">
+ 
+<img width="142" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/915e4b4a-e374-45e7-884b-c0c3baaf19d7">
+
 
