@@ -7,7 +7,7 @@ const PREC = {
   keyword: 2, 
   value: 2, 
   name: 3,
-  constant: 5, 
+  constant: -10, 
   variable: 10
 }
   
@@ -20,12 +20,18 @@ module.exports = grammar({
       $.keyword,
       $.value,
       $.function_block,
-      $.declare_block  
+      $.declare_block,
+      $.class_constructor_block,
+      $.declaration_block  
     ),
     keyword: $ => prec(PREC.keyword,
       choice(
       $.declare,
-      $.function
+      $.function,
+      $.class_extends,
+      $.class_constructor,
+      $.var,
+      $.property
     )),
     constant: $ => prec(PREC.constant,
       choice(
@@ -36,15 +42,15 @@ module.exports = grammar({
     )),
     value: $ => prec(PREC.value,
     choice(
+      $.constant,
       $.class,
       $.local_variable,
       $.process_variable,  
-      $.interprocess_variable,
-      $.constant
+      $.interprocess_variable
     )),
     
-    _var: $ => /(v|V)(a|A)(r|R)/,
-    _property: $ => /(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)/,        
+    var: $ => /(v|V)(a|A)(r|R)/,
+    property: $ => /(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)/,        
     _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
     _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
     _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
@@ -59,9 +65,9 @@ module.exports = grammar({
     _orderBy: $ => / (o|O)(r|R)(d|D)(e|E)(r|R)(b|B)(y|Y)/,
     _computed: $ => choice($._get, $._set, $._query, $._orderBy),
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
-    _letter: $ => /[\p{Letter}_]/,
-    _alnum: $ => /[\p{Letter}_0-9]+/,
-    _alnumsp: $ => /[\p{Letter}_ 0-9]+/,
+    _letter: $ => /[^:;][\p{Letter}_]/,
+    _alnum: $ => /[^:;][\p{Letter}_0-9]+/,
+    _alnumsp: $ => /[^:;][\p{Letter}_ 0-9]+/,
     _name: $ => prec(PREC.name,
       choice(
       $._letter,
@@ -142,16 +148,27 @@ module.exports = grammar({
     ),
     _hex_literal: $ => seq(/[0][xX]/, /[0-9a-fA-F]+/),
     _dec_literal: $ => /[0-9]+/,
-    _num_literal: $ => prec.right(seq(/[0-9]+/, choice('.', ','), /[0-9]+/)),
-    _exp_literal: $ => prec.right(seq(/[0-9]+/, choice('.', ','), /[0-9]+/, /[eE]/, /[+-]?/, /[0-9]+/)),
-    number : $ => prec(PREC.constant,
+    _num_literal: $ => prec.right(seq(/[0-9]+[.,][0-9]+/)),
+    _exp_literal: $ => prec.right(seq(/[0-9]+[.,][0-9]+[eE]-?[0-9]+/)),
+    number : $ => prec.right(PREC.constant,
       choice($._dec_literal, $._hex_literal, $._exp_literal, $._num_literal)
     ),
     string: $ => prec(PREC.constant,
       seq('"',
       repeat(choice('\\r', '\\n', '\\"', '\\t', '\\\\', '\\"', /[^"]/)), 
       '"')
-    )
+    ),
+    
+    class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
+    _class_extends: $ => prec.right(seq($.class_extends, ' ', $.class)),
+    class_constructor: $ => prec.right(seq(/((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/)),
+    class_constructor_block: $ => prec(PREC.class_function, choice($._class_extends, $.class_constructor)),
+    
+    _declaration: $ => choice($.var, $.property),
+    _declaration_argument: $ => choice($.local_variable, $.process_variable),
+    declaration_block: $ => prec(PREC.class_function, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class))
+    
+   
   }
   
 });

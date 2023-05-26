@@ -12,6 +12,10 @@
 
 (function) @identifier.function
 (declare) @identifier.function
+(class_extends) @identifier.function
+(class_constructor) @identifier.function
+(var) @identifier.function
+(property) @identifier.function
 
 ; Constants
 (time) @identifier.constant

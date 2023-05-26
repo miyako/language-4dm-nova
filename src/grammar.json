@@ -26,6 +26,14 @@
         {
           "type": "SYMBOL",
           "name": "declare_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "class_constructor_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "declaration_block"
         }
       ]
     },
@@ -42,13 +50,29 @@
           {
             "type": "SYMBOL",
             "name": "function"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class_extends"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class_constructor"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "var"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "property"
           }
         ]
       }
     },
     "constant": {
       "type": "PREC",
-      "value": 5,
+      "value": -10,
       "content": {
         "type": "CHOICE",
         "members": [
@@ -79,6 +103,10 @@
         "members": [
           {
             "type": "SYMBOL",
+            "name": "constant"
+          },
+          {
+            "type": "SYMBOL",
             "name": "class"
           },
           {
@@ -92,19 +120,15 @@
           {
             "type": "SYMBOL",
             "name": "interprocess_variable"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "constant"
           }
         ]
       }
     },
-    "_var": {
+    "var": {
       "type": "PATTERN",
       "value": "(v|V)(a|A)(r|R)"
     },
-    "_property": {
+    "property": {
       "type": "PATTERN",
       "value": "(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)"
     },
@@ -218,15 +242,15 @@
     },
     "_letter": {
       "type": "PATTERN",
-      "value": "[\\p{Letter}_]"
+      "value": "[^:;][\\p{Letter}_]"
     },
     "_alnum": {
       "type": "PATTERN",
-      "value": "[\\p{Letter}_0-9]+"
+      "value": "[^:;][\\p{Letter}_0-9]+"
     },
     "_alnumsp": {
       "type": "PATTERN",
-      "value": "[\\p{Letter}_ 0-9]+"
+      "value": "[^:;][\\p{Letter}_ 0-9]+"
     },
     "_name": {
       "type": "PREC",
@@ -791,7 +815,7 @@
     },
     "time": {
       "type": "PREC",
-      "value": 5,
+      "value": -10,
       "content": {
         "type": "SEQ",
         "members": [
@@ -828,7 +852,7 @@
     },
     "date": {
       "type": "PREC",
-      "value": 5,
+      "value": -10,
       "content": {
         "type": "CHOICE",
         "members": [
@@ -926,24 +950,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[0-9]+"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "."
-              },
-              {
-                "type": "STRING",
-                "value": ","
-              }
-            ]
-          },
-          {
-            "type": "PATTERN",
-            "value": "[0-9]+"
+            "value": "[0-9]+[.,][0-9]+"
           }
         ]
       }
@@ -956,43 +963,14 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[0-9]+"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "."
-              },
-              {
-                "type": "STRING",
-                "value": ","
-              }
-            ]
-          },
-          {
-            "type": "PATTERN",
-            "value": "[0-9]+"
-          },
-          {
-            "type": "PATTERN",
-            "value": "[eE]"
-          },
-          {
-            "type": "PATTERN",
-            "value": "[+-]?"
-          },
-          {
-            "type": "PATTERN",
-            "value": "[0-9]+"
+            "value": "[0-9]+[.,][0-9]+[eE]-?[0-9]+"
           }
         ]
       }
     },
     "number": {
-      "type": "PREC",
-      "value": 5,
+      "type": "PREC_RIGHT",
+      "value": -10,
       "content": {
         "type": "CHOICE",
         "members": [
@@ -1017,7 +995,7 @@
     },
     "string": {
       "type": "PREC",
-      "value": 5,
+      "value": -10,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1064,6 +1042,132 @@
           {
             "type": "STRING",
             "value": "\""
+          }
+        ]
+      }
+    },
+    "class_extends": {
+      "type": "PATTERN",
+      "value": "((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)"
+    },
+    "_class_extends": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "class_extends"
+          },
+          {
+            "type": "STRING",
+            "value": " "
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class"
+          }
+        ]
+      }
+    },
+    "class_constructor": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))"
+          }
+        ]
+      }
+    },
+    "class_constructor_block": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_class_extends"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class_constructor"
+          }
+        ]
+      }
+    },
+    "_declaration": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "var"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "property"
+        }
+      ]
+    },
+    "_declaration_argument": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "local_variable"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "process_variable"
+        }
+      ]
+    },
+    "declaration_block": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_declaration_argument"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": ";"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_declaration_argument"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "class"
           }
         ]
       }

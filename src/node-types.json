@@ -5,6 +5,34 @@
     "fields": {}
   },
   {
+    "type": "class_constructor",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "class_constructor_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "class",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "constant",
     "named": true,
     "fields": {},
@@ -35,6 +63,29 @@
     "type": "date",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "declaration_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "class",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "process_variable",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "declare",
@@ -102,11 +153,27 @@
       "required": true,
       "types": [
         {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
           "type": "declare",
           "named": true
         },
         {
           "type": "function",
+          "named": true
+        },
+        {
+          "type": "property",
+          "named": true
+        },
+        {
+          "type": "var",
           "named": true
         }
       ]
@@ -135,6 +202,14 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "class_constructor_block",
+          "named": true
+        },
+        {
+          "type": "declaration_block",
+          "named": true
+        },
         {
           "type": "declare_block",
           "named": true
@@ -196,6 +271,10 @@
     }
   },
   {
+    "type": " ",
+    "named": false
+  },
+  {
     "type": "!",
     "named": false
   },
@@ -213,10 +292,6 @@
   },
   {
     "type": ")",
-    "named": false
-  },
-  {
-    "type": ",",
     "named": false
   },
   {
@@ -266,5 +341,17 @@
   {
     "type": "\\t",
     "named": false
+  },
+  {
+    "type": "class_extends",
+    "named": true
+  },
+  {
+    "type": "property",
+    "named": true
+  },
+  {
+    "type": "var",
+    "named": true
   }
 ]
