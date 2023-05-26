@@ -167,7 +167,7 @@ module.exports = grammar({
     _declaration: $ => choice($.var, $.property),
     _declaration_argument: $ => choice($.local_variable, $.process_variable),
     declaration_block: $ => prec(PREC.class_function, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class)),
-    alias_block: $ => prec.left(seq($.alias, ' ', $._attribute_name))
+    alias_block: $ => prec.right(seq($.alias, ' ', $._attribute_name))
    
   }
   
