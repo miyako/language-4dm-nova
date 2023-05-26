@@ -34,7 +34,9 @@ local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
 #DECLARE()->$returnValue:Integer 
 ```
 
-* local, process, interprocess variables
+it seems impossible to tree-sitter process variable; the pattern is too broad
+
+* local, interprocess variables
 * value types
 
 * literals
@@ -50,7 +52,10 @@ class extends 4D.Entity
 
 * new declaration
 
-<img width="205" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/2d03b097-94bc-49c9-a1df-9ecde7ed2749">
+```4d
+var $a; $b : Text
+property $a; $b : Text
+```
 
 * alias attribute
 
