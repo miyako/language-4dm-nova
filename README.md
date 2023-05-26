@@ -26,8 +26,14 @@ local exposed function query aproperty($param1:Text)->$returnValue:Integer
 local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
 ```
 
+* method
 
-* project method declaration
+```4d
+#DECLARE($param1:Text)
+#DECLARE($param1:Text)->$returnValue:Integer
+#DECLARE()->$returnValue:Integer 
+```
+
 * local, process, interprocess variables
 * value types
 
