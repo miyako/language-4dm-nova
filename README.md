@@ -51,4 +51,7 @@ local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
 
 * alias attribute
 
-<img width="96" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/563c2b1b-1c5d-4718-8f95-1aec65905450">
+```4d
+alias name name
+alias name name.name
+```
