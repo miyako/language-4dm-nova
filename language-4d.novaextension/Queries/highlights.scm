@@ -5,25 +5,27 @@
 ; Variables
 
 (local_variable) @identifier.variable
-(process_variable) @identifier.global
 (interprocess_variable) @identifier
+(attribute) @identifier.variable
 
 ; Keywords
 
-(function) @identifier.function
-(declare) @identifier.function
-(class_extends) @identifier.function
-(class_constructor) @identifier.function
 (var) @identifier.function
 (property) @identifier.function
 (alias) @identifier.function
-(alias_block) @identifier.function
+(declare) @identifier.function
+(function) @identifier.function
+
+; Compound Keywords
+
+(function_name) @identifier.function
+(alias_name) @identifier.function
+(class_extends) @identifier.function
+(class_constructor) @identifier.function
 
 ; Constants
-(time) @identifier.constant
-(date) @identifier.constant
-(number) @identifier.constant
-(string) @identifier.constant
+
+(constant) @identifier.constant
 
 ; Operators
 
