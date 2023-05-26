@@ -1,18 +1,32 @@
 [
   {
+    "type": "alias",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "alias_block",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "alias",
           "named": true
+        },
+        {
+          "type": "attribute_path",
+          "named": true
         }
       ]
     }
+  },
+  {
+    "type": "attribute_path",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "class",
@@ -271,6 +285,10 @@
       "required": true,
       "types": [
         {
+          "type": "attribute_path",
+          "named": true
+        },
+        {
           "type": "class",
           "named": true
         },
@@ -364,10 +382,6 @@
   {
     "type": "\\t",
     "named": false
-  },
-  {
-    "type": "alias",
-    "named": true
   },
   {
     "type": "class_extends",

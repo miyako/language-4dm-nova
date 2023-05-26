@@ -1,14 +1,14 @@
 const PREC = {
   key: -10,
+  block: -10,
+  constant: -10, 
   arguments: -1,
-  class_function:1,
-  method_declaration:1,
-  attribute_name: 2,
+  function:1,
+  attribute: 2,
   keyword: 2, 
   value: 2, 
   name: 3,
-  constant: -10, 
-  variable: 10
+  variable: 10 //attribute, variable
 }
   
 module.exports = grammar({
@@ -48,7 +48,8 @@ module.exports = grammar({
       $.class,
       $.local_variable,
       $.process_variable,  
-      $.interprocess_variable
+      $.interprocess_variable,
+      $.attribute_path
     )),
     
     var: $ => /(v|V)(a|A)(r|R)/,
@@ -57,7 +58,7 @@ module.exports = grammar({
     _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
     _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
     _declare: $ => /#(d|D)(e|E)(c|C)(l|L)(a|A)(r|R)(e|E)/,
-    alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S)/,
+    _alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S) /,
     _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/, 
     _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,
     _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,
@@ -67,35 +68,36 @@ module.exports = grammar({
     _orderBy: $ => / (o|O)(r|R)(d|D)(e|E)(r|R)(b|B)(y|Y)/,
     _computed: $ => choice($._get, $._set, $._query, $._orderBy),
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
-    _letter: $ => /[[^:;()][\p{Letter}_]]/,
-    _alnum: $ => /[[^:;()][\p{Letter}_0-9]]+/,
-    _alnumsp: $ => /[[^:;()][\p{Letter}_ 0-9]]+/,
+    _letter: $ => /[[^.:;()][\p{Letter}_]]/,
+    _alnum: $ => /[[^.:;()][\p{Letter}_0-9]]+/,
+    _alnumsp: $ => /[[^.:;()][\p{Letter}_ 0-9]]+/,
     _name: $ => prec(PREC.name,
       choice(
       $._letter,
       seq($._letter, $._alnum),
       seq($._letter, $._alnumsp, $._letter))
     ),
-    _attribute_name: $ => prec(PREC.attribute_name,
+    _attribute_name: $ => prec(PREC.attribute,
       choice(
       $._letter,
       seq($._letter, $._alnum))
     ),    
-    function: $ => prec.right(PREC.key, seq(optional($._scope), $._function, optional($._computed), $._attribute_name)),    
+    alias: $ => prec.right(PREC.key, $._alias),
+    function: $ => prec.right(PREC.function, seq(optional($._scope), $._function, optional($._computed), $._attribute_name)),    
     _function_argument: $ => prec(PREC.arguments, seq($.local_variable, optional(repeat(seq(';', $.local_variable))), ':', $.class)),
     _function_arguments: $ => prec(PREC.arguments, seq('(', optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), ')')),
     _function_result: $ => seq('->', $._function_argument),
-    function_block: $ => prec(PREC.class_function, prec.right(seq(
+    function_block: $ => prec(PREC.block, prec.right(seq(
       $._attribute_name,
-      optional($._function_arguments),
+      $._function_arguments,
       optional($._function_result)
     ))
     ),
     
     declare : $ => prec(PREC.key, $._declare),
-    declare_block: $ => prec(PREC.method_declaration, prec.right(seq(
+    declare_block: $ => prec(PREC.block, prec.right(seq(
       $.declare,
-      optional($._function_arguments),
+      $._function_arguments,
       optional($._function_result)
     ))
     ),
@@ -162,13 +164,21 @@ module.exports = grammar({
     class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
     _class_extends: $ => prec.right(seq($.class_extends, ' ', $.class)),
     class_constructor: $ => prec.right(seq(/((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/)),
-    class_constructor_block: $ => prec(PREC.class_function, choice($._class_extends, $.class_constructor)),
+    class_constructor_block: $ => prec(PREC.block, choice($._class_extends, $.class_constructor)),
     
     _declaration: $ => choice($.var, $.property),
     _declaration_argument: $ => choice($.local_variable, $.process_variable),
-    declaration_block: $ => prec(PREC.class_function, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class)),
-    alias_block: $ => prec.right(seq($.alias, ' ', $._attribute_name))
-   
+    declaration_block: $ => prec(PREC.block, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class)),
+    attribute_path: $ => prec.right(PREC.variable, seq($._attribute_name, optional(repeat(seq('.', $._attribute_name))))),
+    alias_block: $ => prec(PREC.block, seq(
+      $.alias,
+      $._attribute_name,
+      $.attribute_path
+      )
+    )
+
+
+
   }
   
 });

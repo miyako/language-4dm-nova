@@ -128,6 +128,10 @@
           {
             "type": "SYMBOL",
             "name": "interprocess_variable"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "attribute_path"
           }
         ]
       }
@@ -156,9 +160,9 @@
       "type": "PATTERN",
       "value": "#(d|D)(e|E)(c|C)(l|L)(a|A)(r|R)(e|E)"
     },
-    "alias": {
+    "_alias": {
       "type": "PATTERN",
-      "value": "(a|A)(l|L)(i|I)(a|A)(s|S)"
+      "value": "(a|A)(l|L)(i|I)(a|A)(s|S) "
     },
     "_function": {
       "type": "PATTERN",
@@ -250,15 +254,15 @@
     },
     "_letter": {
       "type": "PATTERN",
-      "value": "[[^:;()][\\p{Letter}_]]"
+      "value": "[[^.:;()][\\p{Letter}_]]"
     },
     "_alnum": {
       "type": "PATTERN",
-      "value": "[[^:;()][\\p{Letter}_0-9]]+"
+      "value": "[[^.:;()][\\p{Letter}_0-9]]+"
     },
     "_alnumsp": {
       "type": "PATTERN",
-      "value": "[[^:;()][\\p{Letter}_ 0-9]]+"
+      "value": "[[^.:;()][\\p{Letter}_ 0-9]]+"
     },
     "_name": {
       "type": "PREC",
@@ -329,9 +333,17 @@
         ]
       }
     },
-    "function": {
+    "alias": {
       "type": "PREC_RIGHT",
       "value": -10,
+      "content": {
+        "type": "SYMBOL",
+        "name": "_alias"
+      }
+    },
+    "function": {
+      "type": "PREC_RIGHT",
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -489,7 +501,7 @@
     },
     "function_block": {
       "type": "PREC",
-      "value": 1,
+      "value": -10,
       "content": {
         "type": "PREC_RIGHT",
         "value": 0,
@@ -501,16 +513,8 @@
               "name": "_attribute_name"
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_function_arguments"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_function_arguments"
             },
             {
               "type": "CHOICE",
@@ -538,7 +542,7 @@
     },
     "declare_block": {
       "type": "PREC",
-      "value": 1,
+      "value": -10,
       "content": {
         "type": "PREC_RIGHT",
         "value": 0,
@@ -550,16 +554,8 @@
               "name": "declare"
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_function_arguments"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_function_arguments"
             },
             {
               "type": "CHOICE",
@@ -1085,7 +1081,7 @@
     },
     "class_constructor_block": {
       "type": "PREC",
-      "value": 1,
+      "value": -10,
       "content": {
         "type": "CHOICE",
         "members": [
@@ -1128,7 +1124,7 @@
     },
     "declaration_block": {
       "type": "PREC",
-      "value": 1,
+      "value": -10,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1171,9 +1167,46 @@
         ]
       }
     },
-    "alias_block": {
+    "attribute_path": {
       "type": "PREC_RIGHT",
-      "value": 0,
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_attribute_name"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "."
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_attribute_name"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "alias_block": {
+      "type": "PREC",
+      "value": -10,
       "content": {
         "type": "SEQ",
         "members": [
@@ -1182,12 +1215,12 @@
             "name": "alias"
           },
           {
-            "type": "STRING",
-            "value": " "
+            "type": "SYMBOL",
+            "name": "_attribute_name"
           },
           {
             "type": "SYMBOL",
-            "name": "_attribute_name"
+            "name": "attribute_path"
           }
         ]
       }
