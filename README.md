@@ -21,5 +21,14 @@ language-4d currently supports the following features:
 <img width="434" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/19182eab-eb51-4253-bad6-bf416b6abf3a">
 
 * literals
+ 
+<img width="142" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/915e4b4a-e374-45e7-884b-c0c3baaf19d7">
 
-<img width="143" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/0ae0a106-649a-4525-af82-8a10d85f5c26">
+* class definition
+
+<img width="187" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/3a58647c-eb11-46b5-bb3c-448620d21ef9">
+
+* new declaration
+
+<img width="205" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/2d03b097-94bc-49c9-a1df-9ecde7ed2749">
+
