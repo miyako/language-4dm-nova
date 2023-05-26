@@ -67,9 +67,9 @@ module.exports = grammar({
     _orderBy: $ => / (o|O)(r|R)(d|D)(e|E)(r|R)(b|B)(y|Y)/,
     _computed: $ => choice($._get, $._set, $._query, $._orderBy),
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
-    _letter: $ => /[^:;][\p{Letter}_]/,
-    _alnum: $ => /[[^:;][\p{Letter}_0-9]]+/,
-    _alnumsp: $ => /[[^:;][\p{Letter}_ 0-9]]+/,
+    _letter: $ => /[[^:;()][\p{Letter}_]]/,
+    _alnum: $ => /[[^:;()][\p{Letter}_0-9]]+/,
+    _alnumsp: $ => /[[^:;()][\p{Letter}_ 0-9]]+/,
     _name: $ => prec(PREC.name,
       choice(
       $._letter,
@@ -146,7 +146,7 @@ module.exports = grammar({
       seq('!', /[0-9]{2,4}/, '-', /[0-9]{2}/, '-', /[0-9]{2}/, '!'),
       seq('!', /[0-9]{2}/, '-', /[0-9]{2}/, '-', /[0-9]{2,4}/, '!'))
     ),
-    _hex_literal: $ => seq(/[0][xX]/, /[0-9a-fA-F]+/),
+    _hex_literal: $ => /0[xX][0-9a-fA-F]+/,
     _dec_literal: $ => /[0-9]+/,
     _num_literal: $ => prec.right(seq(/[0-9]+[.,][0-9]+/)),
     _exp_literal: $ => prec.right(seq(/[0-9]+[.,][0-9]+[eE]-?[0-9]+/)),
@@ -167,7 +167,7 @@ module.exports = grammar({
     _declaration: $ => choice($.var, $.property),
     _declaration_argument: $ => choice($.local_variable, $.process_variable),
     declaration_block: $ => prec(PREC.class_function, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class)),
-    alias_block: $ => prec.right(seq($.alias, ' ', $._attribute_name))
+    alias_block: $ => prec.left(seq($.alias, ' ', $._attribute_name))
    
   }
   
