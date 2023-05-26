@@ -41,9 +41,12 @@ local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
  
 <img width="142" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/915e4b4a-e374-45e7-884b-c0c3baaf19d7">
 
-* class definition
+* class
 
-<img width="187" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/3a58647c-eb11-46b5-bb3c-448620d21ef9">
+```4d
+class constructor
+class extends 4D.Entity
+```
 
 * new declaration
 
