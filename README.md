@@ -32,3 +32,6 @@ language-4d currently supports the following features:
 
 <img width="205" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/2d03b097-94bc-49c9-a1df-9ecde7ed2749">
 
+* alias attribute
+
+<img width="96" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/563c2b1b-1c5d-4718-8f95-1aec65905450">
