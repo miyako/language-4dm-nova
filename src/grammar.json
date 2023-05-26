@@ -34,6 +34,10 @@
         {
           "type": "SYMBOL",
           "name": "declaration_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "alias_block"
         }
       ]
     },
@@ -66,6 +70,10 @@
           {
             "type": "SYMBOL",
             "name": "property"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "alias"
           }
         ]
       }
@@ -148,7 +156,7 @@
       "type": "PATTERN",
       "value": "#(d|D)(e|E)(c|C)(l|L)(a|A)(r|R)(e|E)"
     },
-    "_alias": {
+    "alias": {
       "type": "PATTERN",
       "value": "(a|A)(l|L)(i|I)(a|A)(s|S)"
     },
@@ -246,11 +254,11 @@
     },
     "_alnum": {
       "type": "PATTERN",
-      "value": "[^:;][\\p{Letter}_0-9]+"
+      "value": "[[^:;][\\p{Letter}_0-9]]+"
     },
     "_alnumsp": {
       "type": "PATTERN",
-      "value": "[^:;][\\p{Letter}_ 0-9]+"
+      "value": "[[^:;][\\p{Letter}_ 0-9]]+"
     },
     "_name": {
       "type": "PREC",
@@ -1168,6 +1176,27 @@
           {
             "type": "SYMBOL",
             "name": "class"
+          }
+        ]
+      }
+    },
+    "alias_block": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "alias"
+          },
+          {
+            "type": "STRING",
+            "value": " "
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_attribute_name"
           }
         ]
       }

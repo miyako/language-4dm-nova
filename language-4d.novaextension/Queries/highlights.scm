@@ -16,6 +16,8 @@
 (class_constructor) @identifier.function
 (var) @identifier.function
 (property) @identifier.function
+(alias) @identifier.function
+(alias_block) @identifier.function
 
 ; Constants
 (time) @identifier.constant
