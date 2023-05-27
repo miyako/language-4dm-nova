@@ -72,4 +72,4 @@ alias name name
 alias name name.name
 ```
 
-> no good pattern matching for attribute or process variable that does not negate ecisting tokens
+> no good pattern matching for attribute or process variable that does not negate existing tokens
