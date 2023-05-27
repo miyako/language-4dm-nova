@@ -26,7 +26,7 @@ module.exports = grammar({
       $.declare_block,
       $.class_extends,
       $.class_constructor,
-      $.declaration_block,
+      $.var_declaration_block,
       $.alias_name,
       $._token
     ),
@@ -139,9 +139,14 @@ module.exports = grammar({
     class_constructor: $ => prec(PREC.statement, seq(/((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/)),
     class_constructor_block: $ => prec(PREC.statement, choice($._class_extends, $.class_constructor)),
     
-    _declaration: $ => choice($.var, $.property),
-    _declaration_argument: $ => choice($.local_variable),
-    declaration_block: $ => prec(PREC.statement, seq($._declaration_argument, optional(repeat(seq(';', $._declaration_argument))), ':', $.class)),
+    var_declaration_block: $ => prec(PREC.statement, seq(
+      $.var, 
+      $.local_variable, 
+      optional(repeat(seq(';', $.local_variable))), 
+      ':', 
+      $.class
+      )
+    ),
         
     /* 
     keyword
