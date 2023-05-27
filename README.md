@@ -34,8 +34,6 @@ local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
 #DECLARE()->$returnValue:Integer 
 ```
 
-it seems impossible to tree-sitter process variable; the pattern is too broad
-
 * literals
  
 <img width="142" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/915e4b4a-e374-45e7-884b-c0c3baaf19d7">
@@ -51,7 +49,20 @@ class extends 4D.Entity
 
 ```4d
 var $a; $b : Text
-property $a; $b : Text
+```
+
+#### NG
+
+* properties
+
+```4d
+property a; b : Text
+```
+
+* process variables
+
+```4d
+var a; b : Text
 ```
 
 * alias attribute
@@ -60,3 +71,5 @@ property $a; $b : Text
 alias name name
 alias name name.name
 ```
+
+> no good pattern matching for attribute or process variable that does not negate existing tokens
