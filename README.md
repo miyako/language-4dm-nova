@@ -60,8 +60,5 @@ property $a; $b : Text
 alias name name
 alias name name.name
 ```
-<<<<<<< HEAD
-=======
 
 > no good pattern matching for attribute or process variable that does not negate ecisting tokens
->>>>>>> parent of 54679b7 (Update README.md)
