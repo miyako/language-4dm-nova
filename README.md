@@ -51,7 +51,20 @@ class extends 4D.Entity
 
 ```4d
 var $a; $b : Text
-property $a; $b : Text
+```
+
+#### NG
+
+* properties
+
+```4d
+property a; b : Text
+```
+
+* process variables
+
+```4d
+var a; b : Text
 ```
 
 * alias attribute
