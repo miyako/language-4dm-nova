@@ -2,7 +2,7 @@ const PREC = {
   
   /*
   
-  statement > compound > token > classic > name > constant > keyword
+  statement > compound > token > classic > name > constant > keyword > variable > attribute
   
   */
   
@@ -12,8 +12,9 @@ const PREC = {
   classic:    -7,
   name:       -6,
   constant:   -5,
-  keyword:    -4
-  
+  keyword:    -4,
+  variable:   -3,
+  attribute:  -2
 }
   
 module.exports = grammar({
@@ -43,6 +44,7 @@ module.exports = grammar({
       $.local_variable,
       $.interprocess_variable,
       $.attribute,
+      $.variable,
       $.constant
     ),
     constant: $ => choice(
@@ -70,7 +72,10 @@ module.exports = grammar({
       /([\p{Letter}_]+)([\p{Letter}_0-9]*)/
     ), 
     _classic_name: $ => prec(PREC.classic, 
-      /([\p{Letter}_]+)([\p{Letter}_ 0-9]*)([\p{Letter}_0-9]*)/
+      choice(
+      /([\p{Letter}_]+)([\p{Letter}_ 0-9]+)([\p{Letter}_0-9]+)/,
+      $._name 
+      )
     ),
     
     function_name: $ => prec(PREC.compound, seq(optional($._scope), $.function, optional($._computed), $._name)),    
@@ -88,8 +93,13 @@ module.exports = grammar({
     local_variable: $ => prec(PREC.token, seq('$', $._classic_name)),
     interprocess_variable: $ => prec(PREC.token, seq('<>', $._classic_name)),
     _variable: $ => choice($.local_variable, $.interprocess_variable),
-    attribute: $ => "attribute", //prec(PREC.token, seq($._name, ".", $._name, repeat(seq(".", $._name)))),
     
+    /*
+    working on these
+    */
+    
+    attribute: $ => "attribute", 
+    variable: $ => "variable",  
     /* 
     constant
     */

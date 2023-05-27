@@ -305,6 +305,10 @@
         {
           "type": "local_variable",
           "named": true
+        },
+        {
+          "type": "variable",
+          "named": true
         }
       ]
     }
@@ -392,6 +396,10 @@
   },
   {
     "type": "class_extends",
+    "named": true
+  },
+  {
+    "type": "variable",
     "named": true
   }
 ]

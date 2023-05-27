@@ -91,6 +91,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "variable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "constant"
         }
       ]
@@ -236,8 +240,17 @@
       "type": "PREC",
       "value": -7,
       "content": {
-        "type": "PATTERN",
-        "value": "([\\p{Letter}_]+)([\\p{Letter}_ 0-9]*)([\\p{Letter}_0-9]*)"
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "([\\p{Letter}_]+)([\\p{Letter}_ 0-9]+)([\\p{Letter}_0-9]+)"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_name"
+          }
+        ]
       }
     },
     "function_name": {
@@ -494,6 +507,10 @@
     "attribute": {
       "type": "STRING",
       "value": "attribute"
+    },
+    "variable": {
+      "type": "STRING",
+      "value": "variable"
     },
     "time": {
       "type": "PREC",
