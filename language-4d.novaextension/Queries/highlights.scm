@@ -1,19 +1,35 @@
 ;Types
 
 (class) @identifier.type.class
+(classic_compiler) @identifier.type.class
+(class_function) @identifier.type.class
+; Comment
+(comment) @comment
+(command_suffix) @comment
 
 ; Keywords
 
-(var) @identifier.function
-(property) @identifier.function
-(alias) @identifier.function
-(declare) @identifier.function
-(function) @identifier.function
-(return) @identifier.function
-(break) @identifier.function
-(continue) @identifier.function
-(this) @identifier.function
-(form) @identifier.function
+(var) @keyword.construct
+(property) @keyword.construct
+(alias) @keyword.construct
+(declare) @keyword.construct
+(function) @keyword.construct
+
+(return) @keyword.condition
+(break) @keyword.condition
+(continue) @keyword.condition
+
+(if) @keyword.condition
+(else) @keyword.condition
+(end_if) @keyword.condition
+
+(this) @keyword.self
+(form) @keyword.self
+(super) @keyword.self
+
+; Functions
+(generic_function) @identifier.function
+(function_call) @identifier.method
 
 ; Variables
 
@@ -23,8 +39,9 @@
 (alias_block) @identifier.variable
 (return_block) @identifier.variable
 (assignment_block) @identifier.variable
-(function_call) @identifier.variable
-;(function_call) @identifier.variable
+(classic_compiler_block) @identifier.variable
+(ternary_block) @identifier.variable
+(if_block) @identifier.variable
 
 ; Compound Keywords
 
@@ -32,17 +49,18 @@
 (alias_name) @identifier.function
 (class_extends) @identifier.function
 (class_constructor) @identifier.function
+(class_extends) @identifier.function
 
 ; Constants
 
-(constant) @identifier.constant
+(constant) @identifier.property
 (interprocess_variable) @identifier.constant
 (system_variable) @identifier.constant
 (numeric_parameter) @identifier.constant
 
 ; Operators
 
-["(" ";" ":" ")" ":="] @operator
+[":=" ";" "?" ":" "(" ")"] @operator
 
 ;[
 ;	"+" "-" "*" "/"

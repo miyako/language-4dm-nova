@@ -2,10 +2,11 @@ const PREC = {
   
   /*
   
-  operator > statement > compound > token > classic > name > constant > keyword
+  comment > operator > statement > compound > token > classic > name > constant > keyword
   
   */
   
+  comment:    -12,
   operator:   -11,
   statement:  -10,
   compound:   -9,
@@ -34,27 +35,13 @@ module.exports = grammar({
       $.break, 
       $.continue,
       $.assignment_block,
-      $.function_call
+      $.function_call,
+      $.classic_compiler_block,
+      $.ternary_block,
+      $.if_block,
+      $.comment
     ),
-    value: $ => choice(
-      $.class,
-      $.local_variable,
-      $.interprocess_variable,
-      $.system_variable,
-      $.numeric_parameter,
-      $.constant,
-      $.this,
-      $.form
-    ),
-    constant: $ => choice(
-      $.time,
-      $.date,
-      $.number,
-      $.string
-    ),
-    
-    operator: $ => prec(PREC.operator, choice(":=")),    
-        
+                
     _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,
     _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,
     _get: $ => /(g|G)(e|E)(t|T)/,
@@ -80,34 +67,79 @@ module.exports = grammar({
       optional($._scope), $.function, optional($._computed), $._name
       )
     ),    
-    _function_argument: $ => seq($.local_variable, optional(repeat(seq(';', $.local_variable))), ':', $.class),
+    _function_argument: $ => seq($.local_variable, repeat(seq(';', $.local_variable)), ':', $.class),
     function_arguments: $ => seq('(', optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), ')'),
     function_result: $ => seq('->', $._function_argument),
     alias_name: $ => prec(PREC.compound, seq($.alias, $._name)), 
+
+    /*
+    operator
+    */
+    
+    _binary_operator: $ => prec(PREC.operator, 
+      choice('+', '-', '*', '/', 
+      '&&', '||', '&', '|', 
+      '^', '~|', '<', 
+      '>', '=', '#', '<<', '>>', 
+      '??', '?+', '?-', 
+      '+=', '-=', '*=', '/=')
+    ),  
     
     /*
     token
     */
 
     class: $ => prec(PREC.token, choice($._basic_type, $._class)),
-    local_variable: $ => prec(PREC.token, seq('$', $._classic_name)),
+    local_variable: $ => prec(PREC.token, seq('$', $._classic_name, optional(seq('[', $._single_condition, ']')))),
     interprocess_variable: $ => prec(PREC.token, seq('<>', $._classic_name)),
-    _variable: $ => choice($.local_variable, $.interprocess_variable, $.numeric_parameter, $.this),
+    numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),    
+    _variable: $ => choice($.local_variable, $.interprocess_variable, $.numeric_parameter),
     _mutable: $ => choice(
       $._variable,
-      seq($._variable, '.', $._name, repeat(seq('.', $._name)))
+      seq(choice($._variable, $.this, $.form), '.', $._name, repeat(seq('.', $._name)), optional(seq('[', $._single_condition, ']')))
     ),
-    numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),
-    /* 
-    use this for blocks that should default to process variable
-    */
-    _expression_name: $=> choice($.value, seq($._name, repeat(seq('.', $._name)))),
+    _immutable: $ => choice(
+      $.constant,
+      $.system_variable,
+      $._class,
+      $.constant  
+    ),
+    
+    class_function: $ => seq(choice($._class, $.super), $._functional_expression),
+    generic_function: $ => seq($._mutable, $._functional_expression),
+        
+    _function_parameter: $ => prec(-1, choice(
+      '*', 
+      '>', 
+      $._condition
+    )),
+        
     _functional_expression: $=> seq(
-      $._expression_name, 
       '(', 
-      optional(choice($._functional_expression, seq($._functional_expression, repeat(seq(';', $._functional_expression))))), 
-      ')'),
-    _expression: $=> prec.right(choice($._expression_name, $._functional_expression)),
+      optional($._function_parameter),
+      repeat(seq(';', $._function_parameter)),
+      ')'
+    ),
+    
+    _function_call: $ => choice($.class_function, $.generic_function),
+    
+    _single_condition: $ => choice($._mutable, $._immutable, $._function_call),    
+    /*
+    expression that returns a value
+    */
+    _condition: $ => prec.right(choice(
+      $._single_condition, 
+      seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
+    )),
+    
+    ternary_block: $ => prec(PREC.compound, seq(
+      $._condition,
+      '?',
+      $._condition,
+      ':',
+      $._condition
+    )),
+    
     /* 
     constant
     */
@@ -118,7 +150,9 @@ module.exports = grammar({
     date: $ => prec(PREC.constant,
       choice(
       seq('!', /[0-9]{2,4}/, '-', /[0-9]{2}/, '-', /[0-9]{2}/, '!'),
-      seq('!', /[0-9]{2}/, '-', /[0-9]{2}/, '-', /[0-9]{2,4}/, '!'))
+      seq('!', /[0-9]{2}/, '-', /[0-9]{2}/, '-', /[0-9]{2,4}/, '!'),
+      '!00-00-00!'
+      )
     ),
     _hex_literal: $ => /0[xX][0-9a-fA-F]+/,
     _dec_literal: $ => /[0-9]+/,
@@ -132,15 +166,20 @@ module.exports = grammar({
       repeat(choice('\\r', '\\n', '\\"', '\\t', '\\\\', '\\"', /[^"]/)), 
       '"')
     ),
-    
-    function_parameters: $ => seq('(', optional(choice($._expression, seq($._expression, repeat(seq(';', $._expression))))), ')'),
-    
+    constant: $ => choice(
+      $.time,
+      $.date,
+      $.number,
+      $.string
+    ),
+        
     /* 
     statements
     */
     
-    _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
+    //must be ordered alphabetically
     _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
+    _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
     
     function_block: $ => prec(PREC.statement, seq(
       $.function_name,
@@ -163,8 +202,8 @@ module.exports = grammar({
     ),
     
     class_extends: $ => prec(PREC.statement, seq(
-      $.class_extends, 
-      $.class
+      $._class_extends,
+      choice($._name, $._class)
       )
     ),
     
@@ -181,6 +220,16 @@ module.exports = grammar({
       $.class)
     ),
     
+    classic_compiler_block: $ => prec(PREC.statement, seq(
+      $.classic_compiler, 
+      seq(
+        '(', 
+        choice($.local_variable, $._name), 
+        repeat(seq(';', choice($.local_variable, $._name))), 
+        ')')
+      )
+    ),
+    
     property_declaration_block: $ => prec(PREC.statement, seq(
       $.property,
       $._name, 
@@ -191,22 +240,19 @@ module.exports = grammar({
     
     return_block: $ => prec(PREC.statement, seq(
       $.return, 
-      $._expression
+      $._single_condition
       )
     ),
         
     assignment_block: $ => prec(PREC.statement, seq(
       $._mutable,
       ':=',
-      $._expression
+      choice($._single_condition, $.ternary_block)
       )
     ),
     
-    function_call: $ => seq(
-      $._mutable,
-      $.function_parameters
-    ),
-        
+    function_call: $ => prec(PREC.statement, $._function_call),
+  
     /* 
     keyword
     */
@@ -233,14 +279,18 @@ module.exports = grammar({
     
     _this: $ => /(t|T)(h|H)(i|I)(s|S)/,
     _form: $ => /(f|F)(o|O)(r|R)(m|M)/,
-       
-    this: $ => prec(PREC.keyword, $._this),   
-    form: $ => prec(PREC.keyword, $._form),  
+    _super: $ => /(s|S)(u|U)(p|P)(e|E)(r|R)/,
+           
+    this: $ => prec(PREC.keyword, seq($._this, $.command_suffix)),   
+    form: $ => prec(PREC.keyword, seq($._form, $.command_suffix)),  
+    super: $ => prec(PREC.keyword, seq($._super, $.command_suffix)), 
+    
+    _generic_command: $ => prec(PREC.keyword, seq($._name, $.command_suffix)), 
         
     _class_store_4d: $ => /[4](d|D)/,
     _class_store_ds: $ => /(d|D)(s|S)/,
     _class_store_cs: $ => /(c|C)(s|S)/,
-    _class_store: $ => prec(PREC.keyword, choice($._class_store_4d, $._class_store_ds, $._class_store_cs)),
+    _class_store: $ => prec(PREC.keyword, seq(choice($._class_store_4d, $._class_store_ds, $._class_store_cs), $.command_suffix)),
     _class: $ => prec(PREC.keyword, seq($._class_store, repeat(seq('.', $._name)))),
     _basic_type_text: $ => /(t|T)(e|E)(x|X)(t|T)/,
     _basic_type_date: $ => /(d|D)(a|A)(t|T)(e|E)/,
@@ -297,9 +347,59 @@ module.exports = grammar({
       $._system_variable_keycode,
       $._system_variable_modifiers,
       $._system_variable_mouseproc      
-    ))
+    )),
     
-  
-  }
+    _classic_compiler_longint: $ => seq(/(c|C)(_|_)(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
+    
+    classic_compiler: $ => prec(PREC.keyword, choice(
+      $._classic_compiler_longint
+      )
+    ),
+    
+    command_suffix: $ => prec(PREC.keyword, /(:C[0-9]+)?/),
+    
+    comment: $ => choice(
+        prec(PREC.comment,seq('//', /.*/)),
+        prec(PREC.comment,seq(
+          '/*',
+          /[^*]*\*+([^/*][^*]*\*+)*/,
+          '/'
+        ))
+    ),
+    _if_e: $ => /(i|I)(f|F)/,
+    _if_f: $ => /(s|S)(i|I)/,
+    if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
+    
+    _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
+    _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
+    else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
+    
+    _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
+    _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
+    end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
+    
+    /*
+    higher than function call
+    */
+    _if: $ => prec(PREC.statement, seq(
+        seq($.if, '(', $._condition, ')')
+    )),
+    
+    if_block: $ => prec(PREC.statement, seq(
+        $._if,
+        repeat(choice($._statement, seq($._statement, $.else, $._statement))),
+        $.end_if
+      )
+    )
+     
+  },
+
+  conflicts: $ => [
+/*
+    [$._single_condition, $._binary_operator],
+    [$._single_condition]
+*/
+  ]
+
   
 });
