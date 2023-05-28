@@ -71,7 +71,7 @@ $variable.prop:=$value
 $1.prop:=$value
 ```
 
-$ function call
+* function call
 
 **Note**: because of precendence ambiguity, function name can not be process variable
 
