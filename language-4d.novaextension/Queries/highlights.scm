@@ -5,7 +5,8 @@
 ; Variables
 
 (local_variable) @identifier.variable
-(interprocess_variable) @identifier
+(property_declaration_block) @identifier.variable
+(var_declaration_block) @identifier.variable
 (attribute) @identifier.variable
 
 ; Keywords
@@ -25,9 +26,11 @@
 
 ; Constants
 
-(constant) @identifier.constant
+;(constant) @identifier.constant
 
 ; Operators
+
+["(" ";" ":" ")"] @operator
 
 ;[
 ;	"+" "-" "*" "/"

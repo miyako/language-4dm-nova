@@ -62,25 +62,6 @@
     "fields": {}
   },
   {
-    "type": "declaration_block",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "class",
-          "named": true
-        },
-        {
-          "type": "local_variable",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "declare",
     "named": true,
     "fields": {}
@@ -210,6 +191,25 @@
     "fields": {}
   },
   {
+    "type": "property_declaration_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "class",
+          "named": true
+        },
+        {
+          "type": "property",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "source",
     "named": true,
     "fields": {},
@@ -217,10 +217,6 @@
       "multiple": true,
       "required": false,
       "types": [
-        {
-          "type": "alias",
-          "named": true
-        },
         {
           "type": "alias_name",
           "named": true
@@ -234,19 +230,7 @@
           "named": true
         },
         {
-          "type": "declaration_block",
-          "named": true
-        },
-        {
-          "type": "declare",
-          "named": true
-        },
-        {
           "type": "declare_block",
-          "named": true
-        },
-        {
-          "type": "function",
           "named": true
         },
         {
@@ -254,15 +238,11 @@
           "named": true
         },
         {
-          "type": "property",
+          "type": "property_declaration_block",
           "named": true
         },
         {
-          "type": "value",
-          "named": true
-        },
-        {
-          "type": "var",
+          "type": "var_declaration_block",
           "named": true
         }
       ]
@@ -317,6 +297,29 @@
     "type": "var",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "var_declaration_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "class",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "var",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": " ",
