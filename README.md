@@ -67,3 +67,8 @@ alias name name.name
 * assignment
 
 **Note**: because of precendence ambiguity, left operand can not be process variable
+
+```4d
+$variable.prop:=$value
+$1.prop:=$value
+```
