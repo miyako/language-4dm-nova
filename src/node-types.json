@@ -178,6 +178,10 @@
           "named": true
         },
         {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
           "type": "this",
           "named": true
         }
@@ -463,6 +467,10 @@
           "named": true
         },
         {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
           "type": "this",
           "named": true
         }
@@ -608,7 +616,53 @@
   {
     "type": "interprocess_variable",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "command_suffix",
+          "named": true
+        },
+        {
+          "type": "constant",
+          "named": true
+        },
+        {
+          "type": "form",
+          "named": true
+        },
+        {
+          "type": "generic_function",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "local_variable",
@@ -904,6 +958,10 @@
           "named": true
         },
         {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
           "type": "this",
           "named": true
         }
@@ -1127,11 +1185,19 @@
     "named": false
   },
   {
+    "type": "{",
+    "named": false
+  },
+  {
     "type": "|",
     "named": false
   },
   {
     "type": "||",
+    "named": false
+  },
+  {
+    "type": "}",
     "named": false
   },
   {

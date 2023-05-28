@@ -6,8 +6,9 @@ const PREC = {
   
   */
   
-  comment:    -12,
-  operator:   -11,
+  comment:    -100,
+  operator:   -12,
+  expression: -11,
   statement:  -10,
   compound:   -9,
   token:      -8,
@@ -90,49 +91,63 @@ module.exports = grammar({
     */
 
     class: $ => prec(PREC.token, choice($._basic_type, $._class)),
-    local_variable: $ => prec(PREC.token, seq('$', $._classic_name, optional(seq('[', $._single_condition, ']')))),
-    interprocess_variable: $ => prec(PREC.token, seq('<>', $._classic_name)),
+    /*
+    can be up to 2 dimensional
+    */
+    local_variable: $ => prec.right(PREC.token, seq('$', $._classic_name, optional(seq('{', $._single_condition, '}')))),
+    interprocess_variable: $ => prec.right(PREC.token, seq('<>', $._classic_name, optional(seq('{', $._single_condition, '}')))),
+    /*
+    add 1 more dimension
+    */    
     numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),    
-    _variable: $ => choice($.local_variable, $.interprocess_variable, $.numeric_parameter),
+    _variable: $ => seq(choice($.local_variable, $.interprocess_variable, $.numeric_parameter), optional(seq('{', $._single_condition, '}'))),
+    /*
+    property path or collection element
+    */
     _mutable: $ => choice(
       $._variable,
       seq(choice($._variable, $.this, $.form), '.', $._name, repeat(seq('.', $._name)), optional(seq('[', $._single_condition, ']')))
     ),
+    /* 
+    not allowed as left operand of assignment
+    */
     _immutable: $ => choice(
       $.constant,
       $.system_variable,
       $._class,
       $.constant  
     ),
-    
+    /* 
+    can't define process scope function call, too broad a pattern
+    */
     class_function: $ => seq(choice($._class, $.super), $._functional_expression),
     generic_function: $ => seq($._mutable, $._functional_expression),
-        
-    _function_parameter: $ => prec(-1, choice(
+    _function_parameter: $ => choice(
       '*', 
       '>', 
       $._condition
-    )),
-        
+    ),
     _functional_expression: $=> seq(
       '(', 
       optional($._function_parameter),
       repeat(seq(';', $._function_parameter)),
       ')'
     ),
-    
     _function_call: $ => choice($.class_function, $.generic_function),
     
     _single_condition: $ => choice($._mutable, $._immutable, $._function_call),    
     /*
-    expression that returns a value
+    basically an expression that returns a value
     */
     _condition: $ => prec.right(choice(
+      prec(PREC.expression, $.ternary_block),
       $._single_condition, 
       seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
     )),
-    
-    ternary_block: $ => prec(PREC.compound, seq(
+    /* 
+    likewise but can not be combined with a binary operator
+    */
+    ternary_block: $ => prec.left(seq(
       $._condition,
       '?',
       $._condition,
@@ -369,22 +384,15 @@ module.exports = grammar({
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
     if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
-    
     _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
     _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
     else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
-    
     _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
     _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
     end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
-    
-    /*
-    higher than function call
-    */
     _if: $ => prec(PREC.statement, seq(
         seq($.if, '(', $._condition, ')')
     )),
-    
     if_block: $ => prec(PREC.statement, seq(
         $._if,
         repeat(choice($._statement, seq($._statement, $.else, $._statement))),
