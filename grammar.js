@@ -2,19 +2,18 @@ const PREC = {
   
   /*
   
-  statement > compound > token > classic > name > constant > keyword > variable > attribute
+  operator > statement > compound > token > classic > name > constant > keyword
   
   */
   
+  operator:   -11,
   statement:  -10,
   compound:   -9,
   token:      -8,
   classic:    -7,
   name:       -6,
   constant:   -5,
-  keyword:    -4,
-  variable:   -3,
-  attribute:  -2
+  keyword:    -4
 }
   
 module.exports = grammar({
@@ -29,22 +28,19 @@ module.exports = grammar({
       $.class_constructor,
       $.var_declaration_block,
       $.property_declaration_block,
-      $.alias_name
-    ),
-    _token: $ => choice(
-      $.var,
-      $.property,
-      $.alias,
-      $.declare,
-      $.function,
-      $.value
+      $.alias_block,
+      $.return_block,
+      $.return,
+      $.break, 
+      $.continue,
+      $.assignment_block
     ),
     value: $ => choice(
       $.class,
       $.local_variable,
       $.interprocess_variable,
-      $.attribute,
-      $.variable,
+      $.system_variable,
+      $.numeric_parameter,
       $.constant
     ),
     constant: $ => choice(
@@ -53,16 +49,15 @@ module.exports = grammar({
       $.number,
       $.string
     ),
+    
+    operator: $ => prec(PREC.operator, choice(":=")),    
         
-    _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
-    _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
-    _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
     _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,
     _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,
-    _get: $ => / (g|G)(e|E)(t|T)/,
-    _set: $ => / (s|S)(e|E)(t|T)/,
-    _query: $ => / (q|Q)(u|U)(e|E)(r|R)(y|Y)/,
-    _orderBy: $ => / (o|O)(r|R)(d|D)(e|E)(r|R)(b|B)(y|Y)/,
+    _get: $ => /(g|G)(e|E)(t|T)/,
+    _set: $ => /(s|S)(e|E)(t|T)/,
+    _query: $ => /(q|Q)(u|U)(e|E)(r|R)(y|Y)/,
+    _orderBy: $ => /(o|O)(r|R)(d|D)(e|E)(r|R)(b|B)(y|Y)/,
     _computed: $ => choice($._get, $._set, $._query, $._orderBy),
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
     _letter: $ => /[\p{Letter}_]/,
@@ -78,12 +73,14 @@ module.exports = grammar({
       )
     ),
     
-    function_name: $ => prec(PREC.compound, seq(optional($._scope), $.function, optional($._computed), $._name)),    
+    function_name: $ => prec(PREC.compound, seq(
+      optional($._scope), $.function, optional($._computed), $._name
+      )
+    ),    
     _function_argument: $ => seq($.local_variable, optional(repeat(seq(';', $.local_variable))), ':', $.class),
     function_arguments: $ => seq('(', optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), ')'),
     function_result: $ => seq('->', $._function_argument),
-    
-    alias_name: $ => prec(PREC.compound, seq($.alias, $._name, $._name, repeat(seq(".", $._name)))), 
+    alias_name: $ => prec(PREC.compound, seq($.alias, $._name)), 
     
     /*
     token
@@ -92,14 +89,16 @@ module.exports = grammar({
     class: $ => prec(PREC.token, choice($._basic_type, $._class)),
     local_variable: $ => prec(PREC.token, seq('$', $._classic_name)),
     interprocess_variable: $ => prec(PREC.token, seq('<>', $._classic_name)),
-    _variable: $ => choice($.local_variable, $.interprocess_variable),
-    
-    /*
-    working on these
+    _variable: $ => choice($.local_variable, $.interprocess_variable, $.numeric_parameter, $.this),
+    _mutable: $ => choice(
+      $._variable,
+      seq($._variable, '.', $._name, repeat(seq('.', $._name)))
+    ),
+    numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),
+    /* 
+    use this for blocks that should default to process variable
     */
-    
-    attribute: $ => "attribute", 
-    variable: $ => "variable",  
+    _expression: $=> choice($.value, seq($._name, repeat(seq('.', $._name)))),
     /* 
     constant
     */
@@ -129,6 +128,9 @@ module.exports = grammar({
     statements
     */
     
+    _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
+    _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
+    
     function_block: $ => prec(PREC.statement, seq(
       $.function_name,
       $.function_arguments,
@@ -136,7 +138,6 @@ module.exports = grammar({
       )
     ),
 
-    
     declare_block: $ => prec(PREC.statement, seq(
       $.declare,
       $.function_arguments,
@@ -144,11 +145,23 @@ module.exports = grammar({
       )
     ),
     
-    class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
-    _class_extends: $ => seq($.class_extends, ' ', $.class),
-    class_constructor: $ => prec(PREC.statement, seq(/((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/)),
-    class_constructor_block: $ => prec(PREC.statement, choice($._class_extends, $.class_constructor)),
+    alias_block: $ => prec(PREC.statement, seq(
+      $.alias_name,
+      seq($._name, repeat(seq('.', $._name)))
+      )
+    ),
     
+    class_extends: $ => prec(PREC.statement, seq(
+      $.class_extends, 
+      $.class
+      )
+    ),
+    
+    class_constructor: $ => prec(PREC.statement, seq(
+      $._class_constructor
+      )
+    ),
+        
     var_declaration_block: $ => prec(PREC.statement, seq(
       $.var, 
       choice($._name, $.local_variable), 
@@ -158,29 +171,55 @@ module.exports = grammar({
     ),
     
     property_declaration_block: $ => prec(PREC.statement, seq(
-      $.property, 
+      $.property,
       $._name, 
       repeat(seq(';', $._name)), 
       ':', 
       $.class)
     ),
+    
+    return_block: $=> prec(PREC.statement, seq(
+      $.return, 
+      $._expression
+      )
+    ),
+        
+    assignment_block: $=> seq(
+      $._mutable,
+      ':=',
+      $._expression
+    ),
         
     /* 
     keyword
     */
-    
+        
     _var: $ => /(v|V)(a|A)(r|R)/,
     _property: $ => /(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)/,        
     _alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S)/,    
     _declare: $ => /#(d|D)(e|E)(c|C)(l|L)(a|A)(r|R)(e|E)/,
     _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/, 
     
-    var : $ => prec(PREC.keyword, $._var),
-    property : $ => prec(PREC.keyword, $._property),
-    alias : $ => prec(PREC.keyword, $._alias),
-    declare : $ => prec(PREC.keyword, $._declare),
-    function : $ => prec(PREC.keyword, $._function),
+    var: $ => prec(PREC.keyword, $._var),
+    property: $ => prec(PREC.keyword, $._property),
+    alias: $ => prec(PREC.keyword, $._alias),
+    declare: $ => prec(PREC.keyword, $._declare),
+    function: $ => prec(PREC.keyword, $._function),
     
+    _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
+    _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
+    _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
+    
+    return: $ => prec(PREC.keyword, $._return),
+    break: $ => prec(PREC.keyword, $._break),
+    continue: $ => prec(PREC.keyword, $._continue),
+    
+    _this: $ => /(t|T)(h|H)(i|I)(s|S)/,
+    _form: $ => /(f|F)(o|O)(r|R)(m|M)/,
+       
+    this: $ => prec(PREC.keyword, $._this),   
+    form: $ => prec(PREC.keyword, $._form),  
+        
     _class_store_4d: $ => /[4](d|D)/,
     _class_store_ds: $ => /(d|D)(s|S)/,
     _class_store_cs: $ => /(c|C)(s|S)/,
@@ -211,8 +250,39 @@ module.exports = grammar({
       $._basic_type_collection,
       $._basic_type_variant,
       $._basic_type_object
-    )
-
+    ),
+    _system_variable_ok: $ => /(o|O)(k|K)/,
+    _system_variable_document: $ => /(d|D)(o|O)(c|C)(u|U)(m|M)(e|E)(n|N)(t|T)/,
+    _system_variable_flddelimit: $ => /(f|F)(l|L)(d|D)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
+    _system_variable_recdelimit: $ => /(r|R)(e|E)(c|C)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
+    _system_variable_error: $ => /(e|E)(r|R)(r|R)(o|O)(r|R)/,
+    _system_variable_error_method: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (m|M)(e|E)(t|T)(h|H)(o|O)(d|D)/,
+    _system_variable_error_line: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (l|L)(i|I)(n|N)(e|E)/,
+    _system_variable_error_formula: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (f|F)(o|O)(r|R)(m|M)(u|U)(l|L)(a|A)/,
+    _system_variable_mousedown: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(d|D)(o|O)(w|W)(n|N)/,
+    _system_variable_mousex: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(x|X)/,
+    _system_variable_mousey: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(y|Y)/,
+    _system_variable_keycode: $ => /(k|K)(e|E)(y|Y)(c|C)(o|O)(d|D)(e|E)/,
+    _system_variable_modifiers: $ => /(m|M)(o|O)(d|D)(i|I)(f|F)(i|I)(e|E)(r|R)(s|S)/,
+    _system_variable_mouseproc: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(p|P)(r|R)(o|O)(c|C)/,
+    system_variable: $ => prec(PREC.keyword, choice(
+      $._system_variable_ok,
+      $._system_variable_document,
+      $._system_variable_flddelimit,
+      $._system_variable_recdelimit,
+      $._system_variable_error,
+      $._system_variable_error_method,
+      $._system_variable_error_line,
+      $._system_variable_error_formula,
+      $._system_variable_mousedown,
+      $._system_variable_mousex,
+      $._system_variable_mousey,
+      $._system_variable_keycode,
+      $._system_variable_modifiers,
+      $._system_variable_mouseproc      
+    ))
+    
+  
   }
   
 });

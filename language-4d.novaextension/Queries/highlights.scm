@@ -2,13 +2,6 @@
 
 (class) @identifier.type.class
 
-; Variables
-
-(local_variable) @identifier.variable
-(property_declaration_block) @identifier.variable
-(var_declaration_block) @identifier.variable
-(attribute) @identifier.variable
-
 ; Keywords
 
 (var) @identifier.function
@@ -16,6 +9,20 @@
 (alias) @identifier.function
 (declare) @identifier.function
 (function) @identifier.function
+(return) @identifier.function
+(break) @identifier.function
+(continue) @identifier.function
+(this) @identifier.function
+(form) @identifier.function
+
+; Variables
+
+(local_variable) @identifier.variable
+(property_declaration_block) @identifier.variable
+(var_declaration_block) @identifier.variable
+(alias_block) @identifier.variable
+(return_block) @identifier.variable
+(assignment_block) @identifier.variable
 
 ; Compound Keywords
 
@@ -26,11 +33,14 @@
 
 ; Constants
 
-;(constant) @identifier.constant
+(constant) @identifier.constant
+(interprocess_variable) @identifier.constant
+(system_variable) @identifier.constant
+(numeric_parameter) @identifier.constant
 
 ; Operators
 
-["(" ";" ":" ")"] @operator
+["(" ";" ":" ")" ":="] @operator
 
 ;[
 ;	"+" "-" "*" "/"
