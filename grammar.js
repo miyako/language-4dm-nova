@@ -33,7 +33,8 @@ module.exports = grammar({
       $.return,
       $.break, 
       $.continue,
-      $.assignment_block
+      $.assignment_block,
+      $.function_call
     ),
     value: $ => choice(
       $.class,
@@ -41,7 +42,9 @@ module.exports = grammar({
       $.interprocess_variable,
       $.system_variable,
       $.numeric_parameter,
-      $.constant
+      $.constant,
+      $.this,
+      $.form
     ),
     constant: $ => choice(
       $.time,
@@ -98,7 +101,13 @@ module.exports = grammar({
     /* 
     use this for blocks that should default to process variable
     */
-    _expression: $=> choice($.value, seq($._name, repeat(seq('.', $._name)))),
+    _expression_name: $=> choice($.value, seq($._name, repeat(seq('.', $._name)))),
+    _functional_expression: $=> seq(
+      $._expression_name, 
+      '(', 
+      optional(choice($._functional_expression, seq($._functional_expression, repeat(seq(';', $._functional_expression))))), 
+      ')'),
+    _expression: $=> prec.right(choice($._expression_name, $._functional_expression)),
     /* 
     constant
     */
@@ -123,6 +132,8 @@ module.exports = grammar({
       repeat(choice('\\r', '\\n', '\\"', '\\t', '\\\\', '\\"', /[^"]/)), 
       '"')
     ),
+    
+    function_parameters: $ => seq('(', optional(choice($._expression, seq($._expression, repeat(seq(';', $._expression))))), ')'),
     
     /* 
     statements
@@ -178,16 +189,22 @@ module.exports = grammar({
       $.class)
     ),
     
-    return_block: $=> prec(PREC.statement, seq(
+    return_block: $ => prec(PREC.statement, seq(
       $.return, 
       $._expression
       )
     ),
         
-    assignment_block: $=> seq(
+    assignment_block: $ => prec(PREC.statement, seq(
       $._mutable,
       ':=',
       $._expression
+      )
+    ),
+    
+    function_call: $ => seq(
+      $._mutable,
+      $.function_parameters
     ),
         
     /* 

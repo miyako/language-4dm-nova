@@ -23,6 +23,8 @@
 (alias_block) @identifier.variable
 (return_block) @identifier.variable
 (assignment_block) @identifier.variable
+(function_call) @identifier.variable
+;(function_call) @identifier.variable
 
 ; Compound Keywords
 
