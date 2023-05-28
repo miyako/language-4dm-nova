@@ -165,6 +165,11 @@
     }
   },
   {
+    "type": "form",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "function",
     "named": true,
     "fields": {}
@@ -212,6 +217,37 @@
     }
   },
   {
+    "type": "function_call",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "function_parameters",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "function_name",
     "named": true,
     "fields": {},
@@ -221,6 +257,21 @@
       "types": [
         {
           "type": "function",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "function_parameters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "value",
           "named": true
         }
       ]
@@ -354,6 +405,10 @@
           "named": true
         },
         {
+          "type": "function_call",
+          "named": true
+        },
+        {
           "type": "property_declaration_block",
           "named": true
         },
@@ -409,6 +464,10 @@
           "named": true
         },
         {
+          "type": "form",
+          "named": true
+        },
+        {
           "type": "interprocess_variable",
           "named": true
         },
@@ -422,6 +481,10 @@
         },
         {
           "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "this",
           "named": true
         }
       ]
