@@ -51,8 +51,15 @@ class extends 4D.Entity
 
 ```4d
 var $a; $b : Text
-property $a; $b : Text
 ```
+
+* properties
+
+```4d
+property a; b : Text
+```
+
+## NG
 
 * alias attribute
 
@@ -61,4 +68,4 @@ alias name name
 alias name name.name
 ```
 
-> no good pattern matching for attribute or process variable that does not negate ecisting tokens
+> no good pattern matching for attribute or process variable that does not negate existing tokens
