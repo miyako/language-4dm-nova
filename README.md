@@ -63,3 +63,7 @@ property a; b : Text
 alias name name
 alias name name.name
 ```
+
+* assignment
+
+**Note**: because of precendence ambiguity, left operand can not be process variable
