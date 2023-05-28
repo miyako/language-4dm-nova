@@ -57,9 +57,7 @@ var $a; $b : Text
 property a; b : Text
 ```
 
-## NG
-
-* alias attribute
+* alias
 
 ```4d
 alias name name
