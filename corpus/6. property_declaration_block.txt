@@ -1,0 +1,16 @@
+==================
+6. property_declaration_block
+==================
+
+property a : Text
+property a; b : Text
+
+---
+
+(source
+  (property_declaration_block
+    (property)
+    (class))
+  (property_declaration_block
+    (property)
+    (class)))

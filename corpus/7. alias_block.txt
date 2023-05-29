@@ -1,0 +1,16 @@
+==================
+7. alias_block
+==================
+
+alias name name
+alias name name.name
+
+---
+
+(source
+  (alias_block
+    (alias_name
+      (alias)))
+  (alias_block
+    (alias_name
+      (alias))))

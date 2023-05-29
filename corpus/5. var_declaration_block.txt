@@ -1,0 +1,19 @@
+==================
+5. var_declaration_block
+==================
+
+var $a : Text
+var $a; $b : Text
+
+---
+
+(source
+  (var_declaration_block
+    (var)
+    (local_variable)
+    (class))
+  (var_declaration_block
+    (var)
+    (local_variable)
+    (local_variable)
+    (class)))
