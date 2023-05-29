@@ -9,7 +9,7 @@ tree-sitter generate
 ./compile_parser.sh . /Applications/Nova.app
 ```
 
-## the `4dlang` tree-sitter parser
+## the `fourd` tree-sitter parser
 
 * `source` is a series of `_statement`.
 
