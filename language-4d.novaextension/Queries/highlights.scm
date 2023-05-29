@@ -2,7 +2,9 @@
 
 (class) @identifier.type.class
 (classic_compiler) @identifier.type.class
+(classic_array) @identifier.type.class
 (class_function) @identifier.type.class
+
 ; Comment
 (comment) @comment
 (command_suffix) @comment

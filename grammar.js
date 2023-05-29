@@ -34,7 +34,7 @@ module.exports = grammar({
       $.assignment_block,
       $.function_call,
       $.classic_compiler_block,
-      $.ternary_block,
+      $.classic_array_block,
       $.return_block,
       $.return,
       $.break, 
@@ -246,6 +246,18 @@ module.exports = grammar({
       )
     ),
     
+    classic_array_block: $ => prec(PREC.statement, seq(
+      $.classic_array, 
+      seq(
+        '(', 
+        choice($.local_variable, $._name), 
+        seq(';', choice($.local_variable, $._name, /[0-9]+/)), 
+        optional(seq(';', choice($.local_variable, $._name, /[0-9]+/))),
+        ')')
+      )
+    ),
+    
+    
     property_declaration_block: $ => prec(PREC.statement, seq(
       $.property,
       $._name, 
@@ -365,10 +377,59 @@ module.exports = grammar({
       $._system_variable_mouseproc      
     )),
     
+    _classic_compiler_blob: $ => seq(/(c|C)(_|_)(b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
+    _classic_compiler_boolean: $ => seq(/(c|C)(_|_)(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
+    _classic_compiler_collection: $ => seq(/(c|C)(_|_)(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, $.command_suffix),
+    _classic_compiler_date: $ => seq(/(c|C)(_|_)(d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
     _classic_compiler_longint: $ => seq(/(c|C)(_|_)(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
+    _classic_compiler_object: $ => seq(/(c|C)(_|_)(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
+    _classic_compiler_picture: $ => seq(/(c|C)(_|_)(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
+    _classic_compiler_pointer: $ => seq(/(c|C)(_|_)(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
+    _classic_compiler_real: $ => seq(/(c|C)(_|_)(r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
+    _classic_compiler_text: $ => seq(/(c|C)(_|_)(t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
+    _classic_compiler_time: $ => seq(/(c|C)(_|_)(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
+    _classic_compiler_variant: $ => seq(/(c|C)(_|_)(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/, $.command_suffix),
     
     classic_compiler: $ => prec(PREC.keyword, choice(
-      $._classic_compiler_longint
+      $._classic_compiler_blob,
+      $._classic_compiler_boolean,
+      $._classic_compiler_collection,
+      $._classic_compiler_date,
+      $._classic_compiler_longint,
+      $._classic_compiler_object,
+      $._classic_compiler_picture,
+      $._classic_compiler_pointer,
+      $._classic_compiler_real,
+      $._classic_compiler_text,
+      $._classic_compiler_time,
+      $._classic_compiler_variant
+      )
+    ),
+    
+    _classic_array_blob: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
+    _classic_array_boolean: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
+    _classic_array_date: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
+    _classic_array_integer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (i|I)(n|N)(t|T)(e|E)(g|G)(e|E)(r|R)/, $.command_suffix),
+    _classic_array_longint: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
+    _classic_array_object: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
+    _classic_array_picture: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
+    _classic_array_pointer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
+    _classic_array_real: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
+    _classic_array_text: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
+    _classic_array_time: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y)( | )(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
+
+classic_array: $ => prec(PREC.keyword, choice(
+      $._classic_array_blob,
+      $._classic_array_boolean,
+      $._classic_array_date,
+      $._classic_array_integer,
+      $._classic_array_longint,
+      $._classic_array_object,
+      $._classic_array_picture,
+      $._classic_array_pointer,
+      $._classic_array_real,
+      $._classic_array_text,
+      $._classic_array_time
       )
     ),
     

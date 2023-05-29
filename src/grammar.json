@@ -53,7 +53,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "ternary_block"
+          "name": "classic_array_block"
         },
         {
           "type": "SYMBOL",
@@ -1458,6 +1458,105 @@
         ]
       }
     },
+    "classic_array_block": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "classic_array"
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "("
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "local_variable"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_name"
+                  }
+                ]
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ";"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "local_variable"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_name"
+                      },
+                      {
+                        "type": "PATTERN",
+                        "value": "[0-9]+"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": ";"
+                      },
+                      {
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "local_variable"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "_name"
+                          },
+                          {
+                            "type": "PATTERN",
+                            "value": "[0-9]+"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              },
+              {
+                "type": "STRING",
+                "value": ")"
+              }
+            ]
+          }
+        ]
+      }
+    },
     "property_declaration_block": {
       "type": "PREC",
       "value": -10,
@@ -2023,12 +2122,155 @@
         ]
       }
     },
+    "_classic_compiler_blob": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(b|B)(l|L)(o|O)(b|B)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_boolean": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_collection": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_date": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(d|D)(a|A)(t|T)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
     "_classic_compiler_longint": {
       "type": "SEQ",
       "members": [
         {
           "type": "PATTERN",
           "value": "(c|C)(_|_)(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_object": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_picture": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_pointer": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_real": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(r|R)(e|E)(a|A)(l|L)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_text": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(t|T)(e|E)(x|X)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_time": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(t|T)(i|I)(m|M)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_compiler_variant": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(c|C)(_|_)(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)"
         },
         {
           "type": "SYMBOL",
@@ -2044,7 +2286,247 @@
         "members": [
           {
             "type": "SYMBOL",
+            "name": "_classic_compiler_blob"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_boolean"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_collection"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_date"
+          },
+          {
+            "type": "SYMBOL",
             "name": "_classic_compiler_longint"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_object"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_picture"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_pointer"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_real"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_text"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_time"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_compiler_variant"
+          }
+        ]
+      }
+    },
+    "_classic_array_blob": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(l|L)(o|O)(b|B)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_boolean": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_date": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (d|D)(a|A)(t|T)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_integer": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (i|I)(n|N)(t|T)(e|E)(g|G)(e|E)(r|R)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_longint": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_object": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (o|O)(b|B)(j|J)(e|E)(c|C)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_picture": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_pointer": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_real": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (r|R)(e|E)(a|A)(l|L)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_text": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y) (t|T)(e|E)(x|X)(t|T)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "_classic_array_time": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "(a|A)(r|R)(r|R)(a|A)(y|Y)( | )(t|T)(i|I)(m|M)(e|E)"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
+        }
+      ]
+    },
+    "classic_array": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_blob"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_boolean"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_date"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_integer"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_longint"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_object"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_picture"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_pointer"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_real"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_text"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_classic_array_time"
           }
         ]
       }
