@@ -145,6 +145,7 @@ module.exports = grammar({
       prec(PREC.expression, $.ternary_block),
       $._single_condition,  
       $.object_literal_block,
+      $.collection_literal_block,
       seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
     )),
     /* 
@@ -157,13 +158,16 @@ module.exports = grammar({
       ':',
       $._condition
     )),
-    object_literal_block: $ => prec.left(seq(
-      '{',
-      $._name,
-      ':',
-      $._condition,
-      '}'
-    )),
+    object_literal_block: $ => prec.left(
+      choice('{}',
+      seq('{', $._name, ':', $._condition, '}')
+      ) 
+    ),
+    collection_literal_block: $ => prec.left(
+      choice('[]', 
+      seq('[', $._condition, repeat(seq(';', $._condition)), ']')
+      )
+    ),
     
     /* 
     constant

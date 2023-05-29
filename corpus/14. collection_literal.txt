@@ -1,0 +1,22 @@
+==================
+14. collection_literal
+==================
+
+$object:=[$test;$test]
+$object:=[$test;[$test;$test]]
+
+---
+
+(source
+  (assignment_block
+    (local_variable)
+    (collection_literal_block
+      (local_variable)
+      (local_variable)))
+  (assignment_block
+    (local_variable)
+    (collection_literal_block
+      (local_variable)
+      (collection_literal_block
+        (local_variable)
+        (local_variable)))))
