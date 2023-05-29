@@ -19,29 +19,11 @@ tree-sitter generate
 * [`declare_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/2.%20declare_block.txt)
 * [`class_constructor`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/3.%20class_constructor.txt)
 * [`class_extends`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/4.%20class_extends.txt)
- 
+* [`var_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/5.%20var_declaration_block.txt) 
+* [`property_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/6.%20property_declaration_block.txt) 
+* [`alias_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/7.%20alias_block.txt)  
 
-
-* local variables
-
-```4d
-var $a; $b : Text
-```
-
-* properties
-
-```4d
-property a; b : Text
-```
-
-* alias
-
-```4d
-alias name name
-alias name name.name
-```
-
-* assignment
+---
 
 **Note**: because of precendence ambiguity, left operand can not be process variable
 
