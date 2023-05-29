@@ -23,7 +23,7 @@ tree-sitter generate
 * [`property_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/6.%20property_declaration_block.txt) 
 * [`alias_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/7.%20alias_block.txt)  
 
-* assignment
+---
 
 **Note**: because of precendence ambiguity, left operand can not be process variable
 
