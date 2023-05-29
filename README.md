@@ -9,6 +9,8 @@ tree-sitter generate
 ./compile_parser.sh . /Applications/Nova.app
 ```
 
+## the `4dlang` tree-sitter parser
+
 ## features
 
 language-4d currently supports the following features:
