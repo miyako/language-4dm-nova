@@ -77,6 +77,14 @@
         },
         {
           "type": "SYMBOL",
+          "name": "repeat_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "while_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "sql_injection_block"
         },
         {
@@ -2908,6 +2916,110 @@
         ]
       }
     },
+    "_end_while_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)"
+    },
+    "_end_while_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)"
+    },
+    "end_while": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_while_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_while_f"
+          }
+        ]
+      }
+    },
+    "_while": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "while"
+              },
+              {
+                "type": "STRING",
+                "value": "("
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_condition"
+              },
+              {
+                "type": "STRING",
+                "value": ")"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "while_block": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_while"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_statement"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "end_while"
+          }
+        ]
+      }
+    },
+    "_repeat_e": {
+      "type": "PATTERN",
+      "value": "(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)"
+    },
+    "_repeat_f": {
+      "type": "PATTERN",
+      "value": "(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)"
+    },
+    "repeat": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_repeat_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_repeat_f"
+          }
+        ]
+      }
+    },
     "_until_e": {
       "type": "PATTERN",
       "value": "(u|U)(n|N)(t|T)(i|I)(l|L)"
@@ -2929,6 +3041,60 @@
           {
             "type": "SYMBOL",
             "name": "_until_f"
+          }
+        ]
+      }
+    },
+    "_until": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "until"
+              },
+              {
+                "type": "STRING",
+                "value": "("
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_condition"
+              },
+              {
+                "type": "STRING",
+                "value": ")"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "repeat_block": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "repeat"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_statement"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_until"
           }
         ]
       }
@@ -3029,56 +3195,6 @@
           {
             "type": "SYMBOL",
             "name": "_end_use_f"
-          }
-        ]
-      }
-    },
-    "_repeat_e": {
-      "type": "PATTERN",
-      "value": "(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)"
-    },
-    "_repeat_f": {
-      "type": "PATTERN",
-      "value": "(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)"
-    },
-    "repeat": {
-      "type": "PREC",
-      "value": -4,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_repeat_e"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_repeat_f"
-          }
-        ]
-      }
-    },
-    "_end_while_e": {
-      "type": "PATTERN",
-      "value": "(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)"
-    },
-    "_end_while_f": {
-      "type": "PATTERN",
-      "value": "(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)"
-    },
-    "end_while": {
-      "type": "PREC",
-      "value": -4,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_end_while_e"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_end_while_f"
           }
         ]
       }

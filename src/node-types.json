@@ -436,6 +436,11 @@
     "fields": {}
   },
   {
+    "type": "end_while",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "form",
     "named": true,
     "fields": {},
@@ -735,6 +740,10 @@
           "named": true
         },
         {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
           "type": "return",
           "named": true
         },
@@ -760,6 +769,10 @@
         },
         {
           "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
           "named": true
         }
       ]
@@ -965,6 +978,162 @@
     }
   },
   {
+    "type": "repeat",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "repeat_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "assignment_block",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "collection_literal_block",
+          "named": true
+        },
+        {
+          "type": "command_suffix",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "constant",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "form",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "function_call",
+          "named": true
+        },
+        {
+          "type": "generic_function",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "object_literal_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "repeat",
+          "named": true
+        },
+        {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        },
+        {
+          "type": "until",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "return",
     "named": true,
     "fields": {}
@@ -1089,6 +1258,10 @@
           "named": true
         },
         {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
           "type": "return",
           "named": true
         },
@@ -1102,6 +1275,10 @@
         },
         {
           "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
           "named": true
         }
       ]
@@ -1250,6 +1427,11 @@
     "fields": {}
   },
   {
+    "type": "until",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "var",
     "named": true,
     "fields": {}
@@ -1272,6 +1454,162 @@
         },
         {
           "type": "var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "while",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "while_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "assignment_block",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "collection_literal_block",
+          "named": true
+        },
+        {
+          "type": "command_suffix",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "constant",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_while",
+          "named": true
+        },
+        {
+          "type": "form",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "function_call",
+          "named": true
+        },
+        {
+          "type": "generic_function",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "object_literal_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while",
+          "named": true
+        },
+        {
+          "type": "while_block",
           "named": true
         }
       ]

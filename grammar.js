@@ -40,6 +40,8 @@ module.exports = grammar({
       $.break, 
       $.continue,
       $.if_block,
+      $.repeat_block,
+      $.while_block,
       $.sql_injection_block,
       $.comment
     ),
@@ -486,10 +488,35 @@ classic_array: $ => prec(PREC.keyword, choice(
     _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
     _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
     while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
-    
+    _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
+    _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
+    end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
+    _while: $ => prec(PREC.statement, seq(
+        seq($.while, '(', $._condition, ')')
+    )),
+    while_block: $ => prec(PREC.statement, seq(
+        $._while,
+        repeat($._statement),
+        $.end_while
+      )
+    ),
+    _repeat_e: $ => /(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)/,
+    _repeat_f: $ => /(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)/,
+    repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
     _until_e: $ => /(u|U)(n|N)(t|T)(i|I)(l|L)/,
     _until_f: $ => /(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)/,
     until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
+    _until: $ => prec(PREC.statement, seq(
+        seq($.until, '(', $._condition, ')')
+    )),
+    repeat_block: $ => prec(PREC.statement, seq(
+        $.repeat,
+        repeat($._statement),
+        $._until
+      )
+    ),
+    
+    
     
     _for_e: $ => /(f|F)(o|O)(r|R)/,
     _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
@@ -507,13 +534,8 @@ classic_array: $ => prec(PREC.keyword, choice(
     _end_use_f: $ => /(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
     end_use   : $ => prec(PREC.keyword, choice($._end_use_e, $._end_use_f)),
     
-    _repeat_e: $ => /(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)/,
-    _repeat_f: $ => /(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)/,
-    repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
-    
-    _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
-    _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
-    end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
+
+
     
     _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
     _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
