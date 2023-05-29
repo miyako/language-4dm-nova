@@ -32,8 +32,6 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
-* [`object_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal_block.txt)
-* [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
 * [`if_block`]
 * [`repeat_block`]
 * [`while_block`]
@@ -43,6 +41,14 @@ tree-sitter generate
 * [`for_each_block`]
 * [`sql_injection_block`] - code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
 * [`comment`]
+
+### tokens that may appear in a `_statement`
+
+* [`object_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal_block.txt)
+* [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
+* [`local_variable`] [`interprocess_variable`] 1d-array element, 2d-array element, collection element
+* [`system_variable`]
+* [`time`] [`date`] [`string`] [`number`] exponent, flipped delimiter
 
 ### classic commands (disabled)
 
