@@ -32,4 +32,12 @@ tree-sitter generate
 * [`continue`]
 * [`object_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal_block.txt)
 * [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
+* [`if_block`]
+* [`repeat_block`]
+* [`while_block`]
+* [`for_block`]
+* [`use_block`]
+* [`case_block`]
+* [`for_each_block`]
+* [`sql_injection_block`] - code switching to sql not working
 * [`comment`]
