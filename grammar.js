@@ -287,7 +287,7 @@ module.exports = grammar({
     assignment_block: $ => prec(PREC.statement, seq(
       $._mutable,
       ':=',
-      choice($._condition, $.ternary_block, $.object_literal_block)
+      choice($._condition, $.ternary_block)
       )
     ),
     

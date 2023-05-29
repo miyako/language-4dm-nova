@@ -65,25 +65,9 @@
 (system_variable) @identifier.constant
 (numeric_parameter) @identifier.constant
 
+(object_literal_block) @identifier.constant
+(collection_literal_block) @identifier.constant
+
 ; Operators
 
-[":=" ";" "?" ":" "(" ")"] @operator
-
-;[
-;	"+" "-" "*" "/"
-;	"&" "|"
-;	"%" "\"
-;	"^"
-;	"^|"
-;	"<" ">"
-;	">=" "<="
-;	"=" "#"
-;	"<<" ">>"
-;	"??" "?+" "?-"
-;	"+=" "-=" "/=" "*="
-;	"||" "&&"
-;] @operator
-
-; Punctuation
-
-;["(" ")" "[" "]" "{" "}" "[[" "]]"] @punctuation.bracket
+[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]"] @operator

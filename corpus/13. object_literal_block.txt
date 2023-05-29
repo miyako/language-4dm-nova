@@ -1,5 +1,5 @@
 ==================
-13. object_literal
+13. object_literal_block
 ==================
 
 $object:=$test ? $a : $b

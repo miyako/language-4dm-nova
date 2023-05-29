@@ -1,5 +1,5 @@
 ==================
-14. collection_literal
+14. collection_literal_block
 ==================
 
 $object:=[$test;$test]

@@ -1731,10 +1731,6 @@
               {
                 "type": "SYMBOL",
                 "name": "ternary_block"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "object_literal_block"
               }
             ]
           }
