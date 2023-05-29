@@ -17,15 +17,10 @@ tree-sitter generate
 
 * [`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
 * [`declare_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/2.%20declare_block.txt)
-
-* constants
+* [`class_constructor`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/3.%20class_constructor.txt)
+* [`class_extends`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/4.%20class_extends.txt)
  
-* class
 
-```4d
-class constructor
-class extends 4D.Entity
-```
 
 * local variables
 
