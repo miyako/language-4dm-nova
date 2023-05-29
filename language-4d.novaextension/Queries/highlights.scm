@@ -6,7 +6,9 @@
 (class_function) @identifier.type.class
 
 ; Comment
+
 (comment) @comment
+(comment_block) @comment
 (command_suffix) @comment
 
 ; Keywords
@@ -24,11 +26,15 @@
 (else) @keyword.condition
 (end_if) @keyword.condition
 
+(begin_sql) @keyword.condition
+(end_sql) @keyword.condition
+
 (this) @keyword.self
 (form) @keyword.self
 (super) @keyword.self
 
 ; Functions
+
 (generic_function) @identifier.function
 (function_call) @identifier.variable
 

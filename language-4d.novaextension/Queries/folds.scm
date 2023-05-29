@@ -1,3 +1,3 @@
 (if_block) @subtree
-; ["/*"] @start
-; ["*/"] @end
+(sql_injection_block) @subtree
+(comment_block)  @subtree

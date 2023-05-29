@@ -7,7 +7,8 @@
     </meta>
     
     <detectors>
-        <extension priority="1.0">4dm</extension>
+        <extension priority="1.0">4dm,c4d</extension>
+        <match-content lines="1" priority="0.3">\/\/%attributes = \{[^}]*\}</match-content>
     </detectors>
     
     <indentation>
@@ -33,8 +34,22 @@
         </multiline>
     </comments>
     
+    <brackets>
+        <pair open="{"  close="}"   />
+        <pair open="["  close="]"   />
+        <pair open="[[" close="]]"  />
+        <pair open="("  close=")"   />
+    </brackets>
+    
+    <surrounding-pairs>
+        <pair open="{" close="}"    />
+        <pair open="[" close="]"    />
+        <pair open="(" close=")"    />
+        <pair open="&quot;" close="&quot;"  />
+    </surrounding-pairs>
+    
     <injection>
-        <expression>^(4dm)$</expression>
+        <expression>SQL</expression>
     </injection>
     
     <tree-sitter language="fourd">

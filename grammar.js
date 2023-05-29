@@ -40,7 +40,7 @@ module.exports = grammar({
       $.break, 
       $.continue,
       $.if_block,
-      $.sql_block,
+      $.sql_injection_block,
       $.comment
     ),
                 
@@ -116,8 +116,9 @@ module.exports = grammar({
       $.constant,
       $.system_variable,
       $._class,
-      $.constant  
+      $.constant
     ),
+        
     /* 
     can't define process scope function call, too broad a pattern
     */
@@ -142,7 +143,8 @@ module.exports = grammar({
     */
     _condition: $ => prec.right(choice(
       prec(PREC.expression, $.ternary_block),
-      $._single_condition, 
+      $._single_condition,  
+      $.object_literal_block,
       seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
     )),
     /* 
@@ -154,6 +156,13 @@ module.exports = grammar({
       $._condition,
       ':',
       $._condition
+    )),
+    object_literal_block: $ => prec.left(seq(
+      '{',
+      $._name,
+      ':',
+      $._condition,
+      '}'
     )),
     
     /* 
@@ -257,7 +266,6 @@ module.exports = grammar({
       )
     ),
     
-    
     property_declaration_block: $ => prec(PREC.statement, seq(
       $.property,
       $._name, 
@@ -275,7 +283,7 @@ module.exports = grammar({
     assignment_block: $ => prec(PREC.statement, seq(
       $._mutable,
       ':=',
-      choice($._condition, $.ternary_block)
+      choice($._condition, $.ternary_block, $.object_literal_block)
       )
     ),
     
@@ -435,14 +443,16 @@ classic_array: $ => prec(PREC.keyword, choice(
     
     command_suffix: $ => prec(PREC.keyword, /(:C[0-9]+)?/),
     
-    comment: $ => choice(
-        prec(PREC.comment,seq('//', /.*/)),
-        prec(PREC.comment,seq(
-          '/*',
-          /[^*]*\*+([^/*][^*]*\*+)*/,
-          '/'
-        ))
-    ),
+    comment_block: $ => prec(PREC.comment,seq(
+      '/*',
+      /[^*]*\*+([^/*][^*]*\*+)*/,
+      '/'
+    )),
+    
+    _comment: $ => prec(PREC.comment,seq('//', /.*/)),
+    
+    comment: $ => choice($.comment_block, $._comment),
+  
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
     if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
@@ -508,18 +518,22 @@ classic_array: $ => prec(PREC.keyword, choice(
     _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
     _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
     end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
-    
     _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
     begin_sql   : $ => prec(PREC.keyword, choice($._begin_sql_e, $._begin_sql_f)),
-    
     _end_sql_e: $ => /(e|E)(n|N)(d|D) (s|S)(q|Q)(l|L)/,
     _end_sql_f: $ => /(f|F)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     end_sql   : $ => prec(PREC.keyword, choice($._end_sql_e, $._end_sql_f)),
-    sql_block: $ => prec(PREC.statement, seq(
+    /* 
+    injection doesn't seem to work
+    ((sql_block) @injection.content
+     (#set! injection.language "sql")
+    )
+    */
+    sql_block: $ => seq(repeat(/.+?/), $.end_sql),
+    sql_injection_block: $ => prec(PREC.statement, seq(
         $.begin_sql,
-        repeat($._statement),
-        $.end_sql
+        $.sql_block
       )
     ),
 

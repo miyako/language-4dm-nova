@@ -1,0 +1,26 @@
+==================
+13. object_literal
+==================
+
+$object:=$test ? $a : $b
+$object:={test:$test}
+$object:={test:{test:$test}}
+
+---
+
+(source
+  (assignment_block
+    (local_variable)
+    (ternary_block
+      (local_variable)
+      (local_variable)
+      (local_variable)))
+  (assignment_block
+    (local_variable)
+    (object_literal_block
+      (local_variable)))
+  (assignment_block
+    (local_variable)
+    (object_literal_block
+      (object_literal_block
+        (local_variable)))))
