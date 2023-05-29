@@ -16,16 +16,16 @@ $t:=cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
       (local_variable)))
   (function_call
     (class_function
-      (command_suffix)))
+      (command_suffix_optional)))
   (function_call
     (class_function
-      (command_suffix)))
+      (command_suffix_optional)))
   (function_call
     (class_function
-      (command_suffix)))
+      (command_suffix_optional)))
   (assignment_block
     (local_variable)
     (class_function
-      (command_suffix))
+      (command_suffix_optional))
     (class_function
-      (command_suffix))))
+      (command_suffix_optional))))

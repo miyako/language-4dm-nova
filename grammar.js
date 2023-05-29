@@ -330,14 +330,14 @@ module.exports = grammar({
     _form: $ => /(f|F)(o|O)(r|R)(m|M)/,
     _super: $ => /(s|S)(u|U)(p|P)(e|E)(r|R)/,
            
-    this: $ => prec(PREC.keyword, seq($._this, $.command_suffix)),   
-    form: $ => prec(PREC.keyword, seq($._form, $.command_suffix)),  
-    super: $ => prec(PREC.keyword, seq($._super, $.command_suffix)), 
+    this: $ => prec(PREC.keyword, seq($._this, $.command_suffix_optional)),   
+    form: $ => prec(PREC.keyword, seq($._form, $.command_suffix_optional)),  
+    super: $ => prec(PREC.keyword, seq($._super, $.command_suffix_optional)), 
           
     _class_store_4d: $ => /[4](d|D)/,
     _class_store_ds: $ => /(d|D)(s|S)/,
     _class_store_cs: $ => /(c|C)(s|S)/,
-    _class_store: $ => prec(PREC.keyword, seq(choice($._class_store_4d, $._class_store_ds, $._class_store_cs), $.command_suffix)),
+    _class_store: $ => prec(PREC.keyword, seq(choice($._class_store_4d, $._class_store_ds, $._class_store_cs), $.command_suffix_optional)),
     _class: $ => prec(PREC.keyword, seq($._class_store, repeat(seq('.', $._name)))),
     _basic_type_text: $ => /(t|T)(e|E)(x|X)(t|T)/,
     _basic_type_date: $ => /(d|D)(a|A)(t|T)(e|E)/,
@@ -396,18 +396,18 @@ module.exports = grammar({
       $._system_variable_mouseproc      
     )),
     
-    _classic_compiler_blob: $ => seq(/(c|C)_(b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
-    _classic_compiler_boolean: $ => seq(/(c|C)_(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
-    _classic_compiler_collection: $ => seq(/(c|C)_(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, $.command_suffix),
-    _classic_compiler_date: $ => seq(/(c|C)_(d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
-    _classic_compiler_longint: $ => seq(/(c|C)_(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
-    _classic_compiler_object: $ => seq(/(c|C)_(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
-    _classic_compiler_picture: $ => seq(/(c|C)_(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
-    _classic_compiler_pointer: $ => seq(/(c|C)_(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
-    _classic_compiler_real: $ => seq(/(c|C)_(r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
-    _classic_compiler_text: $ => seq(/(c|C)_(t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
-    _classic_compiler_time: $ => seq(/(c|C)_(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
-    _classic_compiler_variant: $ => seq(/(c|C)_(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/, $.command_suffix),
+    _classic_compiler_blob: $ => seq(/(c|C)_(b|B)(l|L)(o|O)(b|B)/, $.command_suffix_optional),
+    _classic_compiler_boolean: $ => seq(/(c|C)_(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix_optional),
+    _classic_compiler_collection: $ => seq(/(c|C)_(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, $.command_suffix_optional),
+    _classic_compiler_date: $ => seq(/(c|C)_(d|D)(a|A)(t|T)(e|E)/, $.command_suffix_optional),
+    _classic_compiler_longint: $ => seq(/(c|C)_(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix_optional),
+    _classic_compiler_object: $ => seq(/(c|C)_(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix_optional),
+    _classic_compiler_picture: $ => seq(/(c|C)_(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix_optional),
+    _classic_compiler_pointer: $ => seq(/(c|C)_(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix_optional),
+    _classic_compiler_real: $ => seq(/(c|C)_(r|R)(e|E)(a|A)(l|L)/, $.command_suffix_optional),
+    _classic_compiler_text: $ => seq(/(c|C)_(t|T)(e|E)(x|X)(t|T)/, $.command_suffix_optional),
+    _classic_compiler_time: $ => seq(/(c|C)_(t|T)(i|I)(m|M)(e|E)/, $.command_suffix_optional),
+    _classic_compiler_variant: $ => seq(/(c|C)_(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/, $.command_suffix_optional),
     
     classic_compiler: $ => prec(PREC.keyword, choice(
       $._classic_compiler_blob,
@@ -425,17 +425,17 @@ module.exports = grammar({
       )
     ),
     
-    _classic_array_blob: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
-    _classic_array_boolean: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
-    _classic_array_date: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
-    _classic_array_integer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (i|I)(n|N)(t|T)(e|E)(g|G)(e|E)(r|R)/, $.command_suffix),
-    _classic_array_longint: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
-    _classic_array_object: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
-    _classic_array_picture: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
-    _classic_array_pointer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
-    _classic_array_real: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
-    _classic_array_text: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
-    _classic_array_time: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y)( | )(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
+    _classic_array_blob: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(l|L)(o|O)(b|B)/, $.command_suffix_optional),
+    _classic_array_boolean: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix_optional),
+    _classic_array_date: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (d|D)(a|A)(t|T)(e|E)/, $.command_suffix_optional),
+    _classic_array_integer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (i|I)(n|N)(t|T)(e|E)(g|G)(e|E)(r|R)/, $.command_suffix_optional),
+    _classic_array_longint: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix_optional),
+    _classic_array_object: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix_optional),
+    _classic_array_picture: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix_optional),
+    _classic_array_pointer: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix_optional),
+    _classic_array_real: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (r|R)(e|E)(a|A)(l|L)/, $.command_suffix_optional),
+    _classic_array_text: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (t|T)(e|E)(x|X)(t|T)/, $.command_suffix_optional),
+    _classic_array_time: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y)( | )(t|T)(i|I)(m|M)(e|E)/, $.command_suffix_optional),
 
 classic_array: $ => prec(PREC.keyword, choice(
       $._classic_array_blob,
@@ -452,7 +452,8 @@ classic_array: $ => prec(PREC.keyword, choice(
       )
     ),
     
-    command_suffix: $ => prec(PREC.keyword, /(:C[0-9]+)?/),
+    command_suffix: $ => prec(PREC.keyword, /(:C[0-9]+)/),
+    command_suffix_optional: $ => prec(PREC.keyword, /(:C[0-9]+)?/),
     constant_suffix: $ => prec(PREC.keyword, /:(k|K)[0-9]+:[0-9]+/),
     
     comment_block: $ => prec(PREC.comment,seq(
@@ -594,8 +595,8 @@ classic_array: $ => prec(PREC.keyword, choice(
       )
     ),
     
-    classic_command: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:C[0-9]+/, optional($._functional_expression)),
-    classic_constant: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:K[0-9]+:[0-9]+/)
+    classic_command: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+/, $.command_suffix, optional($._functional_expression)),
+    classic_constant: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+/, $.constant_suffix)
 
      
   },

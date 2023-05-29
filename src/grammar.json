@@ -1897,7 +1897,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "command_suffix"
+            "name": "command_suffix_optional"
           }
         ]
       }
@@ -1914,7 +1914,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "command_suffix"
+            "name": "command_suffix_optional"
           }
         ]
       }
@@ -1931,7 +1931,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "command_suffix"
+            "name": "command_suffix_optional"
           }
         ]
       }
@@ -1973,7 +1973,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "command_suffix"
+            "name": "command_suffix_optional"
           }
         ]
       }
@@ -2238,7 +2238,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2251,7 +2251,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2264,7 +2264,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2277,7 +2277,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2290,7 +2290,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2303,7 +2303,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2316,7 +2316,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2329,7 +2329,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2342,7 +2342,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2355,7 +2355,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2368,7 +2368,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2381,7 +2381,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2451,7 +2451,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2464,7 +2464,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2477,7 +2477,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2490,7 +2490,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2503,7 +2503,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2516,7 +2516,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2529,7 +2529,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2542,7 +2542,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2555,7 +2555,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2568,7 +2568,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2581,7 +2581,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "command_suffix"
+          "name": "command_suffix_optional"
         }
       ]
     },
@@ -2639,6 +2639,14 @@
       }
     },
     "command_suffix": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "PATTERN",
+        "value": "(:C[0-9]+)"
+      }
+    },
+    "command_suffix_optional": {
       "type": "PREC",
       "value": -4,
       "content": {
@@ -3737,7 +3745,11 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:C[0-9]+"
+          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "command_suffix"
         },
         {
           "type": "CHOICE",
@@ -3758,7 +3770,11 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:K[0-9]+:[0-9]+"
+          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "constant_suffix"
         }
       ]
     }

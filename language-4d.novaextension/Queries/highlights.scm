@@ -8,7 +8,9 @@
 
 (comment) @comment
 (comment_block) @comment
+(command_suffix_optional) @comment
 (command_suffix) @comment
+(constant_suffix) @comment
 
 ; Keywords
 

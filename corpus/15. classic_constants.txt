@@ -15,31 +15,38 @@ $t:=cs.aComponent.aClass.method(fk desktop folder:K87:19) + cs.aComponent.aClass
     (generic_function
       (local_variable)
       (constant
-        (classic_constant))))
+        (classic_constant
+          (constant_suffix)))))
   (function_call
     (class_function
-      (command_suffix)
+      (command_suffix_optional)
       (constant
-        (classic_constant))
+        (classic_constant
+          (constant_suffix)))
       (constant
-        (classic_constant))))
+        (classic_constant
+          (constant_suffix)))))
   (function_call
     (class_function
-      (command_suffix)
+      (command_suffix_optional)
       (constant
-        (classic_constant))))
+        (classic_constant
+          (constant_suffix)))))
   (function_call
     (class_function
-      (command_suffix)
+      (command_suffix_optional)
       (constant
-        (classic_constant))))
+        (classic_constant
+          (constant_suffix)))))
   (assignment_block
     (local_variable)
     (class_function
-      (command_suffix)
+      (command_suffix_optional)
       (constant
-        (classic_constant)))
+        (classic_constant
+          (constant_suffix))))
     (class_function
-      (command_suffix)
+      (command_suffix_optional)
       (constant
-        (classic_constant)))))
+        (classic_constant
+          (constant_suffix))))))
