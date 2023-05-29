@@ -1,0 +1,45 @@
+==================
+15. classic_constants
+==================
+
+$value.method(fk desktop folder:K87:19)
+4D.File.method(fk desktop folder:K87:19;fk desktop folder:K87:19)
+cs.aClass.method(fk desktop folder:K87:19)
+cs.aComponent.aClass.method(fk desktop folder:K87:19)
+$t:=cs.aComponent.aClass.method(fk desktop folder:K87:19) + cs.aComponent.aClass.method(fk desktop folder:K87:19)
+
+---
+
+(source
+  (function_call
+    (generic_function
+      (local_variable)
+      (constant
+        (classic_constant))))
+  (function_call
+    (class_function
+      (command_suffix)
+      (constant
+        (classic_constant))
+      (constant
+        (classic_constant))))
+  (function_call
+    (class_function
+      (command_suffix)
+      (constant
+        (classic_constant))))
+  (function_call
+    (class_function
+      (command_suffix)
+      (constant
+        (classic_constant))))
+  (assignment_block
+    (local_variable)
+    (class_function
+      (command_suffix)
+      (constant
+        (classic_constant)))
+    (class_function
+      (command_suffix)
+      (constant
+        (classic_constant)))))

@@ -906,6 +906,10 @@
             "name": "collection_literal_block"
           },
           {
+            "type": "SYMBOL",
+            "name": "classic_command"
+          },
+          {
             "type": "SEQ",
             "members": [
               {
@@ -1284,6 +1288,10 @@
         {
           "type": "SYMBOL",
           "name": "string"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "classic_constant"
         }
       ]
     },
@@ -1928,23 +1936,6 @@
         ]
       }
     },
-    "_generic_command": {
-      "type": "PREC",
-      "value": -4,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_name"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "command_suffix"
-          }
-        ]
-      }
-    },
     "_class_store_4d": {
       "type": "PATTERN",
       "value": "[4](d|D)"
@@ -2243,7 +2234,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(b|B)(l|L)(o|O)(b|B)"
+          "value": "(c|C)_(b|B)(l|L)(o|O)(b|B)"
         },
         {
           "type": "SYMBOL",
@@ -2256,7 +2247,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)"
+          "value": "(c|C)_(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)"
         },
         {
           "type": "SYMBOL",
@@ -2269,7 +2260,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)"
+          "value": "(c|C)_(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)"
         },
         {
           "type": "SYMBOL",
@@ -2282,7 +2273,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(d|D)(a|A)(t|T)(e|E)"
+          "value": "(c|C)_(d|D)(a|A)(t|T)(e|E)"
         },
         {
           "type": "SYMBOL",
@@ -2295,7 +2286,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)"
+          "value": "(c|C)_(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)"
         },
         {
           "type": "SYMBOL",
@@ -2308,7 +2299,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)"
+          "value": "(c|C)_(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)"
         },
         {
           "type": "SYMBOL",
@@ -2321,7 +2312,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)"
+          "value": "(c|C)_(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)"
         },
         {
           "type": "SYMBOL",
@@ -2334,7 +2325,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)"
+          "value": "(c|C)_(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)"
         },
         {
           "type": "SYMBOL",
@@ -2347,7 +2338,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(r|R)(e|E)(a|A)(l|L)"
+          "value": "(c|C)_(r|R)(e|E)(a|A)(l|L)"
         },
         {
           "type": "SYMBOL",
@@ -2360,7 +2351,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(t|T)(e|E)(x|X)(t|T)"
+          "value": "(c|C)_(t|T)(e|E)(x|X)(t|T)"
         },
         {
           "type": "SYMBOL",
@@ -2373,7 +2364,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(t|T)(i|I)(m|M)(e|E)"
+          "value": "(c|C)_(t|T)(i|I)(m|M)(e|E)"
         },
         {
           "type": "SYMBOL",
@@ -2386,7 +2377,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "(c|C)(_|_)(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)"
+          "value": "(c|C)_(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)"
         },
         {
           "type": "SYMBOL",
@@ -2653,6 +2644,14 @@
       "content": {
         "type": "PATTERN",
         "value": "(:C[0-9]+)?"
+      }
+    },
+    "constant_suffix": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "PATTERN",
+        "value": ":(k|K)[0-9]+:[0-9]+"
       }
     },
     "comment_block": {
@@ -3732,6 +3731,36 @@
           }
         ]
       }
+    },
+    "classic_command": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:C[0-9]+"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_functional_expression"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "classic_constant": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:K[0-9]+:[0-9]+"
+        }
+      ]
     }
   },
   "extras": [

@@ -2,7 +2,6 @@
 
 (class) @identifier.type.class
 (classic_compiler) @identifier.type.class
-(classic_array) @identifier.type.class
 (class_function) @identifier.type.class
 
 ; Comment
@@ -54,6 +53,9 @@
 
 (generic_function) @identifier.function
 (function_call) @identifier.variable
+(classic_command) @identifier.method
+(classic_array) @identifier.function
+(classic_command) @identifier.function
 
 ; Variables
 
@@ -87,3 +89,4 @@
 ; Operators
 
 [":=" ";" "?" ":" "(" ")" "{" "}" "[" "]"] @operator
+
