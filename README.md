@@ -15,7 +15,7 @@ tree-sitter generate
 
 start with the most specific statements.
 
-`function_block`
+[`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
 
 
 ## features
