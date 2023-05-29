@@ -39,7 +39,7 @@ tree-sitter generate
 * [`use_block`]
 * [`case_block`]
 * [`for_each_block`]
-* [`sql_injection_block`] - code switching to sql not working
+* [`sql_injection_block`] - code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
 * [`comment`]
 
 ### native commands
