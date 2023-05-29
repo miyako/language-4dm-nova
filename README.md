@@ -43,7 +43,7 @@ tree-sitter generate
 * [`classic_command`] - very limited; see below
 * [`comment`]
 
-### native commands
+### classic commands
 
 hard-coding every single command does not work well with tree-sitter; the compiler simply enters a death sprial. 
 
