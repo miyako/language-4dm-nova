@@ -41,8 +41,8 @@ rm -f $WORKINGDIR/language-4d.novaextension/Syntaxes/$PRODUCT_NAME
 cp $PRODUCT_PATH $WORKINGDIR/language-4d.novaextension/Syntaxes/$PRODUCT_NAME
 
 # notary
- rm -f "$DMG_PATH"
- hdiutil create -format UDBZ -plist -srcfolder "$PRODUCT_PATH" "$DMG_PATH"
- xcrun notarytool submit "$DMG_PATH" --keychain-profile "notarytool" --wait
- xcrun stapler staple "$DMG_PATH"
+# rm -f "$DMG_PATH"
+# hdiutil create -format UDBZ -plist -srcfolder "$PRODUCT_PATH" "$DMG_PATH"
+# xcrun notarytool submit "$DMG_PATH" --keychain-profile "notarytool" --wait
+# xcrun stapler staple "$DMG_PATH"
 
