@@ -47,6 +47,7 @@ module.exports = grammar({
       $.case_block,
       $.for_each_block,
       $.sql_injection_block,
+      //$.classic_command,
       $.comment
     ),
                 
@@ -152,6 +153,7 @@ module.exports = grammar({
       $._single_condition,  
       $.object_literal_block,
       $.collection_literal_block,
+      $.classic_command,
       seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
     )),
     /* 
@@ -205,7 +207,8 @@ module.exports = grammar({
       $.time,
       $.date,
       $.number,
-      $.string
+      $.string,
+      $.classic_constant
     ),
         
     /* 
@@ -330,9 +333,7 @@ module.exports = grammar({
     this: $ => prec(PREC.keyword, seq($._this, $.command_suffix)),   
     form: $ => prec(PREC.keyword, seq($._form, $.command_suffix)),  
     super: $ => prec(PREC.keyword, seq($._super, $.command_suffix)), 
-    
-    _generic_command: $ => prec(PREC.keyword, seq($._name, $.command_suffix)), 
-        
+          
     _class_store_4d: $ => /[4](d|D)/,
     _class_store_ds: $ => /(d|D)(s|S)/,
     _class_store_cs: $ => /(c|C)(s|S)/,
@@ -395,18 +396,18 @@ module.exports = grammar({
       $._system_variable_mouseproc      
     )),
     
-    _classic_compiler_blob: $ => seq(/(c|C)(_|_)(b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
-    _classic_compiler_boolean: $ => seq(/(c|C)(_|_)(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
-    _classic_compiler_collection: $ => seq(/(c|C)(_|_)(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, $.command_suffix),
-    _classic_compiler_date: $ => seq(/(c|C)(_|_)(d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
-    _classic_compiler_longint: $ => seq(/(c|C)(_|_)(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
-    _classic_compiler_object: $ => seq(/(c|C)(_|_)(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
-    _classic_compiler_picture: $ => seq(/(c|C)(_|_)(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
-    _classic_compiler_pointer: $ => seq(/(c|C)(_|_)(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
-    _classic_compiler_real: $ => seq(/(c|C)(_|_)(r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
-    _classic_compiler_text: $ => seq(/(c|C)(_|_)(t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
-    _classic_compiler_time: $ => seq(/(c|C)(_|_)(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
-    _classic_compiler_variant: $ => seq(/(c|C)(_|_)(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/, $.command_suffix),
+    _classic_compiler_blob: $ => seq(/(c|C)_(b|B)(l|L)(o|O)(b|B)/, $.command_suffix),
+    _classic_compiler_boolean: $ => seq(/(c|C)_(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, $.command_suffix),
+    _classic_compiler_collection: $ => seq(/(c|C)_(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, $.command_suffix),
+    _classic_compiler_date: $ => seq(/(c|C)_(d|D)(a|A)(t|T)(e|E)/, $.command_suffix),
+    _classic_compiler_longint: $ => seq(/(c|C)_(l|L)(o|O)(n|N)(g|G)(i|I)(n|N)(t|T)/, $.command_suffix),
+    _classic_compiler_object: $ => seq(/(c|C)_(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/, $.command_suffix),
+    _classic_compiler_picture: $ => seq(/(c|C)_(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/, $.command_suffix),
+    _classic_compiler_pointer: $ => seq(/(c|C)_(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/, $.command_suffix),
+    _classic_compiler_real: $ => seq(/(c|C)_(r|R)(e|E)(a|A)(l|L)/, $.command_suffix),
+    _classic_compiler_text: $ => seq(/(c|C)_(t|T)(e|E)(x|X)(t|T)/, $.command_suffix),
+    _classic_compiler_time: $ => seq(/(c|C)_(t|T)(i|I)(m|M)(e|E)/, $.command_suffix),
+    _classic_compiler_variant: $ => seq(/(c|C)_(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/, $.command_suffix),
     
     classic_compiler: $ => prec(PREC.keyword, choice(
       $._classic_compiler_blob,
@@ -452,6 +453,7 @@ classic_array: $ => prec(PREC.keyword, choice(
     ),
     
     command_suffix: $ => prec(PREC.keyword, /(:C[0-9]+)?/),
+    constant_suffix: $ => prec(PREC.keyword, /:(k|K)[0-9]+:[0-9]+/),
     
     comment_block: $ => prec(PREC.comment,seq(
       '/*',
@@ -591,12 +593,13 @@ classic_array: $ => prec(PREC.keyword, choice(
         $.sql_block
       )
     ),
-
     
+    classic_command: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:C[0-9]+/, optional($._functional_expression)),
+    classic_constant: $ => seq(/[A-Za-z]+[A-Z a-z0-9]*[A-Za-z]+:K[0-9]+:[0-9]+/)
+
      
   },
   
-
   conflicts: $ => [
 
     [$.for_each_block, $._while],

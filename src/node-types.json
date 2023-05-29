@@ -47,6 +47,10 @@
           "named": true
         },
         {
+          "type": "classic_command",
+          "named": true
+        },
+        {
           "type": "collection_literal_block",
           "named": true
         },
@@ -149,6 +153,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -321,6 +329,10 @@
           "named": true
         },
         {
+          "type": "classic_command",
+          "named": true
+        },
+        {
           "type": "collection_literal_block",
           "named": true
         },
@@ -410,6 +422,73 @@
     }
   },
   {
+    "type": "classic_command",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "classic_command",
+          "named": true
+        },
+        {
+          "type": "collection_literal_block",
+          "named": true
+        },
+        {
+          "type": "command_suffix",
+          "named": true
+        },
+        {
+          "type": "constant",
+          "named": true
+        },
+        {
+          "type": "form",
+          "named": true
+        },
+        {
+          "type": "generic_function",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "object_literal_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "classic_compiler",
     "named": true,
     "fields": {},
@@ -444,6 +523,11 @@
     }
   },
   {
+    "type": "classic_constant",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "collection_literal_block",
     "named": true,
     "fields": {},
@@ -453,6 +537,10 @@
       "types": [
         {
           "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -539,6 +627,10 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "classic_constant",
+          "named": true
+        },
         {
           "type": "date",
           "named": true
@@ -679,6 +771,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -851,6 +947,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -1116,6 +1216,10 @@
           "named": true
         },
         {
+          "type": "classic_command",
+          "named": true
+        },
+        {
           "type": "collection_literal_block",
           "named": true
         },
@@ -1209,6 +1313,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -1467,6 +1575,10 @@
           "named": true
         },
         {
+          "type": "classic_command",
+          "named": true
+        },
+        {
           "type": "collection_literal_block",
           "named": true
         },
@@ -1584,6 +1696,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
@@ -1952,6 +2068,10 @@
           "named": true
         },
         {
+          "type": "classic_command",
+          "named": true
+        },
+        {
           "type": "collection_literal_block",
           "named": true
         },
@@ -2258,6 +2378,10 @@
         },
         {
           "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_command",
           "named": true
         },
         {
