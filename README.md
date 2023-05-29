@@ -44,9 +44,9 @@ tree-sitter generate
 
 ### native commands
 
-hard-coding every single command does not work well with tree-sitter; the compiler enters a death sprial. 
+hard-coding every single command does not work well with tree-sitter; the compiler simply enters a death sprial. 
 
-on the other hand, generic global tokens would invalidate tokens such as:
+on the other hand, a generic token pattern would partially match and invalidate tokens such as:
 
 * var_declaration_block
 * function_block
@@ -55,4 +55,7 @@ on the other hand, generic global tokens would invalidate tokens such as:
 * alias_block
 * function_call
 
-as the generic token will take precedence.
+as a compromise, `classic_array_block` is tokenised as a regular command.
+
+other native commands must have the `:C` token suffix.
+
