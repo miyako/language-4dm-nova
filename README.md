@@ -25,6 +25,7 @@ tree-sitter generate
 * [`assignment_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/8.%20assignment_block.txt) - process scope not supported because of conflict
 * [`function_call`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/9.%20function_call.txt) - process scope not supported because of conflict
 * [`classic_compiler_block`]
+* [`classic_array_block`]
 * [`return_block`]
 * [`return`]
 * [`break`]
