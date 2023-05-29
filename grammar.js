@@ -31,14 +31,14 @@ module.exports = grammar({
       $.var_declaration_block,
       $.property_declaration_block,
       $.alias_block,
-      $.return_block,
-      $.return,
-      $.break, 
-      $.continue,
       $.assignment_block,
       $.function_call,
       $.classic_compiler_block,
       $.ternary_block,
+      $.return_block,
+      $.return,
+      $.break, 
+      $.continue,
       $.if_block,
       $.sql_block,
       $.comment
@@ -263,7 +263,7 @@ module.exports = grammar({
     assignment_block: $ => prec(PREC.statement, seq(
       $._mutable,
       ':=',
-      choice($._single_condition, $.ternary_block)
+      choice($._condition, $.ternary_block)
       )
     ),
     

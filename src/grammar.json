@@ -41,22 +41,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "return_block"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "return"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "break"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "continue"
-        },
-        {
-          "type": "SYMBOL",
           "name": "assignment_block"
         },
         {
@@ -70,6 +54,22 @@
         {
           "type": "SYMBOL",
           "name": "ternary_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "return_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "return"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "break"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "continue"
         },
         {
           "type": "SYMBOL",
@@ -1535,7 +1535,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "_single_condition"
+                "name": "_condition"
               },
               {
                 "type": "SYMBOL",
