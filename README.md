@@ -40,7 +40,7 @@ tree-sitter generate
 * [`case_block`] - EN/FR
 * [`for_each_block`] - EN/FR
 * [`sql_injection_block`]  - EN/FR; code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
-* [`comment`]
+* [`comment`] [`comment_block`]
 
 ### tokens that may appear in a `_statement`
 
