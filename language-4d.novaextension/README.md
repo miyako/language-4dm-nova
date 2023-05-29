@@ -32,17 +32,38 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
+* [`if_block`] - EN/FR
+* [`repeat_block`] - EN/FR
+* [`while_block`] - EN/FR
+* [`for_block`] - EN/FR
+* [`use_block`] - EN/FR
+* [`case_block`] - EN/FR
+* [`for_each_block`] - EN/FR
+* [`sql_injection_block`]  - EN/FR; code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
+* [`comment`] [`comment_block`]
+
+### tokens that may appear in a `_statement`
+
 * [`object_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal_block.txt)
 * [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
-* [`if_block`]
-* [`repeat_block`]
-* [`while_block`]
-* [`for_block`]
-* [`use_block`]
-* [`case_block`]
-* [`for_each_block`]
-* [`sql_injection_block`] - code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
-* [`comment`]
+* [`local_variable`] [`interprocess_variable`] 1d-array element, 2d-array element, collection element
+* [`system_variable`]
+* [`time`] 
+* [`date`] 
+* [`number`] hex literal, exponent, comma or period as decimal separator
+* [`string`] `\n` `\r` `\t` `\\` `\"`
+* [`binary_operator`]
+* [`ternary_operator`]
+
+### mutable or immutable
+
+in the screenshort above, `This` is coloured in 3 ways
+
+1. mutable object (left operand)
+2. immutable function call (right operand)
+3. immutable value (right operand)
+
+this is because every "block" is set to default to some kind of code object to avoid undefined tokens in the global scope.
 
 ### classic commands (disabled)
 

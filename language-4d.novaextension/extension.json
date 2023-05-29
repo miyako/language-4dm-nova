@@ -3,6 +3,6 @@
     "name": "language-4d",
     "organization": "4D SAS",
     "description": "add syntax highlighting to .4dm files.",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "categories": ["languages"]
 }

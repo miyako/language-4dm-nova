@@ -1,3 +1,3 @@
-## Version 0.0.7
+## Version 0.0.8
 
-Initial release
+change `:C` `:K` suffixes to comments 
