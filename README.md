@@ -1,6 +1,8 @@
 # language-4dm-nova
 add syntax highlighting to .4dm files.
 
+<img width="769" alt="" src="https://github.com/miyako/language-4dm-nova/assets/1725068/8bce5422-58de-4631-8f32-13ca54303f2a">
+
 ## to compile
 
 ```sh
