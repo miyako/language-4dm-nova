@@ -77,6 +77,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "sql_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "comment"
         }
       ]
@@ -2222,6 +2226,380 @@
           {
             "type": "SYMBOL",
             "name": "end_if"
+          }
+        ]
+      }
+    },
+    "_for_each_e": {
+      "type": "PATTERN",
+      "value": "(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)"
+    },
+    "_for_each_f": {
+      "type": "PATTERN",
+      "value": "(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)"
+    },
+    "for_each": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_for_each_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_for_each_f"
+          }
+        ]
+      }
+    },
+    "_end_for_each_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)"
+    },
+    "_end_for_each_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)"
+    },
+    "end_for_each": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_each_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_each_f"
+          }
+        ]
+      }
+    },
+    "_while_e": {
+      "type": "PATTERN",
+      "value": "(w|W)(h|H)(i|I)(l|L)(e|E)"
+    },
+    "_while_f": {
+      "type": "PATTERN",
+      "value": "(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)"
+    },
+    "while": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_while_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_while_f"
+          }
+        ]
+      }
+    },
+    "_until_e": {
+      "type": "PATTERN",
+      "value": "(u|U)(n|N)(t|T)(i|I)(l|L)"
+    },
+    "_until_f": {
+      "type": "PATTERN",
+      "value": "(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)"
+    },
+    "until": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_until_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_until_f"
+          }
+        ]
+      }
+    },
+    "_for_e": {
+      "type": "PATTERN",
+      "value": "(f|F)(o|O)(r|R)"
+    },
+    "_for_f": {
+      "type": "PATTERN",
+      "value": "(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)"
+    },
+    "for": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_for_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_for_f"
+          }
+        ]
+      }
+    },
+    "_end_for_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)"
+    },
+    "_end_for_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)"
+    },
+    "end_for": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_f"
+          }
+        ]
+      }
+    },
+    "_use_e": {
+      "type": "PATTERN",
+      "value": "(u|U)(s|S)(e|E)"
+    },
+    "_use_f": {
+      "type": "PATTERN",
+      "value": "(u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)"
+    },
+    "use": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_use_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_use_f"
+          }
+        ]
+      }
+    },
+    "_end_use_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (u|U)(s|S)(e|E)"
+    },
+    "_end_use_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)"
+    },
+    "end_use": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_use_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_use_f"
+          }
+        ]
+      }
+    },
+    "_repeat_e": {
+      "type": "PATTERN",
+      "value": "(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)"
+    },
+    "_repeat_f": {
+      "type": "PATTERN",
+      "value": "(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)"
+    },
+    "repeat": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_repeat_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_repeat_f"
+          }
+        ]
+      }
+    },
+    "_end_while_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)"
+    },
+    "_end_while_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)"
+    },
+    "end_while": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_while_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_while_f"
+          }
+        ]
+      }
+    },
+    "_case_of_e": {
+      "type": "PATTERN",
+      "value": "(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)"
+    },
+    "_case_of_f": {
+      "type": "PATTERN",
+      "value": "(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)"
+    },
+    "case_of": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_case_of_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_case_of_f"
+          }
+        ]
+      }
+    },
+    "_end_case_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)"
+    },
+    "_end_case_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)"
+    },
+    "end_case": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_case_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_case_f"
+          }
+        ]
+      }
+    },
+    "_begin_sql_e": {
+      "type": "PATTERN",
+      "value": "(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)"
+    },
+    "_begin_sql_f": {
+      "type": "PATTERN",
+      "value": "(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)"
+    },
+    "begin_sql": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_begin_sql_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_begin_sql_f"
+          }
+        ]
+      }
+    },
+    "_end_sql_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (s|S)(q|Q)(l|L)"
+    },
+    "_end_sql_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (s|S)(q|Q)(l|L)"
+    },
+    "end_sql": {
+      "type": "PREC",
+      "value": -4,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_sql_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_sql_f"
+          }
+        ]
+      }
+    },
+    "sql_block": {
+      "type": "PREC",
+      "value": -10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "begin_sql"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_statement"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "end_sql"
           }
         ]
       }
