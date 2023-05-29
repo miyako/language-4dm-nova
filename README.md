@@ -16,15 +16,7 @@ tree-sitter generate
 ### `_statement`
 
 [`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
-
-
-* method
-
-```4d
-#DECLARE($param1:Text)
-#DECLARE($param1:Text)->$returnValue:Integer
-#DECLARE()->$returnValue:Integer 
-```
+[`declare_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/2.%20declare_block.txt)
 
 * constants
  
