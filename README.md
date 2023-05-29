@@ -11,11 +11,9 @@ tree-sitter generate
 
 ## the `4dlang` tree-sitter parser
 
-### `_statement`
-
 * `source` is a series of `_statement`.
 
-start with the most specific statements.
+### `_statement`
 
 [`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
 
