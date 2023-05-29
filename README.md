@@ -52,6 +52,7 @@ tree-sitter generate
 * [`date`] 
 * [`number`] hex literal, exponent, comma or period as decimal separator
 * [`string`] `\n` `\r` `\t` `\\` `\"`
+* [`ternary_operator`]
 
 ### classic commands (disabled)
 
