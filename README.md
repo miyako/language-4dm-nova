@@ -13,27 +13,10 @@ tree-sitter generate
 
 * `source` is a series of `_statement`.
 
-start with the most specific statements.
+### `_statement`
 
-`function_block`
+[`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
 
-
-## features
-
-language-4d currently supports the following features:
-
-* function
-
-```4d
-function afunction($param1:Text)->$returnValue:Integer
-exposed function afunction($param1:Text)->$returnValue:Integer
-local function afunction($param1:Text)->$returnValue:Integer
-local exposed function afunction($param1:Text)->$returnValue:Integer
-local exposed function get aproperty($param1:Text)->$returnValue:Integer
-local exposed function set aproperty($param1:Text)->$returnValue:Integer
-local exposed function query aproperty($param1:Text)->$returnValue:Integer
-local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
-```
 
 * method
 

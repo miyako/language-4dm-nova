@@ -90,6 +90,11 @@
     }
   },
   {
+    "type": "begin_sql",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "break",
     "named": true,
     "fields": {}
@@ -175,6 +180,10 @@
         },
         {
           "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
           "named": true
         },
         {
@@ -300,6 +309,11 @@
   },
   {
     "type": "end_if",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "end_sql",
     "named": true,
     "fields": {}
   },
@@ -463,6 +477,10 @@
           "named": true
         },
         {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
           "type": "this",
           "named": true
         }
@@ -587,6 +605,10 @@
           "named": true
         },
         {
+          "type": "sql_block",
+          "named": true
+        },
+        {
           "type": "system_variable",
           "named": true
         },
@@ -608,7 +630,53 @@
   {
     "type": "interprocess_variable",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "class_function",
+          "named": true
+        },
+        {
+          "type": "command_suffix",
+          "named": true
+        },
+        {
+          "type": "constant",
+          "named": true
+        },
+        {
+          "type": "form",
+          "named": true
+        },
+        {
+          "type": "generic_function",
+          "named": true
+        },
+        {
+          "type": "interprocess_variable",
+          "named": true
+        },
+        {
+          "type": "local_variable",
+          "named": true
+        },
+        {
+          "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "this",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "local_variable",
@@ -824,6 +892,101 @@
           "named": true
         },
         {
+          "type": "sql_block",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "sql_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "assignment_block",
+          "named": true
+        },
+        {
+          "type": "begin_sql",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_sql",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "function_call",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_block",
+          "named": true
+        },
+        {
           "type": "ternary_block",
           "named": true
         },
@@ -901,6 +1064,10 @@
         },
         {
           "type": "system_variable",
+          "named": true
+        },
+        {
+          "type": "ternary_block",
           "named": true
         },
         {
@@ -1127,11 +1294,19 @@
     "named": false
   },
   {
+    "type": "{",
+    "named": false
+  },
+  {
     "type": "|",
     "named": false
   },
   {
     "type": "||",
+    "named": false
+  },
+  {
+    "type": "}",
     "named": false
   },
   {

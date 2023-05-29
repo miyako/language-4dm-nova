@@ -6,8 +6,9 @@ const PREC = {
   
   */
   
-  comment:    -12,
-  operator:   -11,
+  comment:    -100,
+  operator:   -12,
+  expression: -11,
   statement:  -10,
   compound:   -9,
   token:      -8,
@@ -39,6 +40,7 @@ module.exports = grammar({
       $.classic_compiler_block,
       $.ternary_block,
       $.if_block,
+      $.sql_block,
       $.comment
     ),
                 
@@ -90,49 +92,63 @@ module.exports = grammar({
     */
 
     class: $ => prec(PREC.token, choice($._basic_type, $._class)),
-    local_variable: $ => prec(PREC.token, seq('$', $._classic_name, optional(seq('[', $._single_condition, ']')))),
-    interprocess_variable: $ => prec(PREC.token, seq('<>', $._classic_name)),
+    /*
+    can be up to 2 dimensional
+    */
+    local_variable: $ => prec.right(PREC.token, seq('$', $._classic_name, optional(seq('{', $._single_condition, '}')))),
+    interprocess_variable: $ => prec.right(PREC.token, seq('<>', $._classic_name, optional(seq('{', $._single_condition, '}')))),
+    /*
+    add 1 more dimension
+    */    
     numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),    
-    _variable: $ => choice($.local_variable, $.interprocess_variable, $.numeric_parameter),
+    _variable: $ => seq(choice($.local_variable, $.interprocess_variable, $.numeric_parameter), optional(seq('{', $._single_condition, '}'))),
+    /*
+    property path or collection element
+    */
     _mutable: $ => choice(
       $._variable,
       seq(choice($._variable, $.this, $.form), '.', $._name, repeat(seq('.', $._name)), optional(seq('[', $._single_condition, ']')))
     ),
+    /* 
+    not allowed as left operand of assignment
+    */
     _immutable: $ => choice(
       $.constant,
       $.system_variable,
       $._class,
       $.constant  
     ),
-    
+    /* 
+    can't define process scope function call, too broad a pattern
+    */
     class_function: $ => seq(choice($._class, $.super), $._functional_expression),
     generic_function: $ => seq($._mutable, $._functional_expression),
-        
-    _function_parameter: $ => prec(-1, choice(
+    _function_parameter: $ => choice(
       '*', 
       '>', 
       $._condition
-    )),
-        
+    ),
     _functional_expression: $=> seq(
       '(', 
       optional($._function_parameter),
       repeat(seq(';', $._function_parameter)),
       ')'
     ),
-    
     _function_call: $ => choice($.class_function, $.generic_function),
     
     _single_condition: $ => choice($._mutable, $._immutable, $._function_call),    
     /*
-    expression that returns a value
+    basically an expression that returns a value
     */
     _condition: $ => prec.right(choice(
+      prec(PREC.expression, $.ternary_block),
       $._single_condition, 
       seq($._single_condition, repeat(seq($._binary_operator, $._single_condition)))
     )),
-    
-    ternary_block: $ => prec(PREC.compound, seq(
+    /* 
+    likewise but can not be combined with a binary operator
+    */
+    ternary_block: $ => prec.left(seq(
       $._condition,
       '?',
       $._condition,
@@ -369,30 +385,87 @@ module.exports = grammar({
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
     if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
-    
     _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
     _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
     else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
-    
     _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
     _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
     end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
-    
-    /*
-    higher than function call
-    */
     _if: $ => prec(PREC.statement, seq(
         seq($.if, '(', $._condition, ')')
     )),
-    
     if_block: $ => prec(PREC.statement, seq(
         $._if,
         repeat(choice($._statement, seq($._statement, $.else, $._statement))),
         $.end_if
       )
-    )
+    ),
+    _for_each_e: $ => /(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
+    _for_each_f: $ => /(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
+    for_each   : $ => prec(PREC.keyword, choice($._for_each_e, $._for_each_f)),
+    
+    _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
+    _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
+    end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
+    
+    _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
+    _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
+    while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
+    
+    _until_e: $ => /(u|U)(n|N)(t|T)(i|I)(l|L)/,
+    _until_f: $ => /(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)/,
+    until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
+    
+    _for_e: $ => /(f|F)(o|O)(r|R)/,
+    _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
+    for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
+    
+    _end_for_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)/,
+    _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
+    end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
+    
+    _use_e: $ => /(u|U)(s|S)(e|E)/,
+    _use_f: $ => /(u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
+    use   : $ => prec(PREC.keyword, choice($._use_e, $._use_f)),
+    
+    _end_use_e: $ => /(e|E)(n|N)(d|D) (u|U)(s|S)(e|E)/,
+    _end_use_f: $ => /(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
+    end_use   : $ => prec(PREC.keyword, choice($._end_use_e, $._end_use_f)),
+    
+    _repeat_e: $ => /(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)/,
+    _repeat_f: $ => /(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)/,
+    repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
+    
+    _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
+    _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
+    end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
+    
+    _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
+    _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
+    case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),
+    
+    _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
+    _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
+    end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
+    
+    _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
+    _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
+    begin_sql   : $ => prec(PREC.keyword, choice($._begin_sql_e, $._begin_sql_f)),
+    
+    _end_sql_e: $ => /(e|E)(n|N)(d|D) (s|S)(q|Q)(l|L)/,
+    _end_sql_f: $ => /(f|F)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
+    end_sql   : $ => prec(PREC.keyword, choice($._end_sql_e, $._end_sql_f)),
+    sql_block: $ => prec(PREC.statement, seq(
+        $.begin_sql,
+        repeat($._statement),
+        $.end_sql
+      )
+    ),
+
+    
      
   },
+  
 
   conflicts: $ => [
 /*
