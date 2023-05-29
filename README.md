@@ -50,7 +50,7 @@ tree-sitter generate
 * [`system_variable`]
 * [`time`] 
 * [`date`] 
-* [`number`] exponent, flipped delimiter
+* [`number`] hex literal, exponent, comma or period as decimal separator
 * [`string`] `\n` `\r` `\t` `\\` `\"`
 
 ### classic commands (disabled)
