@@ -30,5 +30,6 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
-* [`object_literal`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal.txt)
+* [`object_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/13.%20object_literal_block.txt)
+* [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
 * [`comment`]
