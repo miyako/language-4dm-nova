@@ -55,16 +55,6 @@ tree-sitter generate
 * [`binary_operator`]
 * [`ternary_operator`]
 
-### mutable or immutable
-
-in the screenshort above, `This` is coloured in 3 ways
-
-1. mutable object (left operand)
-2. immutable function call (right operand)
-3. immutable value (right operand)
-
-this is because every "block" is set to default to some kind of code object to avoid undefined tokens in the global scope.
-
 ### classic commands (disabled)
 
 hard-coding every single command does not work well with tree-sitter; the compiler simply enters a death sprial. 
