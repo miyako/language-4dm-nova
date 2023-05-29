@@ -48,7 +48,10 @@ tree-sitter generate
 * [`collection_literal_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/14.%20collection_literal_block.txt)
 * [`local_variable`] [`interprocess_variable`] 1d-array element, 2d-array element, collection element
 * [`system_variable`]
-* [`time`] [`date`] [`string`] [`number`] exponent, flipped delimiter
+* [`time`] 
+* [`date`] 
+* [`number`] exponent, flipped delimiter
+* [`string`] `\n` `\r` `\t` `\\` `\"`
 
 ### classic commands (disabled)
 
