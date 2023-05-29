@@ -13,7 +13,7 @@ tree-sitter generate
 
 ## the `fourd` tree-sitter parser
 
-* `source` is a series of `_statement`.
+* `source` is a series of `_statement`
 
 ### `_statement`
 
