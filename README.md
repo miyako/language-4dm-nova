@@ -32,14 +32,14 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
-* [`if_block`]
-* [`repeat_block`]
-* [`while_block`]
-* [`for_block`]
-* [`use_block`]
-* [`case_block`]
-* [`for_each_block`]
-* [`sql_injection_block`] - code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
+* [`if_block`] - EN/FR
+* [`repeat_block`] - EN/FR
+* [`while_block`] - EN/FR
+* [`for_block`] - EN/FR
+* [`use_block`] - EN/FR
+* [`case_block`] - EN/FR
+* [`for_each_block`] - EN/FR
+* [`sql_injection_block`]  - EN/FR; code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
 * [`comment`]
 
 ### tokens that may appear in a `_statement`
