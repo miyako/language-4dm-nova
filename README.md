@@ -41,3 +41,7 @@ tree-sitter generate
 * [`for_each_block`]
 * [`sql_injection_block`] - code switching to sql not working
 * [`comment`]
+
+### native commands
+
+hard-coding every single command does not work with tree-sitter. 
