@@ -28,7 +28,7 @@
 
 ; Functions
 (generic_function) @identifier.function
-(function_call) @identifier.method
+(function_call) @identifier.variable
 
 ; Variables
 

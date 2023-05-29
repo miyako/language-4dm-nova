@@ -1,0 +1,31 @@
+==================
+9. function_call
+==================
+
+$value.method()
+4D.File.method()
+cs.aClass.method()
+cs.aComponent.aClass.method()
+$t:=cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
+
+---
+
+(source
+  (function_call
+    (generic_function
+      (local_variable)))
+  (function_call
+    (class_function
+      (command_suffix)))
+  (function_call
+    (class_function
+      (command_suffix)))
+  (function_call
+    (class_function
+      (command_suffix)))
+  (assignment_block
+    (local_variable)
+    (class_function
+      (command_suffix))
+    (class_function
+      (command_suffix))))
