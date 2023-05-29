@@ -22,15 +22,7 @@ tree-sitter generate
 * [`var_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/5.%20var_declaration_block.txt) 
 * [`property_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/6.%20property_declaration_block.txt) 
 * [`alias_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/7.%20alias_block.txt)  
-
----
-
-**Note**: because of precendence ambiguity, left operand can not be process variable
-
-```4d
-$variable.prop:=$value
-$1.prop:=$value
-```
+* [`assignment_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/8.%20assignment_block.txt) - process scope not supported because of conflict
 
 * function call
 
