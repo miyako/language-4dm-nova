@@ -44,4 +44,15 @@ tree-sitter generate
 
 ### native commands
 
-hard-coding every single command does not work with tree-sitter. 
+hard-coding every single command does not work well with tree-sitter; the compiler enters a death sprial. 
+
+on the other hand, generic global tokens would invalidate tokens such as:
+
+* var_declaration_block
+* function_block
+* classic_compiler_block
+* property_declaration_block
+* alias_block
+* function_call
+
+as the generic token will take precedence.
