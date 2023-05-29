@@ -26,8 +26,8 @@ module.exports = grammar({
     _statement: $ => choice(
       $.function_block,
       $.declare_block,
-      $.class_extends,
       $.class_constructor,
+      $.class_extends,
       $.var_declaration_block,
       $.property_declaration_block,
       $.alias_block,
@@ -219,7 +219,7 @@ module.exports = grammar({
     
     class_extends: $ => prec(PREC.statement, seq(
       $._class_extends,
-      choice($._name, $._class)
+      seq(choice($._class_store_4d, $._name), repeat(seq('.', $._name)))
       )
     ),
     

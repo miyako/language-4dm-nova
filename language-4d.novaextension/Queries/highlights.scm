@@ -13,7 +13,6 @@
 (property) @keyword.construct
 (alias) @keyword.construct
 (declare) @keyword.construct
-(function) @keyword.construct
 
 (return) @keyword.condition
 (break) @keyword.condition

@@ -21,11 +21,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "class_extends"
+          "name": "class_constructor"
         },
         {
           "type": "SYMBOL",
-          "name": "class_constructor"
+          "name": "class_extends"
         },
         {
           "type": "SYMBOL",
@@ -1286,15 +1286,36 @@
             "name": "_class_extends"
           },
           {
-            "type": "CHOICE",
+            "type": "SEQ",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "_name"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_class_store_4d"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_name"
+                  }
+                ]
               },
               {
-                "type": "SYMBOL",
-                "name": "_class"
+                "type": "REPEAT",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "."
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_name"
+                    }
+                  ]
+                }
               }
             ]
           }

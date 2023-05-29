@@ -1,0 +1,10 @@
+==================
+3. class_constructor
+==================
+
+class constructor
+
+---
+
+(source
+  (class_constructor))

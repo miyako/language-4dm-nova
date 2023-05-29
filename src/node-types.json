@@ -122,17 +122,7 @@
   {
     "type": "class_extends",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "command_suffix",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "class_function",
