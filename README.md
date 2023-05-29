@@ -40,10 +40,9 @@ tree-sitter generate
 * [`case_block`]
 * [`for_each_block`]
 * [`sql_injection_block`] - code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
-* [`classic_command`] - very limited; see below
 * [`comment`]
 
-### classic commands
+### classic commands (disabled)
 
 hard-coding every single command does not work well with tree-sitter; the compiler simply enters a death sprial. 
 
@@ -56,7 +55,5 @@ on the other hand, a generic token pattern would partially match and invalidate 
 * alias_block
 * function_call
 
-as a compromise, `classic_array_block` is tokenised as a regular command.
-
-other native commands must have the `:C` token suffix.
+even if we make the `:C` token suffix mandatory, it will be hard to tokenise reference commands such as `Form` `This` `Super` `cs` `ds` `4D`).
 
