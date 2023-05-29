@@ -1,0 +1,30 @@
+==================
+2. declare_block
+==================
+
+#DECLARE($param1:Text)
+#DECLARE($param1:Text)->$returnValue:Integer
+#DECLARE()->$returnValue:Integer 
+
+---
+
+(source
+  (declare_block
+    (declare)
+    (function_arguments
+      (local_variable)
+      (class)))
+  (declare_block
+    (declare)
+    (function_arguments
+      (local_variable)
+      (class))
+    (function_result
+      (local_variable)
+      (class)))
+  (declare_block
+    (declare)
+    (function_arguments)
+    (function_result
+      (local_variable)
+      (class))))
