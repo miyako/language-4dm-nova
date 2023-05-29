@@ -26,6 +26,23 @@
 (else) @keyword.condition
 (end_if) @keyword.condition
 
+(case_of) @keyword.condition
+(end_case) @keyword.condition
+
+(use) @keyword.condition
+(end_use) @keyword.condition
+
+(for) @keyword.condition
+(end_for) @keyword.condition
+
+(repeat) @keyword.condition
+(until) @keyword.condition
+(while) @keyword.condition
+(end_while) @keyword.condition
+
+(for_each) @keyword.condition
+(end_for_each) @keyword.condition
+
 (begin_sql) @keyword.condition
 (end_sql) @keyword.condition
 

@@ -42,6 +42,10 @@ module.exports = grammar({
       $.if_block,
       $.repeat_block,
       $.while_block,
+      $.for_block,
+      $.use_block,
+      $.case_block,
+      $.for_each_block,
       $.sql_injection_block,
       $.comment
     ),
@@ -473,7 +477,10 @@ classic_array: $ => prec(PREC.keyword, choice(
     )),
     if_block: $ => prec(PREC.statement, seq(
         $._if,
-        repeat(choice($._statement, seq($._statement, $.else, $._statement))),
+        choice(
+          repeat( $._statement),
+          seq(repeat( $._statement), $.else, repeat( $._statement))
+        ),
         $.end_if
       )
     ),
@@ -484,7 +491,16 @@ classic_array: $ => prec(PREC.keyword, choice(
     _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
     _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
     end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
-    
+    for_each_block: $ => prec(PREC.statement, seq(
+        $.for_each,
+        '(', choice($.local_variable, $.interprocess_variable), ';', $._condition, 
+        optional(choice(seq(';', $._condition), seq(';', $._condition, ';', $._condition))),
+        ')',
+        optional(seq(choice($.while, $.until), '(', $._condition, ')')),
+        repeat( $._statement),
+        $.end_for_each
+      )
+    ),
     _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
     _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
     while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
@@ -515,35 +531,48 @@ classic_array: $ => prec(PREC.keyword, choice(
         $._until
       )
     ),
-    
-    
-    
     _for_e: $ => /(f|F)(o|O)(r|R)/,
     _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
     for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
-    
     _end_for_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)/,
     _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
     end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
-    
+    for_block: $ => prec(PREC.statement, seq(
+        seq($.for, '(', choice($.local_variable, $.interprocess_variable), ';', $._condition, ';', $._condition, optional(seq(';', $._condition)), ')'),
+        repeat($._statement),
+        $.end_for
+      )
+    ),
     _use_e: $ => /(u|U)(s|S)(e|E)/,
     _use_f: $ => /(u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
     use   : $ => prec(PREC.keyword, choice($._use_e, $._use_f)),
-    
+    _use: $ => prec(PREC.statement, seq(
+        seq($.use, '(', $._mutable, ')')
+    )),
     _end_use_e: $ => /(e|E)(n|N)(d|D) (u|U)(s|S)(e|E)/,
     _end_use_f: $ => /(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
     end_use   : $ => prec(PREC.keyword, choice($._end_use_e, $._end_use_f)),
-    
-
-
-    
+    use_block: $ => prec(PREC.statement, seq(
+        $._use,
+        repeat($._statement),
+        $.end_use
+      )
+    ),
     _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
     _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
-    case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),
-    
+    case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),    
     _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
     _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
     end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
+    case_block: $ => prec(PREC.statement, seq(
+        $.case_of,
+        choice(
+          repeat(seq(':', '(', $._condition, ')', repeat($._statement))),
+          seq(repeat(seq(':', '(', $._condition, ')', repeat($._statement))), $.else, repeat($._statement))
+        ),
+        $.end_case
+      )
+    ),
     _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
     begin_sql   : $ => prec(PREC.keyword, choice($._begin_sql_e, $._begin_sql_f)),
@@ -569,10 +598,10 @@ classic_array: $ => prec(PREC.keyword, choice(
   
 
   conflicts: $ => [
-/*
-    [$._single_condition, $._binary_operator],
-    [$._single_condition]
-*/
+
+    [$.for_each_block, $._while],
+    [$._while]
+
   ]
 
   
