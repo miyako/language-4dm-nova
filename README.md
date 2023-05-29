@@ -11,6 +11,13 @@ tree-sitter generate
 
 ## the `4dlang` tree-sitter parser
 
+* `source` is a series of `_statement`.
+
+start with the most specific statements.
+
+`function_block`
+
+
 ## features
 
 language-4d currently supports the following features:
