@@ -48,7 +48,7 @@
 (end_sql) @keyword.condition
 
 (this) @keyword.self
-(form) @keyword.self
+;(form) @keyword.self
 (super) @keyword.self
 
 ; Functions
