@@ -48,7 +48,8 @@ module.exports = grammar({
       $.for_each_block,
       $.sql_injection_block,
       //$.classic_command,
-      $.comment
+      $.comment,
+      $.comment_block
     ),
                 
     _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,
@@ -273,8 +274,8 @@ module.exports = grammar({
       seq(
         '(', 
         choice($.local_variable, $._name), 
-        seq(';', choice($.local_variable, $._name, /[0-9]+/)), 
-        optional(seq(';', choice($.local_variable, $._name, /[0-9]+/))),
+        seq(';', choice($.local_variable, $._name, $._immutable)), 
+        optional(seq(';', choice($.local_variable, $._name, $._immutable))),
         ')')
       )
     ),
@@ -462,27 +463,28 @@ classic_array: $ => prec(PREC.keyword, choice(
       '/'
     )),
     
-    _comment: $ => prec(PREC.comment,seq('//', /.*/)),
-    
-    comment: $ => choice($.comment_block, $._comment),
-  
+    comment: $ => prec(PREC.comment,seq('//', /.*/)),
+      
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
-    if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
+    _if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
     _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
     _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
     else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
     _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
     _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
     end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
-    _if: $ => prec(PREC.statement, seq(
-        seq($.if, '(', $._condition, ')')
+    if: $ => prec(PREC.statement, seq(
+        seq($._if, '(', $._condition, ')')
     )),
+    
+    else_block: $ => seq($.else, repeat( $._statement)),
+    
     if_block: $ => prec(PREC.statement, seq(
-        $._if,
+        $.if,
         choice(
-          repeat( $._statement),
-          seq(repeat( $._statement), $.else, repeat( $._statement))
+          repeat($._statement),
+          seq(repeat($._statement), $.else_block)
         ),
         $.end_if
       )
@@ -571,7 +573,7 @@ classic_array: $ => prec(PREC.keyword, choice(
         $.case_of,
         choice(
           repeat(seq(':', '(', $._condition, ')', repeat($._statement))),
-          seq(repeat(seq(':', '(', $._condition, ')', repeat($._statement))), $.else, repeat($._statement))
+          seq(repeat(seq(':', '(', $._condition, ')', repeat($._statement))), $.else_block)
         ),
         $.end_case
       )
@@ -582,16 +584,11 @@ classic_array: $ => prec(PREC.keyword, choice(
     _end_sql_e: $ => /(e|E)(n|N)(d|D) (s|S)(q|Q)(l|L)/,
     _end_sql_f: $ => /(f|F)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     end_sql   : $ => prec(PREC.keyword, choice($._end_sql_e, $._end_sql_f)),
-    /* 
-    injection doesn't seem to work
-    ((sql_block) @injection.content
-     (#set! injection.language "sql")
-    )
-    */
-    sql_block: $ => seq(repeat(/.+?/), $.end_sql),
+
     sql_injection_block: $ => prec(PREC.statement, seq(
         $.begin_sql,
-        $.sql_block
+        repeat(/.+?/),
+        $.end_sql
       )
     ),
     

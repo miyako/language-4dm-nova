@@ -1,94 +1,138 @@
-;Types
+(function_arguments
+ (local_variable) @identifier.variable
+ (class) @identifier.type.class
+)
 
-(class) @identifier.type.class
-(classic_compiler) @identifier.type.class
-(class_function) @identifier.type.class
+(function_result
+ (local_variable) @identifier.variable
+ (class) @identifier.type.class
+)
 
-; Comment
+(function_block
+ (function_name
+  (function) @keyword.construct) @identifier.function
+ (function_arguments)?
+ (function_result)?
+)
 
-(comment) @comment
-(comment_block) @comment
-(command_suffix_optional) @comment
-(command_suffix) @comment
-(constant_suffix) @comment
+(declare_block
+ (declare) @keyword.construct
+ (function_arguments)?
+ (function_result)?
+)
 
-; Keywords
+(class_constructor) @keyword.construct
 
-(var) @keyword.construct
-(property) @keyword.construct
-(alias) @keyword.construct
-(declare) @keyword.construct
+(class_extends) @keyword.construct
+
+(var_declaration_block
+ ((var) @keyword.construct) 
+ (local_variable)? @identifier.variable
+ ;optional to allow for process variable as generic node
+ (class) @identifier.type.class
+) 
+
+(property_declaration_block
+ (property) @keyword.construct
+ ;property name is a generic node
+ (class) @identifier.type.class
+)
+
+(alias_block
+ (alias_name
+  (alias) @keyword.construct) @identifier.function
+)
+
+(function_call
+ (generic_function)? @identifier.function
+ (class_function
+  (command_suffix_optional)? @comment)? @identifier.type.class 
+)
+
+(classic_compiler_block
+ (classic_compiler)
+ (local_variable)? @identifier.variable
+)
+
+(classic_array_block
+ (classic_array)
+ (local_variable)? @identifier.variable
+)
+
+(return_block
+ (return) @keyword.condition
+)
 
 (return) @keyword.condition
 (break) @keyword.condition
 (continue) @keyword.condition
 
-(if) @keyword.condition
-(else) @keyword.condition
-(end_if) @keyword.condition
+(comment) @comment
+(comment_block) @comment
 
-(case_of) @keyword.condition
-(end_case) @keyword.condition
+(if_block
+ (if) @keyword.condition
+ (else_block 
+  (else))? @keyword.condition
+ (end_if) @keyword.condition
+)
 
-(use) @keyword.condition
-(end_use) @keyword.condition
+(case_block
+ (case_of) @keyword.condition
+ (else_block 
+ (else))? @keyword.condition
+ (end_case) @keyword.condition
+)
 
-(for) @keyword.condition
-(end_for) @keyword.condition
+(use_block
+ (use) @keyword.condition
+ (end_use) @keyword.condition
+)
 
-(repeat) @keyword.condition
-(until) @keyword.condition
-(while) @keyword.condition
-(end_while) @keyword.condition
+(for_block
+ (for) @keyword.condition
+ (end_for) @keyword.condition
+)
 
-(for_each) @keyword.condition
-(end_for_each) @keyword.condition
+(repeat_block
+ (repeat) @keyword.condition
+ (until) @keyword.condition
+)
 
-(begin_sql) @keyword.condition
-(end_sql) @keyword.condition
+(while_block
+ (while) @keyword.condition
+ (end_while) @keyword.condition
+)
 
-(this) @keyword.self
-;(form) @keyword.self
-(super) @keyword.self
+(for_each_block
+ (for_each) @keyword.condition
+ (end_for_each) @keyword.condition
+)
 
-; Functions
+(sql_injection_block
+ (begin_sql) @keyword.condition
+ (end_sql) @keyword.condition
+)
 
-(generic_function) @identifier.function
-(function_call) @identifier.variable
-(classic_command) @identifier.method
-(classic_array) @identifier.function
-(classic_command) @identifier.function
+; allow out-of-context symbolisation
 
-; Variables
+(numeric_parameter)? @identifier.constant
+(local_variable)? @identifier.variable
+(constant)? @identifier.property
 
-(local_variable) @identifier.variable
-(property_declaration_block) @identifier.variable
-(var_declaration_block) @identifier.variable
-(alias_block) @identifier.variable
-(return_block) @identifier.variable
-(assignment_block) @identifier.variable
-(classic_compiler_block) @identifier.variable
-(ternary_block) @identifier.variable
-(if_block) @identifier.variable
+;symbols with suffix
 
-; Compound Keywords
+(classic_compiler
+ (command_suffix_optional)? @comment
+) @identifier.type.class
 
-(function_name) @identifier.function
-(alias_name) @identifier.function
-(class_extends) @identifier.function
-(class_constructor) @identifier.function
-(class_extends) @identifier.function
+(classic_array
+ (command_suffix_optional)? @comment
+) @identifier.type.class
 
-; Constants
+(constant
+ (classic_constant
+  (constant_suffix)? @comment) @identifier.property
+)
 
-(constant) @identifier.property
-(interprocess_variable) @identifier.constant
-(system_variable) @identifier.constant
-(numeric_parameter) @identifier.constant
-(object_literal_block) @identifier.constant
-(collection_literal_block) @identifier.constant
-
-; Operators
-
-[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]"] @operator
-
+[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]" "+" "-" "*" "/" "&&" "||" "&" "|" "^" "~|" "<" ">" "=" "#" "<<" ">>" "+=" "-=" "*=" "/=" "??" "?+" "?-"] @operator

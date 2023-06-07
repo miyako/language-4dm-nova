@@ -57,192 +57,336 @@ ARRAY TIME:C1223($a; 0; 0)
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable))
+    (local_variable)
+    (constant
+      (number)))
   (classic_array_block
     (classic_array
       (command_suffix_optional))
-    (local_variable)))
+    (local_variable)
+    (constant
+      (number))
+    (constant
+      (number))))

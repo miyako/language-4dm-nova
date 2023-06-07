@@ -14,5 +14,4 @@ End SQL
 (source
   (sql_injection_block
     (begin_sql)
-    (sql_block
-      (end_sql))))
+    (end_sql)))
