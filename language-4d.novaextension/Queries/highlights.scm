@@ -50,15 +50,11 @@
  (expression_argument)?
 ) @identifier.function
 
-; (class_function
-;  (_) @start.before @end.after;function_name_1
-;  (_) ;function_argument
-; ) @identifier.function
-
-; (generic_function
-;  (_) @start.before @end.after;function_name_2
-;  (_) ;function_argument
-; ) @identifier.function
+(class_instance
+ (class_name) @start.before @end.after
+ (command_suffix)? @comment
+ (expression_argument)?
+) @identifier.type.class
 
 (classic_compiler_block
  (classic_compiler)
