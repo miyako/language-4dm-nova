@@ -98,7 +98,12 @@ module.exports = grammar({
     /*
     token
     */
-
+    local_variable_expression: $ => seq($.local_variable, repeat(seq('.', $._name))),
+    
+    numeric_parameter_expression: $ => prec.right(seq($.numeric_parameter, repeat(seq('.', $._name)))),
+    
+    interprocess_variable_expression: $ => seq($.interprocess_variable, repeat(seq('.', $._name))),
+    
     class: $ => prec(PREC.token, choice($._basic_type, $._class)),
     /*
     can be up to 2 dimensional
@@ -109,7 +114,7 @@ module.exports = grammar({
     add 1 more dimension
     */    
     numeric_parameter: $ => prec(PREC.token, seq('$', /[0-9]+/)),    
-    _variable: $ => seq(choice($.local_variable, $.interprocess_variable, $.numeric_parameter), optional(seq('{', $._single_condition, '}'))),
+    _variable: $ => seq(choice($.local_variable_expression, $.interprocess_variable, $.numeric_parameter_expression), optional(seq('{', $._single_condition, '}'))),
     /*
     property path or collection element
     */
@@ -599,7 +604,8 @@ classic_array: $ => prec(PREC.keyword, choice(
   },
   
   conflicts: $ => [
-
+    [$.local_variable_expression],
+    [$.local_variable],
     [$.for_each_block, $._while],
     [$._while]
 

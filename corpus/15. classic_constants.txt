@@ -13,7 +13,8 @@ $t:=cs.aComponent.aClass.method(fk desktop folder:K87:19) + cs.aComponent.aClass
 (source
   (function_call
     (generic_function
-      (local_variable)
+      (local_variable_expression
+        (local_variable))
       (constant
         (classic_constant
           (constant_suffix)))))
@@ -39,7 +40,8 @@ $t:=cs.aComponent.aClass.method(fk desktop folder:K87:19) + cs.aComponent.aClass
         (classic_constant
           (constant_suffix)))))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (class_function
       (command_suffix_optional)
       (constant

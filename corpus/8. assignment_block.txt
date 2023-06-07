@@ -18,43 +18,63 @@ $1.prop:=$value ? "a" : "b"
 
 (source
   (assignment_block
-    (local_variable)
-    (local_variable))
+    (local_variable_expression
+      (local_variable))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (local_variable)
-    (local_variable))
+    (local_variable_expression
+      (local_variable))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (local_variable)
-    (local_variable))
+    (local_variable_expression
+      (local_variable))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (numeric_parameter)
-    (local_variable))
+    (numeric_parameter_expression
+      (numeric_parameter))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (numeric_parameter)
-    (local_variable))
+    (numeric_parameter_expression
+      (numeric_parameter))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (numeric_parameter)
-    (local_variable))
+    (numeric_parameter_expression
+      (numeric_parameter))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (numeric_parameter)
-    (local_variable))
+    (numeric_parameter_expression
+      (numeric_parameter))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (constant
       (date)))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (constant
       (date)))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (constant
       (string))
-    (local_variable))
+    (local_variable_expression
+      (local_variable)))
   (assignment_block
-    (numeric_parameter)
+    (numeric_parameter_expression
+      (numeric_parameter))
     (ternary_block
-      (local_variable)
+      (local_variable_expression
+        (local_variable))
       (constant
         (string))
       (constant

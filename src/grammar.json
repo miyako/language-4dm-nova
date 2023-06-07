@@ -494,6 +494,85 @@
         ]
       }
     },
+    "local_variable_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "local_variable"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_name"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "numeric_parameter_expression": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "numeric_parameter"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "."
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_name"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "interprocess_variable_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "interprocess_variable"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_name"
+              }
+            ]
+          }
+        }
+      ]
+    },
     "class": {
       "type": "PREC",
       "value": -8,
@@ -620,7 +699,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "local_variable"
+              "name": "local_variable_expression"
             },
             {
               "type": "SYMBOL",
@@ -628,7 +707,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "numeric_parameter"
+              "name": "numeric_parameter_expression"
             }
           ]
         },
@@ -3770,6 +3849,12 @@
     }
   ],
   "conflicts": [
+    [
+      "local_variable_expression"
+    ],
+    [
+      "local_variable"
+    ],
     [
       "for_each_block",
       "_while"

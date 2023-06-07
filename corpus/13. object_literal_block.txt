@@ -10,17 +10,25 @@ $object:={test:{test:$test}}
 
 (source
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (ternary_block
-      (local_variable)
-      (local_variable)
-      (local_variable)))
+      (local_variable_expression
+        (local_variable))
+      (local_variable_expression
+        (local_variable))
+      (local_variable_expression
+        (local_variable))))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (object_literal_block
-      (local_variable)))
+      (local_variable_expression
+        (local_variable))))
   (assignment_block
-    (local_variable)
+    (local_variable_expression
+      (local_variable))
     (object_literal_block
       (object_literal_block
-        (local_variable)))))
+        (local_variable_expression
+          (local_variable))))))

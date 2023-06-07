@@ -8,6 +8,8 @@
  (class) @identifier.type.class
 )
 
+(class_function) @identifier.function
+
 (function_block
  (function_name
   (function) @keyword.construct) @identifier.function
@@ -116,8 +118,17 @@
 
 ; allow out-of-context symbolisation
 
-(numeric_parameter)? @identifier.constant
-(local_variable)? @identifier.variable
+(numeric_parameter) @identifier.decorator
+(local_variable) @identifier.variable
+
+(numeric_parameter_expression
+ (numeric_parameter) @identifier.decorator
+) @identifier.decorator
+
+(local_variable_expression
+ (local_variable) @identifier.variable
+) @identifier.variable
+
 (constant)? @identifier.property
 
 ;symbols with suffix
@@ -135,4 +146,4 @@
   (constant_suffix)? @comment) @identifier.property
 )
 
-[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]" "+" "-" "*" "/" "&&" "||" "&" "|" "^" "~|" "<" ">" "=" "#" "<<" ">>" "+=" "-=" "*=" "/=" "??" "?+" "?-"] @operator
+[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]" "+" "-" "*" "/" "&&" "||" "&" "|" "^" "~|" "<" ">" "=" "#" "<<" ">>" "+=" "-=" "*=" "/=" "??" "?+" "?-" "->"] @operator
