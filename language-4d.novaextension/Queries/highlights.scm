@@ -1,10 +1,10 @@
 (function_arguments
- (local_variable) @identifier.variable
+ (local_variable_name) @identifier.variable
  (class) @identifier.type.class
 )
 
 (function_result
- (local_variable) @identifier.variable
+ (local_variable_name) @identifier.variable
  (class) @identifier.type.class
 )
 
@@ -27,7 +27,8 @@
 
 (var_declaration_block
  ((var) @keyword.construct) 
- (local_variable)? @identifier.variable
+ (local_variable_name)? @identifier.variable
+ (interprocess_variable_name)? @identifier.variable
  ;optional to allow for process variable as generic node
  (class) @identifier.type.class
 ) 
@@ -43,11 +44,11 @@
   (alias) @keyword.construct) @identifier.function
 )
 
-; (classic_function
-;  (classic_command) @start.before @end.after
-;  (command_suffix_optional)? @comment
-;  (function_argument)?
-; ) @identifier.function
+(classsic_command_expression
+ (classic_command) @start.before @end.after
+ (command_suffix)? @comment
+ (expression_argument)?
+) @identifier.function
 
 ; (class_function
 ;  (_) @start.before @end.after;function_name_1
@@ -61,63 +62,69 @@
 
 (classic_compiler_block
  (classic_compiler)
- (local_variable)? @identifier.variable
+ (local_variable_name)? @identifier.variable
+ (interprocess_variable_name)? @identifier.variable
 )
 
 (classic_array_block
  (classic_array)
- (local_variable)? @identifier.variable
+ (local_variable_name)? @identifier.variable
+ (interprocess_variable_name)? @identifier.variable
 )
 
-; (return_block
-;  (return) @keyword.condition
-; )
+(return_block
+ (return) @keyword.condition
+)
 
-; (return) @keyword.condition
-; (break) @keyword.condition
-; (continue) @keyword.condition
+(return) @keyword.condition
+(break) @keyword.condition
+(continue) @keyword.condition
 
 (comment) @comment
 (comment_block) @comment
 
-; (if_block
-;  (if) @keyword.condition
-;  (else_block 
-;   (else))? @keyword.condition
-;  (end_if) @keyword.condition
-; )
+; conditions
 
-; (case_block
-;  (case_of) @keyword.condition
-;  (else_block 
-;  (else))? @keyword.condition
-;  (end_case) @keyword.condition
-; )
+(if_block
+ (if) @keyword.condition
+ (else_block 
+  (else))? @keyword.condition
+ (end_if) @keyword.condition
+)
 
-; (use_block
-;  (use) @keyword.condition
-;  (end_use) @keyword.condition
-; )
+(case_block
+ (case_of) @keyword.condition
+ (else_block 
+ (else))? @keyword.condition
+ (end_case) @keyword.condition
+)
 
-; (for_block
-;  (for) @keyword.condition
-;  (end_for) @keyword.condition
-; )
+(use_block
+ (use) @keyword.condition
+ (end_use) @keyword.condition
+)
 
-; (repeat_block
-;  (repeat) @keyword.condition
-;  (until) @keyword.condition
-; )
+(for_block
+ (for) @keyword.condition
+ (end_for) @keyword.condition
+)
 
-; (while_block
-;  (while) @keyword.condition
-;  (end_while) @keyword.condition
-; )
+(repeat_block
+ (repeat) @keyword.condition
+ (until) @keyword.condition
+)
 
-; (for_each_block
-;  (for_each) @keyword.condition
-;  (end_for_each) @keyword.condition
-; )
+(while_block
+ (while) @keyword.condition
+ (end_while) @keyword.condition
+)
+
+(for_each_block
+ (for_each) @keyword.condition
+ (end_for_each) @keyword.condition
+)
+
+; injection
 
 (sql_injection_block
  (begin_sql) @keyword.condition
@@ -139,10 +146,5 @@
 (classic_array
  (command_suffix)? @comment
 ) @identifier.type.class
-
-; (constant
-;  (classic_constant
-;   (constant_suffix)? @comment) @identifier.property
-; )
 
 [":=" ";" "?" ":" "(" ")" "{" "}" "[" "]" "+" "-" "*" "/" "&&" "||" "&" "|" "^" "~|" "<" ">" "=" "#" "<<" ">>" "+=" "-=" "*=" "/=" "??" "?+" "?-" "->"] @operator

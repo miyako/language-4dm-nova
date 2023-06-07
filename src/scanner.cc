@@ -1359,11 +1359,11 @@ bool tree_sitter_fourd_external_scanner_scan(
             }
             
             if(iswspace(lexer->lookahead)) {
-                if(char_is_space) {
+                if((char_is_space) && (i != 0)) {
                     break;//disallow double spaces
                 }
                 char_is_space = true;
-                lexer->advance(lexer, false);//allow single space
+                lexer->advance(lexer, false);//allow single or leading space
                 continue;
             }
             

@@ -27,6 +27,18 @@ module.exports = grammar({
       $.property_declaration_block,
       $.classic_array_block,
       $.classic_compiler_block,
+      $.case_block,
+      $.use_block,
+      $.if_block,
+      $.for_each_block,
+      $.repeat_block,
+      $.while_block,
+      $.for_block,
+      $.for_each_block,
+      $.return_block,
+      $.return,
+      $.break, 
+      $.continue,
       $.comment_block
     ),
     
@@ -63,10 +75,10 @@ module.exports = grammar({
       seq('(', $.value, repeat(seq(';', $.value)), ')')
     ),
     command_suffix: $ => /(:C[0-9]+)/,
-    classsic_command_expression: $ => seq(
+    classsic_command_expression: $ => prec.right(seq(
       $.classic_command, 
       optional($.command_suffix), 
-      optional($.expression_argument)),
+      repeat($._node))),
       
     _name: $ => /([\p{Letter}_]+)([\p{Letter}_0-9]*)/, 
     _node: $ => choice(
@@ -135,7 +147,7 @@ module.exports = grammar({
     _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,
     _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
-    _function: $ => 'function', 
+    _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/, 
     _class_store_4d: $ => /[4](d|D)/,
     _class_store_ds: $ => /(d|D)(s|S)/,
     _class_store_cs: $ => /(c|C)(s|S)/,
@@ -172,7 +184,7 @@ module.exports = grammar({
     function_name: $ => seq(
       optional($._scope), $.function, repeat($._name)
     ),    
-    _function_argument: $ => seq($.local_variable, repeat(seq(';', $.local_variable)), ':', $.class),
+    _function_argument: $ => seq($.local_variable_name, repeat(seq(';', $.local_variable_name)), ':', $.class),
     function_arguments: $ => seq('(', optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), ')'),
     function_result: $ => seq('->', $._function_argument),
     function_block: $ => seq(
@@ -209,8 +221,8 @@ module.exports = grammar({
     var: $ => prec(PREC.keyword, $._var),
     var_declaration_block: $ => seq(
       $.var, 
-      choice($._name, $.local_variable), 
-      repeat(seq(';', choice($._name, $.local_variable))), 
+      choice($._name, $.local_variable_name), 
+      repeat(seq(';', choice($._name, $.local_variable_name))), 
       ':', 
       $.class
     ),
@@ -259,8 +271,8 @@ module.exports = grammar({
       $.classic_compiler, 
       seq(
         '(', 
-        choice($.local_variable, $._name), 
-        repeat(seq(';', choice($.local_variable, $._name))), 
+        choice($.local_variable_name, $.interprocess_variable_name, $._name), 
+        repeat(seq(';', choice($.local_variable_name, $.interprocess_variable_name, $._name))), 
         ')')
     ),
     _classic_array_blob: $ => seq(/(a|A)(r|R)(r|R)(a|A)(y|Y) (b|B)(l|L)(o|O)(b|B)/, optional($.command_suffix)),
@@ -293,13 +305,106 @@ module.exports = grammar({
       $.classic_array, 
       seq(
         '(', 
-        choice($.local_variable, $._name), 
-        seq(';', choice($.local_variable, $._name, $.value)), 
-        optional(seq(';', choice($.local_variable, $._name, $.value))),
+        choice($.local_variable_name, $.interprocess_variable_name, $._name), 
+        seq(';', $.value), 
+        optional(seq(';', $.value)),
         ')')
+    ),
+    _for_each_e: $ => /(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
+    _for_each_f: $ => /(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
+    for_each   : $ => prec(PREC.keyword, choice($._for_each_e, $._for_each_f)),
+    _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
+    _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
+    end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
+    for_each_block: $ => seq(
+      $.for_each,
+      '(', choice($.local_variable_name, $.interprocess_variable_name, $._name), ';', $.value, 
+      optional(choice(seq(';', $.value), seq(';', $.value, ';', $.value))),
+      ')',
+      optional(seq(choice($.while, $.until), '(', $.value, ')')),
+      repeat( $._statement),
+      $.end_for_each
+    ),
+    _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
+    _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
+    while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
+    _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
+    _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
+    end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
+    _while: $ => seq(
+        seq($.while, '(', $.value, ')')
+    ),
+    while_block: $ => seq(
+      $._while,
+      repeat($._statement),
+      $.end_while
+    ),
+    _repeat_e: $ => /(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)/,
+    _repeat_f: $ => /(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)/,
+    repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
+    _until_e: $ => /(u|U)(n|N)(t|T)(i|I)(l|L)/,
+    _until_f: $ => /(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)/,
+    until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
+    _until: $ => seq(
+      seq($.until, '(', $.value, ')')
+    ),
+    repeat_block: $ => seq(
+      $.repeat,
+      repeat($._statement),
+      $._until
+    ),
+    _for_e: $ => /(f|F)(o|O)(r|R)/,
+    _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
+    for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
+    _end_for_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)/,
+    _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
+    end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
+    for_block: $ => seq(
+      seq($.for, '(', choice($.local_variable_name, $.interprocess_variable_name, $._name), ';', $.value, ';', $.value, optional(seq(';', $.value)), ')'),
+      repeat($._statement),
+      $.end_for
     ),
     
     
+    
+    
+    
+    _if_e: $ => /(i|I)(f|F)/,
+    _if_f: $ => /(s|S)(i|I)/,
+    _if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
+    _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
+    _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
+    else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
+    _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
+    _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
+    end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
+    if: $ => seq(
+        seq($._if, '(', $.value, ')')
+    ),
+    else_block: $ => seq($.else, repeat( $._statement)),
+    if_block: $ =>  seq(
+        $.if,
+        choice(
+          repeat($._statement),
+          seq(repeat($._statement), $.else_block)
+        ),
+        $.end_if
+    ),
+    _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
+    _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
+    case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),    
+    _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
+    _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
+    end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
+    case_block: $ => seq(
+      $.case_of,
+      choice(
+        repeat(seq(':', '(', $.value, ')', repeat($._statement))),
+        seq(repeat(seq(':', '(', $.value, ')', repeat($._statement))), $.else_block)
+      ),
+      $.end_case
+      
+    ),
     _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
     begin_sql   : $ => prec(PREC.keyword, choice($._begin_sql_e, $._begin_sql_f)),
@@ -311,7 +416,31 @@ module.exports = grammar({
       repeat(/.+?/),
       $.end_sql
     ),      
-
+    _use_e: $ => /(u|U)(s|S)(e|E)/,
+    _use_f: $ => /(u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
+    use   : $ => prec(PREC.keyword, choice($._use_e, $._use_f)),
+    _use: $ => seq(
+        seq($.use, '(', $.value, ')')
+    ),
+    _end_use_e: $ => /(e|E)(n|N)(d|D) (u|U)(s|S)(e|E)/,
+    _end_use_f: $ => /(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
+    end_use   : $ => prec(PREC.keyword, choice($._end_use_e, $._end_use_f)),
+    use_block: $ => seq(
+      $._use,
+      repeat($._statement),
+      $.end_use
+    ),
+    
+    _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
+    _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
+    _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
+    return: $ => prec(PREC.keyword, $._return),
+    break: $ => prec(PREC.keyword, $._break),
+    continue: $ => prec(PREC.keyword, $._continue),
+    return_block: $ => seq(
+      $.return, 
+      $.value
+    ),
     /*
     operator
     */
@@ -338,14 +467,21 @@ module.exports = grammar({
   },
   
   conflicts: $ => [
+    [$.return_block, $._statement],
+    [$.return_block, $.ternary_block],
+    [$.return_block],
     [$.local_variable],
     [$.interprocess_variable],
     [$.class_instance],
-    [$.value, $.numeric_parameter],
-  //  [$.value], 
     [$.literal_block],
+    [$.if_block, $._statement],  
+    [$.if_block],  
+    [$.else_block, $._statement],  
+    [$.else_block],  
     [$.ternary_block, $._statement],
-    [$.ternary_block]
+    [$.ternary_block],
+    [$.for_each_block, $._while],
+    [$._while]
 
   ]
 
