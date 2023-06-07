@@ -2,11 +2,14 @@
 8. assignment_block
 ==================
 
+$0:=$value.prop
+
 $variable:=$value.prop
 $variable.prop:=$value
 $variable.prop:=$value.prop
-$0:=$value
+$1:=$value
 $1.prop:=$value
+
 $0:=$value.prop
 $1.prop:=$value.prop
 $variable:=!00-00-00!
@@ -14,68 +17,103 @@ $variable:=!2001-01-01!
 $variable:="abc\r\n\t\"\\"+$value
 $1.prop:=$value ? "a" : "b"
 
+
 ---
 
 (source
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (numeric_parameter_expression
-      (numeric_parameter))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (numeric_parameter_expression
-      (numeric_parameter))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (numeric_parameter_expression
-      (numeric_parameter))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (numeric_parameter_expression
-      (numeric_parameter))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (constant
-      (date)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (constant
-      (date)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (constant
-      (string))
-    (local_variable_expression
-      (local_variable)))
-  (assignment_block
-    (numeric_parameter_expression
-      (numeric_parameter))
-    (ternary_block
-      (local_variable_expression
-        (local_variable))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (local_variable
+        (local_variable_name))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
       (constant
-        (string))
+        (date))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
       (constant
-        (string)))))
+        (date))))
+  (value
+    (value
+      (local_variable
+        (local_variable_name)))
+    (value
+      (value
+        (constant
+          (string)))
+      (value
+        (local_variable
+          (local_variable_name)))))
+  (value
+    (value
+      (numeric_parameter
+        (numeric_parameter_name)))
+    (value
+      (ternary_block
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (string)))
+        (value
+          (constant
+            (string)))))))

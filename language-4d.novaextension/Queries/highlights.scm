@@ -8,8 +8,6 @@
  (class) @identifier.type.class
 )
 
-(class_function) @identifier.function
-
 (function_block
  (function_name
   (function) @keyword.construct) @identifier.function
@@ -45,11 +43,21 @@
   (alias) @keyword.construct) @identifier.function
 )
 
-(function_call
- (generic_function)? @identifier.function
- (class_function
-  (command_suffix_optional)? @comment)? @identifier.type.class 
-)
+(classic_function
+ (classic_command) @start.before @end.after
+ (command_suffix_optional)? @comment
+ (function_argument)?
+) @identifier.function
+
+(class_function
+ (_) @start.before @end.after;function_name_1
+ (_) ;function_argument
+) @identifier.function
+
+(generic_function
+ (_) @start.before @end.after;function_name_2
+ (_) ;function_argument
+) @identifier.function
 
 (classic_compiler_block
  (classic_compiler)
@@ -116,19 +124,10 @@
  (end_sql) @keyword.condition
 )
 
-; allow out-of-context symbolisation
+; allow out-of-context symbolisation for these only
 
 (numeric_parameter) @identifier.decorator
 (local_variable) @identifier.variable
-
-(numeric_parameter_expression
- (numeric_parameter) @identifier.decorator
-) @identifier.decorator
-
-(local_variable_expression
- (local_variable) @identifier.variable
-) @identifier.variable
-
 (constant)? @identifier.property
 
 ;symbols with suffix

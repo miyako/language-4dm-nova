@@ -18,71 +18,87 @@ local exposed function orderBy aproperty($param1:Text)->$returnValue:Integer
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (function_block
     (function_name
       (function))
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))))

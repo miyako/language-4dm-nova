@@ -12,19 +12,23 @@
   (declare_block
     (declare)
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (declare_block
     (declare)
     (function_arguments
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class)))
   (declare_block
     (declare)
     (function_arguments)
     (function_result
-      (local_variable)
+      (local_variable
+        (local_variable_name))
       (class))))

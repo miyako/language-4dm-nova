@@ -2,32 +2,45 @@
 9. function_call
 ==================
 
+$ANSI.push($ccccvc)
 $value.method()
 4D.File.method()
 cs.aClass.method()
 cs.aComponent.aClass.method()
-$t:=cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
+cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
 
 ---
 
 (source
-  (function_call
-    (generic_function
-      (local_variable_expression
-        (local_variable))))
-  (function_call
-    (class_function
-      (command_suffix_optional)))
-  (function_call
-    (class_function
-      (command_suffix_optional)))
-  (function_call
-    (class_function
-      (command_suffix_optional)))
-  (assignment_block
-    (local_variable_expression
-      (local_variable))
-    (class_function
-      (command_suffix_optional))
-    (class_function
-      (command_suffix_optional))))
+  (value
+    (local_variable
+      (local_variable_name)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name))))))
+  (value
+    (local_variable
+      (local_variable_name)
+      (expression_argument)))
+  (value
+    (class_instance
+      (class_name)
+      (expression_argument)))
+  (value
+    (class_instance
+      (class_name)
+      (expression_argument)))
+  (value
+    (class_instance
+      (class_name)
+      (expression_argument)))
+  (value
+    (value
+      (class_instance
+        (class_name)
+        (expression_argument)))
+    (value
+      (class_instance
+        (class_name)
+        (expression_argument)))))

@@ -1,5 +1,0 @@
-$value.method(fk desktop folder:K87:19)
-4D.File.method(fk desktop folder:K87:19;fk desktop folder:K87:19)
-cs.aClass.method(fk desktop folder:K87:19)
-cs.aComponent.aClass.method(fk desktop folder:K87:19)
-$t:=cs.aComponent.aClass.method(fk desktop folder:K87:19) + cs.aComponent.aClass.method(fk desktop folder:K87:19)
