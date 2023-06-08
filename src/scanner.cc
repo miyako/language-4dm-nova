@@ -3,10 +3,21 @@
 #include <vector>
 
 enum TokenType {
-  CLASSIC_COMMAND
+    CLASSIC_COMMAND,
+    CLASSIC_CONSTANT
 };
 
-const wchar_t *tokens[] = {
+const wchar_t *constant_tokens[] = {
+    L"ZIPWITHOUTENCLOSINGFOLDER",
+    L"ZIPIGNOREINVISIBLEFILES",
+    L"ZIPENCRYPTIONNONE",
+    L"ZIPENCRYPTIONAES256",
+    L"ZIPENCRYPTIONAES192",
+    L"ZIPENCRYPTIONAES128",
+    L"ZIPCOMPRESSIONXZ"
+};
+
+const wchar_t *command_tokens[] = {
     L"ZIPREADARCHIVE",
     L"ZIPCREATEARCHIVE",
     L"YEAROF",
@@ -1315,7 +1326,7 @@ const wchar_t *tokens[] = {
     L"ABORT"
 };
 
-#define MAX_TOKEN_LENGTH 40
+#define MAX_TOKEN_LENGTH 42
 
 extern "C" {
 
@@ -1335,7 +1346,7 @@ bool tree_sitter_fourd_external_scanner_scan(
                                              const bool *valid_symbols
                                              ) {
     if (valid_symbols[CLASSIC_COMMAND]) {
-        //indicates which of external tokens are currently expected by the parser.
+        //indicates which of external command_tokens are currently expected by the parser.
         lexer->result_symbol = CLASSIC_COMMAND;
         
         std::vector<int32_t>buffer(MAX_TOKEN_LENGTH);
@@ -1383,6 +1394,13 @@ bool tree_sitter_fourd_external_scanner_scan(
                 continue;
             }
             
+            if(character >= '_') {
+                buffer[i++] = character;
+                lexer->advance(lexer, false);
+                char_is_space = false;
+                continue;
+            }
+            
             //TODO: inline comment
             
             break;
@@ -1390,14 +1408,87 @@ bool tree_sitter_fourd_external_scanner_scan(
         
         buffer[i] = 0;
 
-        for(int i = 0; i < sizeof(tokens) / sizeof(wchar_t *);++i)
+        for(int i = 0; i < sizeof(command_tokens) / sizeof(wchar_t *);++i)
         {
-            const wchar_t *token = tokens[i];
+            const wchar_t *token = command_tokens[i];
             if(wcscmp(token, (wchar_t *)&buffer[0]) == 0) {
                 return true;
             }
         }
     }
+    
+    if (valid_symbols[CLASSIC_CONSTANT]) {
+        //indicates which of external command_tokens are currently expected by the parser.
+        lexer->result_symbol = CLASSIC_CONSTANT;
+        
+        std::vector<int32_t>buffer(MAX_TOKEN_LENGTH);
+        
+        unsigned int i = 0;
+        bool char_is_space = false;
+        
+        for (;;) {
+            
+            if(i == (MAX_TOKEN_LENGTH-1)) {
+                break;
+            }
+            
+            if(lexer->eof(lexer)) {
+                break;
+            }
+            
+            if(lexer->lookahead == '\\') {
+                lexer->advance(lexer, true);//ignore this
+                continue;
+            }
+            
+            if(iswspace(lexer->lookahead)) {
+                if((char_is_space) && (i != 0)) {
+                    break;//disallow double spaces
+                }
+                char_is_space = true;
+                lexer->advance(lexer, false);//allow single or leading space
+                continue;
+            }
+            
+            wint_t character = towupper(lexer->lookahead);
+            
+            if((character >= '0') && (character <= '9')) {
+                buffer[i++] = character;
+                lexer->advance(lexer, false);
+                char_is_space = false;
+                continue;
+            }
+            
+            if((character >= 'A') && (character <= 'z')) {
+                buffer[i++] = character;
+                lexer->advance(lexer, false);
+                char_is_space = false;
+                continue;
+            }
+            
+            if(character >= '_') {
+                buffer[i++] = character;
+                lexer->advance(lexer, false);
+                char_is_space = false;
+                continue;
+            }
+            
+            //TODO: inline comment
+            
+            break;
+        }
+        
+        buffer[i] = 0;
+
+        for(int i = 0; i < sizeof(constant_tokens) / sizeof(wchar_t *);++i)
+        {
+            const wchar_t *token = constant_tokens[i];
+            if(wcscmp(token, (wchar_t *)&buffer[0]) == 0) {
+                return true;
+            }
+        }
+    }
+    
     return false;
 }
 

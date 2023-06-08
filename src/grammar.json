@@ -351,6 +351,10 @@
         {
           "type": "SYMBOL",
           "name": "string"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "classsic_constant_expression"
         }
       ]
     },
@@ -428,6 +432,35 @@
               "type": "SYMBOL",
               "name": "_node"
             }
+          }
+        ]
+      }
+    },
+    "constant_suffix": {
+      "type": "PATTERN",
+      "value": "(:K[0-9]+:[0-9]+)"
+    },
+    "classsic_constant_expression": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "classic_constant"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "constant_suffix"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }
@@ -3406,6 +3439,10 @@
     {
       "type": "SYMBOL",
       "name": "classic_command"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "classic_constant"
     }
   ],
   "inline": [],

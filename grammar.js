@@ -10,7 +10,8 @@ module.exports = grammar({
   name: 'fourd',
 
   externals: $=> [
-    $.classic_command
+    $.classic_command,
+    $.classic_constant
   ],
   rules: {
     source: $ => repeat($._statement),
@@ -68,7 +69,7 @@ module.exports = grammar({
       $.time,
       $.date,
       $.number,
-      $.string
+      $.string, $.classsic_constant_expression
     ),
     expression_argument: $ => choice(
       '()',
@@ -79,6 +80,11 @@ module.exports = grammar({
       $.classic_command, 
       optional($.command_suffix), 
       repeat($._node))),
+    constant_suffix: $ => /(:K[0-9]+:[0-9]+)/,
+    classsic_constant_expression: $ => prec.right(seq(
+      $.classic_constant, 
+      optional($.constant_suffix))
+    ),
       
     _name: $ => /([\p{Letter}_]+)([\p{Letter}_0-9]*)/, 
     _node: $ => choice(
