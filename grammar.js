@@ -318,7 +318,7 @@ module.exports = grammar({
     end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
     for_each_block: $ => seq(
       $.for_each,
-      '(', choice($.local_variable_name, $.interprocess_variable_name, $._name), ';', $.value, 
+      '(', $.value, ';', $.value, 
       optional(choice(seq(';', $.value), seq(';', $.value, ';', $.value))),
       ')',
       optional(seq(choice($.while, $.until), '(', $.value, ')')),
@@ -360,15 +360,10 @@ module.exports = grammar({
     _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
     end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
     for_block: $ => seq(
-      seq($.for, '(', choice($.local_variable_name, $.interprocess_variable_name, $._name), ';', $.value, ';', $.value, optional(seq(';', $.value)), ')'),
+      seq($.for, '(', $.value, ';', $.value, ';', $.value, optional(seq(';', $.value)), ')'),
       repeat($._statement),
       $.end_for
     ),
-    
-    
-    
-    
-    
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
     _if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),

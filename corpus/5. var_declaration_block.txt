@@ -10,13 +10,10 @@ var $a; $b : Text
 (source
   (var_declaration_block
     (var)
-    (local_variable
-      (local_variable_name))
+    (local_variable_name)
     (class))
   (var_declaration_block
     (var)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
+    (local_variable_name)
+    (local_variable_name)
     (class)))

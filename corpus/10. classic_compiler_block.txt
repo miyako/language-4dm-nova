@@ -32,205 +32,133 @@ C_VARIANT:C1683($a; $b; $c)
 (source
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler)
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name)))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name))
   (classic_compiler_block
     (classic_compiler
       (command_suffix))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))
-    (local_variable
-      (local_variable_name))))
+    (local_variable_name)
+    (local_variable_name)
+    (local_variable_name)))

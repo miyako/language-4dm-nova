@@ -2257,21 +2257,8 @@
           "value": "("
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "local_variable_name"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "interprocess_variable_name"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_name"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "value"
         },
         {
           "type": "STRING",
@@ -2640,21 +2627,8 @@
               "value": "("
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "local_variable_name"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "interprocess_variable_name"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_name"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "value"
             },
             {
               "type": "STRING",
