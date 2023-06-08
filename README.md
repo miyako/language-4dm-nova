@@ -78,4 +78,4 @@ tree-sitter generate
 ## limitations
 
 * process variables, project mothods are not recognised
-* SQL code switching to sql not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
+* SQL code switching not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
