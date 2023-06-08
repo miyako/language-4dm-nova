@@ -18,7 +18,7 @@ tree-sitter generate
 ### `_statement`
 
 * [`value`]
-* [`sql_injection_block`]  - EN/FR; code switching to sql not working; probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
+* [`sql_injection_block`]  - EN/FR
 * [`function_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/1.%20function_block.txt)
 * [`declare_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/2.%20declare_block.txt)
 * [`alias_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/7.%20alias_block.txt)  
@@ -29,7 +29,7 @@ tree-sitter generate
 * [`property_declaration_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/6.%20property_declaration_block.txt) 
 * [`classic_array_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/11.%20classic_array_block.txt)
 * [`classic_compiler_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/10.%20classic_compiler_block.txt)
-* [`function_call`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/9.%20function_call.txt) - process scope not supported because of conflict
+* [`function_call`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/9.%20function_call.txt) 
 * [`case_block`] - EN/FR
 * [`use_block`] - EN/FR
 * [`if_block`] - EN/FR 
@@ -74,3 +74,8 @@ tree-sitter generate
 * [`_hex_literal`]
 * [`_exp_literal`]
 * [`_num_literal`]
+
+## limitations
+
+* process variables, project mothods are not recognised
+* SQL code switching to sql not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
