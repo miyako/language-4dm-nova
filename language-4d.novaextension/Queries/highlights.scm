@@ -50,6 +50,12 @@
  (expression_argument)?
 ) @identifier.function
 
+(constant
+ (classic_constant_expression
+  (classic_constant) @start.before @end.after
+  (constant_suffix)? @comment
+))
+
 (class_instance
  (class_name) @start.before @end.after
  (command_suffix)? @comment

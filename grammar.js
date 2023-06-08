@@ -69,7 +69,8 @@ module.exports = grammar({
       $.time,
       $.date,
       $.number,
-      $.string, $.classsic_constant_expression
+      $.string, 
+      $.classic_constant_expression
     ),
     expression_argument: $ => choice(
       '()',
@@ -81,11 +82,11 @@ module.exports = grammar({
       optional($.command_suffix), 
       repeat($._node))),
     constant_suffix: $ => /(:K[0-9]+:[0-9]+)/,
-    classsic_constant_expression: $ => prec.right(seq(
+    classic_constant_expression: $ => prec.right(seq(
       $.classic_constant, 
-      optional($.constant_suffix))
-    ),
-      
+      optional($.constant_suffix)
+      )
+    ), 
     _name: $ => /([\p{Letter}_]+)([\p{Letter}_0-9]*)/, 
     _node: $ => choice(
       seq('.', $._name),
