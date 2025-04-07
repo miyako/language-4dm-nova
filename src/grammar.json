@@ -113,19 +113,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "try"
-        },
-        {
-          "type": "SYMBOL",
           "name": "try_line"
         },
         {
           "type": "SYMBOL",
           "name": "catch_block"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "catch"
         },
         {
           "type": "SYMBOL",

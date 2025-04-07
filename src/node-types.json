@@ -69,10 +69,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -150,10 +146,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -291,10 +283,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -618,10 +606,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -695,10 +679,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -809,10 +789,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -893,10 +869,6 @@
           "named": true
         },
         {
-          "type": "try",
-          "named": true
-        },
-        {
           "type": "try_block",
           "named": true
         },
@@ -946,10 +918,6 @@
         },
         {
           "type": "case_block",
-          "named": true
-        },
-        {
-          "type": "catch",
           "named": true
         },
         {
@@ -1030,10 +998,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -1188,10 +1152,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -1273,10 +1233,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -1460,10 +1416,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -1537,10 +1489,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -1619,10 +1567,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -1692,10 +1636,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -1792,10 +1732,6 @@
         },
         {
           "type": "case_block",
-          "named": true
-        },
-        {
-          "type": "catch",
           "named": true
         },
         {
@@ -1923,10 +1859,6 @@
         },
         {
           "type": "case_block",
-          "named": true
-        },
-        {
-          "type": "catch",
           "named": true
         },
         {
@@ -2063,10 +1995,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -2140,10 +2068,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {
@@ -2278,10 +2202,6 @@
           "named": true
         },
         {
-          "type": "catch",
-          "named": true
-        },
-        {
           "type": "catch_block",
           "named": true
         },
@@ -2355,10 +2275,6 @@
         },
         {
           "type": "sql_injection_block",
-          "named": true
-        },
-        {
-          "type": "try",
           "named": true
         },
         {

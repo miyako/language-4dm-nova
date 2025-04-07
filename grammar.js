@@ -41,10 +41,8 @@ module.exports = grammar({
       $.break, 
       $.continue,
       $.try_block,
-      $.try,
       $.try_line,
       $.catch_block,
-      $.catch,
       $.comment_block
     ),
     
