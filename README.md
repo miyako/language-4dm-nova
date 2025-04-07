@@ -35,9 +35,9 @@ tree-sitter generate
 * [`classic_array_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/11.%20classic_array_block.txt)
 * [`classic_compiler_block`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/10.%20classic_compiler_block.txt)
 * [`function_call`](https://github.com/miyako/language-4dm-nova/blob/main/corpus/9.%20function_call.txt) 
-* [`case_block`] - EN/FR
+* [`case_block`] - EN/FR  - folds (not case/else level)
 * [`use_block`] - EN/FR - folds
-* [`if_block`] - EN/FR 
+* [`if_block`] - EN/FR - folds (not else level)
 * [`for_each_block`] - EN/FR
 * [`repeat_block`] - EN/FR - folds
 * [`while_block`] - EN/FR - folds
