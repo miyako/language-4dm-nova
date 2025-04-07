@@ -500,6 +500,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$._statement, $.catch_block],
     [$._statement, $.try_block],
+    
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
     [$.return_block],
@@ -507,10 +508,12 @@ module.exports = grammar({
     [$.interprocess_variable],
     [$.class_instance],
     [$.literal_block],
+    
     [$.if_block, $._statement],  
     [$.if_block],  
     [$.else_block, $._statement],  
     [$.else_block],  
+    
     [$.ternary_block, $._statement],
     [$.ternary_block],
     [$.for_each_block, $._while],
