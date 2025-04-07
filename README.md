@@ -13,7 +13,7 @@ tree-sitter generate
 
 ## updates
 
-* `0.3.0`: added try, try~end try, try~catch~end try
+* `0.3.0`: added `try`
 
 
 ## the `fourd` tree-sitter parser
