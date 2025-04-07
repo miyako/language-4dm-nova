@@ -69,6 +69,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -109,6 +113,10 @@
           "named": true
         },
         {
+          "type": "end_try",
+          "named": true
+        },
+        {
           "type": "for_block",
           "named": true
         },
@@ -145,6 +153,14 @@
           "named": true
         },
         {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
+          "named": true
+        },
+        {
           "type": "use_block",
           "named": true
         },
@@ -167,6 +183,134 @@
     "type": "case_of",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "catch",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "catch_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "case_block",
+          "named": true
+        },
+        {
+          "type": "catch",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "comment_block",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
+          "named": true
+        },
+        {
+          "type": "for_block",
+          "named": true
+        },
+        {
+          "type": "for_each_block",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
+          "named": true
+        },
+        {
+          "type": "use_block",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "class",
@@ -462,6 +606,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -498,6 +646,10 @@
           "named": true
         },
         {
+          "type": "end_try",
+          "named": true
+        },
+        {
           "type": "for_block",
           "named": true
         },
@@ -531,6 +683,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -574,6 +734,11 @@
   },
   {
     "type": "end_sql",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "end_try",
     "named": true,
     "fields": {}
   },
@@ -628,6 +793,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -661,6 +830,10 @@
         },
         {
           "type": "end_for",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -701,6 +874,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -748,6 +929,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -781,6 +966,10 @@
         },
         {
           "type": "end_for_each",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -821,6 +1010,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -967,6 +1164,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -1007,6 +1208,10 @@
           "named": true
         },
         {
+          "type": "end_try",
+          "named": true
+        },
+        {
           "type": "for_block",
           "named": true
         },
@@ -1044,6 +1249,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -1219,6 +1432,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -1248,6 +1465,10 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -1288,6 +1509,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -1358,6 +1587,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -1387,6 +1620,10 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -1423,6 +1660,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -1489,17 +1734,12 @@
     "fields": {}
   },
   {
-    "type": "until",
+    "type": "try",
     "named": true,
     "fields": {}
   },
   {
-    "type": "use",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "use_block",
+    "type": "try_line",
     "named": true,
     "fields": {},
     "children": {
@@ -1516,6 +1756,10 @@
         },
         {
           "type": "case_block",
+          "named": true
+        },
+        {
+          "type": "catch",
           "named": true
         },
         {
@@ -1548,6 +1792,143 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
+          "named": true
+        },
+        {
+          "type": "for_block",
+          "named": true
+        },
+        {
+          "type": "for_each_block",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
+          "named": true
+        },
+        {
+          "type": "use_block",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "until",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "use",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "use_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "case_block",
+          "named": true
+        },
+        {
+          "type": "catch",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "comment_block",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -1588,6 +1969,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {
@@ -1714,6 +2103,10 @@
           "named": true
         },
         {
+          "type": "catch",
+          "named": true
+        },
+        {
           "type": "class_constructor",
           "named": true
         },
@@ -1743,6 +2136,10 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "end_try",
           "named": true
         },
         {
@@ -1783,6 +2180,14 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try",
+          "named": true
+        },
+        {
+          "type": "try_line",
           "named": true
         },
         {

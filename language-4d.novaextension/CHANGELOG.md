@@ -1,3 +1,7 @@
+## Version 0.3.0
+
+try catch block
+
 ## Version 0.2.0
 
 external parser for v20 english constants 
