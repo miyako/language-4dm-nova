@@ -1,3 +1,7 @@
+## Version 0.4.0
+
+some folding
+
 ## Version 0.3.0
 
 try catch block

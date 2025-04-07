@@ -4,6 +4,15 @@
  (#set! role block)
 )
 
+((case_block
+  (case_of) @start
+  (end_case) @end)
+ (#set! role block)
+)
+
+
+
+
 ((for_each_block
   (for_each) @start
   (end_for_each) @end)
