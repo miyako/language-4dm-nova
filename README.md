@@ -49,7 +49,7 @@ tree-sitter generate
 * [`try_block`] - folds
 * [`try_line`]
 * [`catch_block`] - folds
-* [`comment_block`]
+* [`comment_block`] - folds
  
 ### included in `value`
 
