@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-4dm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Adds syntax highlighting to .4dm files.",
   "main": "bindings/node",
   "scripts": {

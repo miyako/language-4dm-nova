@@ -121,6 +121,10 @@
  (end_while) @keyword.condition
 )
 
+(try) @keyword.condition
+(catch)? @keyword.condition 
+(end_try) @keyword.condition
+
 (for_each_block
  (for_each) @keyword.condition
  (end_for_each) @keyword.condition

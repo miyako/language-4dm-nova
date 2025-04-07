@@ -109,6 +109,22 @@
         },
         {
           "type": "SYMBOL",
+          "name": "try"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "try_line"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "catch"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "end_try"
+        },
+        {
+          "type": "SYMBOL",
           "name": "comment_block"
         }
       ]
@@ -1256,6 +1272,146 @@
               "type": "BLANK"
             }
           ]
+        }
+      ]
+    },
+    "_try": {
+      "type": "PATTERN",
+      "value": "(t|T)(r|R)(y|Y)"
+    },
+    "try": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "SYMBOL",
+        "name": "_try"
+      }
+    },
+    "try_line": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "try"
+        },
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_statement"
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
+    "_catch": {
+      "type": "PATTERN",
+      "value": "(c|C)(a|A)(t|T)(c|C)(h|H)"
+    },
+    "catch": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "SYMBOL",
+        "name": "_catch"
+      }
+    },
+    "_end_try": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (t|T)(r|R)(y|Y)"
+    },
+    "end_try": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "SYMBOL",
+        "name": "_end_try"
+      }
+    },
+    "catch_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "catch"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_statement"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "end_try"
+        }
+      ]
+    },
+    "_try_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "try"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_statement"
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "end_try"
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "try"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_statement"
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "catch_block"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_try_statement": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "try_line"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_try_block"
         }
       ]
     },
@@ -3382,6 +3538,17 @@
     }
   ],
   "conflicts": [
+    [
+      "catch_block",
+      "_statement"
+    ],
+    [
+      "_try_block",
+      "_statement"
+    ],
+    [
+      "catch_block"
+    ],
     [
       "return_block",
       "_statement"
