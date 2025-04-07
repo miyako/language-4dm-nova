@@ -87,20 +87,6 @@
 
 ; conditions
 
-(if_block
- (if) @keyword.condition
- (else_block 
-  (else))? @keyword.condition
- (end_if) @keyword.condition
-)
-
-(case_block
- (case_of) @keyword.condition
- (else_block 
- (else))? @keyword.condition
- (end_case) @keyword.condition
-)
-
 (use_block
  (use) @keyword.condition
  (end_use) @keyword.condition
@@ -124,6 +110,15 @@
 (try) @keyword.condition
 (catch)? @keyword.condition 
 (end_try) @keyword.condition
+
+(if) @keyword.condition
+(else)? @keyword.condition
+(end_if) @keyword.condition
+
+(case_of) @keyword.condition
+(case)? @keyword.condition
+(else)? @keyword.condition
+(end_case) @keyword.condition
 
 (for_each_block
  (for_each) @keyword.condition

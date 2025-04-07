@@ -45,6 +45,21 @@
     "fields": {}
   },
   {
+    "type": "case",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "case_block",
     "named": true,
     "fields": {},
@@ -58,6 +73,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -203,6 +222,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -614,6 +637,10 @@
           "named": true
         },
         {
+          "type": "case",
+          "named": true
+        },
+        {
           "type": "case_block",
           "named": true
         },
@@ -746,6 +773,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -944,6 +975,10 @@
           "named": true
         },
         {
+          "type": "case",
+          "named": true
+        },
+        {
           "type": "case_block",
           "named": true
         },
@@ -1081,6 +1116,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -1320,6 +1359,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -1591,6 +1634,10 @@
           "named": true
         },
         {
+          "type": "case",
+          "named": true
+        },
+        {
           "type": "case_block",
           "named": true
         },
@@ -1747,6 +1794,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -1926,6 +1977,10 @@
           "named": true
         },
         {
+          "type": "case",
+          "named": true
+        },
+        {
           "type": "case_block",
           "named": true
         },
@@ -2058,6 +2113,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -2199,6 +2258,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {
@@ -2414,6 +2477,10 @@
         },
         {
           "type": "break",
+          "named": true
+        },
+        {
+          "type": "case",
           "named": true
         },
         {

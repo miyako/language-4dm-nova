@@ -65,6 +65,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "case"
+        },
+        {
+          "type": "SYMBOL",
           "name": "else_block_case"
         },
         {
@@ -3120,6 +3124,31 @@
         }
       ]
     },
+    "case": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "value"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          }
+        ]
+      }
+    },
     "case_block": {
       "type": "SEQ",
       "members": [
@@ -3139,20 +3168,8 @@
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": ":"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "("
-                      },
-                      {
                         "type": "SYMBOL",
-                        "name": "value"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": ")"
+                        "name": "case"
                       },
                       {
                         "type": "REPEAT",
@@ -3183,20 +3200,8 @@
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": ":"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "("
-                      },
-                      {
                         "type": "SYMBOL",
-                        "name": "value"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": ")"
+                        "name": "case"
                       },
                       {
                         "type": "REPEAT",
