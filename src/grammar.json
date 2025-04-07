@@ -109,6 +109,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "try_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "try"
         },
         {
@@ -117,11 +121,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "catch"
+          "name": "catch_block"
         },
         {
           "type": "SYMBOL",
-          "name": "end_try"
+          "name": "catch"
         },
         {
           "type": "SYMBOL",
@@ -1352,7 +1356,7 @@
         }
       ]
     },
-    "_try_block": {
+    "try_block": {
       "type": "SEQ",
       "members": [
         {
@@ -1411,7 +1415,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_try_block"
+          "name": "try_block"
         }
       ]
     },
@@ -3539,15 +3543,12 @@
   ],
   "conflicts": [
     [
-      "catch_block",
-      "_statement"
-    ],
-    [
-      "_try_block",
-      "_statement"
-    ],
-    [
+      "_statement",
       "catch_block"
+    ],
+    [
+      "_statement",
+      "try_block"
     ],
     [
       "return_block",

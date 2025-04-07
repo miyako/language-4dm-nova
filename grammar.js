@@ -40,10 +40,11 @@ module.exports = grammar({
       $.return,
       $.break, 
       $.continue,
+      $.try_block,
       $.try,
       $.try_line,
+      $.catch_block,
       $.catch,
-      $.end_try,
       $.comment_block
     ),
     
@@ -226,7 +227,7 @@ module.exports = grammar({
       repeat($._statement), 
       $.end_try
     ),
-    _try_block: $ => seq(
+    try_block: $ => seq(
         choice(
           seq($.try, repeat($._statement), $.end_try),
           seq($.try, repeat($._statement), $.catch_block)
@@ -234,7 +235,7 @@ module.exports = grammar({
     ),
     _try_statement: $ => choice(
       $.try_line,
-      $._try_block
+      $.try_block
     ),
     _alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S)/,    
     alias: $ => prec(PREC.keyword, $._alias),
@@ -499,10 +500,8 @@ module.exports = grammar({
   },
   
   conflicts: $ => [
-    [$.catch_block, $._statement],
-    [$._try_block, $._statement],
-
-    [$.catch_block],
+    [$._statement, $.catch_block],
+    [$._statement, $.try_block],
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
     [$.return_block],

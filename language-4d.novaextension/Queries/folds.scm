@@ -1,9 +1,18 @@
-(comment_block)  @subtree
-(if_block) @subtree
-(repeat_block) @subtree
-(while_block)  @subtree
-(for_block)  @subtree
-(use_block)  @subtree
-(case_block)  @subtree
-(for_each_block)  @subtree
-(sql_injection_block) @subtree
+((try_block
+  (try) @start
+  (end_try) @end)
+ (#set! role block)
+)
+
+((try_block
+  (try) @start
+  (catch_block
+   (catch) @end))
+ (#set! role block)
+)
+
+((catch_block
+  (catch) @start
+  (end_try) @end)
+ (#set! role block)
+)
