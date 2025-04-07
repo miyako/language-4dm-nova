@@ -274,10 +274,6 @@ module.exports = grammar({
       ':', 
       $.class
     ),
-    _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
-    class_constructor: $ => seq(
-      $._class_constructor
-    ),
     _classic_compiler_blob: $ => seq(/(c|C)_(b|B)(l|L)(o|O)(b|B)/, optional($.command_suffix)),
     _classic_compiler_boolean: $ => seq(/(c|C)_(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/, optional($.command_suffix)),
     _classic_compiler_collection: $ => seq(/(c|C)_(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/, optional($.command_suffix)),
