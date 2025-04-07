@@ -29,6 +29,7 @@ module.exports = grammar({
       $.classic_array_block,
       $.classic_compiler_block,
       $.case_block,
+      $.case,
       $.else_block_case,
       $.use_block,
       $.if_block,
@@ -436,13 +437,14 @@ module.exports = grammar({
       repeat($._statement), 
       $.end_case
     ),
+    case: $ => prec(PREC.keyword, seq(':', '(', $.value, ')')),
     case_block: $ => seq(
       choice(
         seq($.case_of, 
-          repeat(seq(':', '(', $.value, ')', repeat($._statement))), 
+          repeat(seq($.case, repeat($._statement))), 
           $.end_case),
         seq($.case_of, 
-          repeat(seq(':', '(', $.value, ')', repeat($._statement))), 
+          repeat(seq($.case, repeat($._statement))), 
           $.else_block_case)
         )
     ),

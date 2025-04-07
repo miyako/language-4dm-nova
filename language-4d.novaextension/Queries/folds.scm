@@ -1,23 +1,52 @@
+((case_block
+  (case_of) @start
+  (case)
+  (end_case) @end)
+ (#set! role block)
+)
+
+((case_block
+  (case_of) @start
+  (case)
+  (else_block_case
+   (else) @end))
+ (#set! role block)
+)
+
+((else_block_case
+  (else) @start
+  (end_case) @end)
+ (#set! role block)
+)
+
+;if
+
 ((if_block
   (if) @start
   (end_if) @end)
  (#set! role block)
 )
 
-((case_block
-  (case_of) @start
-  (end_case) @end)
+((else_block_if
+  (else) @start
+  (end_if) @end)
  (#set! role block)
 )
 
-
-
+((if_block
+  (if) @start
+  (else_block_if
+   (else) @end))
+ (#set! role block)
+)
 
 ((for_each_block
   (for_each) @start
   (end_for_each) @end)
  (#set! role block)
 )
+
+;while, repeat, for, for each
 
 ((while_block
   (while) @start
@@ -36,6 +65,8 @@
   (end_for) @end)
  (#set! role block)
 )
+
+;try
 
 ((try_block
   (try) @start
