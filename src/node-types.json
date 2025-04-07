@@ -105,7 +105,11 @@
           "named": true
         },
         {
-          "type": "else_block",
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -243,6 +247,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -586,7 +598,7 @@
     "fields": {}
   },
   {
-    "type": "else_block",
+    "type": "else_block_case",
     "named": true,
     "fields": {},
     "children": {
@@ -643,6 +655,153 @@
         },
         {
           "type": "else",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
+          "named": true
+        },
+        {
+          "type": "end_case",
+          "named": true
+        },
+        {
+          "type": "for_block",
+          "named": true
+        },
+        {
+          "type": "for_each_block",
+          "named": true
+        },
+        {
+          "type": "function_block",
+          "named": true
+        },
+        {
+          "type": "if_block",
+          "named": true
+        },
+        {
+          "type": "property_declaration_block",
+          "named": true
+        },
+        {
+          "type": "repeat_block",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "return_block",
+          "named": true
+        },
+        {
+          "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "try_block",
+          "named": true
+        },
+        {
+          "type": "try_line",
+          "named": true
+        },
+        {
+          "type": "use_block",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        },
+        {
+          "type": "var_declaration_block",
+          "named": true
+        },
+        {
+          "type": "while_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "else_block_if",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "alias_block",
+          "named": true
+        },
+        {
+          "type": "break",
+          "named": true
+        },
+        {
+          "type": "case_block",
+          "named": true
+        },
+        {
+          "type": "catch_block",
+          "named": true
+        },
+        {
+          "type": "class_constructor",
+          "named": true
+        },
+        {
+          "type": "class_extends",
+          "named": true
+        },
+        {
+          "type": "classic_array_block",
+          "named": true
+        },
+        {
+          "type": "classic_compiler_block",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "comment_block",
+          "named": true
+        },
+        {
+          "type": "continue",
+          "named": true
+        },
+        {
+          "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
+          "named": true
+        },
+        {
+          "type": "end_if",
           "named": true
         },
         {
@@ -825,6 +984,14 @@
           "named": true
         },
         {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
+          "named": true
+        },
+        {
           "type": "end_for",
           "named": true
         },
@@ -954,6 +1121,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -1188,7 +1363,11 @@
           "named": true
         },
         {
-          "type": "else_block",
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -1452,6 +1631,14 @@
           "named": true
         },
         {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
+          "named": true
+        },
+        {
           "type": "for_block",
           "named": true
         },
@@ -1600,6 +1787,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -1771,6 +1966,14 @@
           "named": true
         },
         {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
+          "named": true
+        },
+        {
           "type": "end_try",
           "named": true
         },
@@ -1895,6 +2098,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -2028,6 +2239,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {
@@ -2235,6 +2454,14 @@
         },
         {
           "type": "declare_block",
+          "named": true
+        },
+        {
+          "type": "else_block_case",
+          "named": true
+        },
+        {
+          "type": "else_block_if",
           "named": true
         },
         {

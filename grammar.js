@@ -29,8 +29,10 @@ module.exports = grammar({
       $.classic_array_block,
       $.classic_compiler_block,
       $.case_block,
+      $.else_block_case,
       $.use_block,
       $.if_block,
+      $.else_block_if,
       $.for_each_block,
       $.repeat_block,
       $.while_block,
@@ -412,14 +414,16 @@ module.exports = grammar({
     if: $ => seq(
         seq($._if, '(', $.value, ')')
     ),
-    else_block: $ => seq($.else, repeat( $._statement)),
+    else_block_if: $ => seq(
+      $.else, 
+      repeat($._statement), 
+      $.end_if
+    ),
     if_block: $ =>  seq(
-        $.if,
         choice(
-          repeat($._statement),
-          seq(repeat($._statement), $.else_block)
-        ),
-        $.end_if
+          seq($.if, repeat($._statement), $.end_if),
+          seq($.if, repeat($._statement), $.else_block_if)
+        )
     ),
     _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
     _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
@@ -427,14 +431,20 @@ module.exports = grammar({
     _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
     _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
     end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
-    case_block: $ => seq(
-      $.case_of,
-      choice(
-        repeat(seq(':', '(', $.value, ')', repeat($._statement))),
-        seq(repeat(seq(':', '(', $.value, ')', repeat($._statement))), $.else_block)
-      ),
+    else_block_case: $ => seq(
+      $.else, 
+      repeat($._statement), 
       $.end_case
-      
+    ),
+    case_block: $ => seq(
+      choice(
+        seq($.case_of, 
+          repeat(seq(':', '(', $.value, ')', repeat($._statement))), 
+          $.end_case),
+        seq($.case_of, 
+          repeat(seq(':', '(', $.value, ')', repeat($._statement))), 
+          $.else_block_case)
+        )
     ),
     _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
     _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
@@ -500,6 +510,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$._statement, $.catch_block],
     [$._statement, $.try_block],
+    
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
     [$.return_block],
@@ -507,10 +518,11 @@ module.exports = grammar({
     [$.interprocess_variable],
     [$.class_instance],
     [$.literal_block],
-    [$.if_block, $._statement],  
-    [$.if_block],  
-    [$.else_block, $._statement],  
-    [$.else_block],  
+    
+    [$._statement, $.if_block],
+    [$._statement, $.case_block],
+    [$.case_block],    
+        
     [$.ternary_block, $._statement],
     [$.ternary_block],
     [$.for_each_block, $._while],

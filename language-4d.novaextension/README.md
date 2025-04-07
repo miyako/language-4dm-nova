@@ -1,7 +1,7 @@
 # language-4dm-nova
 add syntax highlighting to .4dm files.
 
-<img width="658" alt="0.2.0" src="https://github.com/miyako/language-4dm-nova/assets/1725068/c38e9cb8-9268-4132-b562-d7f1b0c5bd7c">
+<img width="658" alt="0.3.0" src="https://github.com/miyako/language-4dm-nova/assets/1725068/c38e9cb8-9268-4132-b562-d7f1b0c5bd7c">
 
 ## to compile
 
@@ -10,6 +10,11 @@ export PATH="$PATH:./node_modules/.bin/"
 tree-sitter generate
 ./compile_parser.sh . /Applications/Nova.app
 ```
+
+## updates
+
+* `0.3.0`: added `try`
+
 
 ## the `fourd` tree-sitter parser
 
@@ -41,6 +46,9 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
+* [`try_block`] - folds
+* [`try_line`]
+* [`catch_block`] - folds
 * [`comment_block`]
  
 ### included in `value`
@@ -78,4 +86,4 @@ tree-sitter generate
 ## limitations
 
 * process variables, project mothods are not recognised
-* SQL code switching to sql not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
+* SQL code switching not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
