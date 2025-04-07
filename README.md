@@ -86,4 +86,5 @@ tree-sitter generate
 ## limitations
 
 * process variables, project mothods are not recognised
+* commands/functions that do not take arguments should nevertheless have parentheses
 * SQL code switching not working probably because sql is [not tree-sitter](https://docs.nova.app/syntax-reference/syntaxes/#injections)
