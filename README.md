@@ -41,7 +41,7 @@ tree-sitter generate
 * [`for_each_block`] - EN/FR
 * [`repeat_block`] - EN/FR
 * [`while_block`] - EN/FR
-* [`for_block`] - EN/FR
+* [`for_block`] - EN/FR - folds
 * [`return_block`]
 * [`return`]
 * [`break`]
