@@ -46,6 +46,9 @@ tree-sitter generate
 * [`return`]
 * [`break`]
 * [`continue`]
+* [`try_block`]
+* [`try_line`]
+* [`catch_block`]
 * [`comment_block`]
  
 ### included in `value`
