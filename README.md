@@ -11,6 +11,11 @@ tree-sitter generate
 ./compile_parser.sh . /Applications/Nova.app
 ```
 
+## updates
+
+* `0.3.0`: added try, try~end try, try~catch~end try
+
+
 ## the `fourd` tree-sitter parser
 
 * `source` is a series of `_statement`
