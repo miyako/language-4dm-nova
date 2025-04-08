@@ -1,3 +1,7 @@
+## Version 0.5.1
+
+update operators
+
 ## Version 0.5.0
 
 update external parser for v20 R8
