@@ -1,10 +1,10 @@
 (function_arguments
- (local_variable_name) @identifier.variable
+ (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
 )
 
 (function_result
- (local_variable_name) @identifier.variable
+ (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
 )
 
@@ -61,18 +61,6 @@
  (command_suffix)? @comment
  (expression_argument)?
 ) @identifier.type.class
-
-(classic_compiler_block
- (classic_compiler)
- (local_variable_name)? @identifier.variable
- (interprocess_variable_name)? @identifier.variable
-)
-
-(classic_array_block
- (classic_array)
- (local_variable_name)? @identifier.variable
- (interprocess_variable_name)? @identifier.variable
-)
 
 (return_block
  (return) @keyword.condition
@@ -138,14 +126,14 @@
 (local_variable) @identifier.variable
 (constant)? @identifier.property
 
-;symbols with suffix
-
-(classic_compiler
- (command_suffix)? @comment
-) @identifier.type.class
-
-(classic_array
- (command_suffix)? @comment
-) @identifier.type.class
-
-[":=" ";" "?" ":" "(" ")" "{" "}" "[" "]" "+" "-" "*" "/" "&&" "||" "&" "|" "^" "~|" "<" ">" "=" "#" "<<" ">>" "+=" "-=" "*=" "/=" "??" "?+" "?-" "->"] @operator
+[
+"+=" "-=" "*=" "/=" "~|"
+"&&" "&" "||" "|"
+"<<" "<=" "<"
+">>" ">=" ">"
+":=" 
+"??" "?+" "?-"
+"+" "-" "*" "/"
+"=" "#"
+"^" "%"
+"?" ":"] @operator

@@ -195,9 +195,17 @@ module.exports = grammar({
     function_name: $ => seq(
       optional($._scope), $.function, repeat($._name)
     ),    
-    _function_argument: $ => seq($.local_variable_name, repeat(seq(';', $.local_variable_name)), ':', $.class),
+    _function_argument: $ => seq(
+      choice($.local_variable_name, '...'), 
+      repeat(seq(';', choice($.local_variable_name, '...'))),
+      ':', 
+      $.class
+    ),
     function_arguments: $ => seq('(', optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), ')'),
-    function_result: $ => seq('->', $._function_argument),
+    function_result: $ => choice(
+      seq('->', $.local_variable_name, ':', $.class),
+      seq(':', $.class)
+    ),
     function_block: $ => seq(
       $.function_name,
       $.function_arguments,
@@ -438,6 +446,10 @@ module.exports = grammar({
   conflicts: $ => [
     [$._statement, $.catch_block],
     [$._statement, $.try_block],
+    
+    [$.declare_block, $.function_block],
+    [$.function_block],
+    [$.declare_block],
     
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
