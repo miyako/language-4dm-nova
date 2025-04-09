@@ -41,7 +41,6 @@ module.exports = grammar({
       $.return,
       $.break, 
       $.continue,
-      $.system_variable,
       $.try_block,
       $.try_line,
       $.catch_block,
@@ -143,6 +142,7 @@ module.exports = grammar({
       $.local_variable, 
       $.interprocess_variable,
       $.numeric_parameter,
+      $.system_variable,
       $.constant,
       seq($.value, $.operator, $.value)
     )),
@@ -359,8 +359,15 @@ module.exports = grammar({
     _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
     _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
     end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
+    _condition: $ => seq('(', $.value, ')'),
+    _conditions : $ => seq(
+      $._condition,  
+      optional(repeat(seq($.operator, $._condition)))
+    ),
+    conditions : $ => choice(seq('(', $._conditions, ')'), $._conditions),
     if: $ => seq(
-        seq($._if, '(', $.value, ')')
+      $._if, 
+      $.conditions
     ),
     else_block_if: $ => seq(
       $.else, 
@@ -490,7 +497,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$._statement, $.catch_block],
     [$._statement, $.try_block],
-    
+    [$._statement],
     [$.class_constructor, $.function_block],
     
     [$.declare_block, $.function_block],

@@ -84,9 +84,13 @@
 (catch)? @keyword.condition 
 (end_try) @keyword.condition
 
+;if
 (if) @keyword.condition
-(else)? @keyword.condition
+(else) @keyword.condition
 (end_if) @keyword.condition
+
+
+
 
 (case_of) @keyword.condition
 (case)? @keyword.condition
@@ -107,7 +111,7 @@
 
 ;out-of-context symbolisation
 
-(system_variable) @identifier.property
+(system_variable) @identifier.variable
 (numeric_parameter) @identifier.decorator
 (local_variable) @identifier.variable
 (interprocess_variable_name) @identifier.variable

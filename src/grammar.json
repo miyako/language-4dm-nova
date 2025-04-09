@@ -113,10 +113,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "system_variable"
-        },
-        {
-          "type": "SYMBOL",
           "name": "try_block"
         },
         {
@@ -795,6 +791,10 @@
           {
             "type": "SYMBOL",
             "name": "numeric_parameter"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "system_variable"
           },
           {
             "type": "SYMBOL",
@@ -2281,29 +2281,92 @@
         ]
       }
     },
-    "if": {
+    "_condition": {
       "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "value"
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
+    "_conditions": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_condition"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "operator"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_condition"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "conditions": {
+      "type": "CHOICE",
       "members": [
         {
           "type": "SEQ",
           "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_if"
-            },
             {
               "type": "STRING",
               "value": "("
             },
             {
               "type": "SYMBOL",
-              "name": "value"
+              "name": "_conditions"
             },
             {
               "type": "STRING",
               "value": ")"
             }
           ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_conditions"
+        }
+      ]
+    },
+    "if": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_if"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "conditions"
         }
       ]
     },
@@ -3052,6 +3115,9 @@
     [
       "_statement",
       "try_block"
+    ],
+    [
+      "_statement"
     ],
     [
       "class_constructor",
