@@ -1116,8 +1116,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "local_variable_name"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "local_variable_name"
+            },
+            {
+              "type": "STRING",
+              "value": "..."
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -1129,8 +1138,17 @@
                 "value": ";"
               },
               {
-                "type": "SYMBOL",
-                "name": "local_variable_name"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "local_variable_name"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "..."
+                  }
+                ]
               }
             ]
           }
@@ -1201,15 +1219,41 @@
       ]
     },
     "function_result": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
-          "type": "STRING",
-          "value": "->"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "->"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "local_variable_name"
+            },
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "class"
+            }
+          ]
         },
         {
-          "type": "SYMBOL",
-          "name": "_function_argument"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "class"
+            }
+          ]
         }
       ]
     },
@@ -2866,6 +2910,16 @@
     [
       "_statement",
       "try_block"
+    ],
+    [
+      "declare_block",
+      "function_block"
+    ],
+    [
+      "function_block"
+    ],
+    [
+      "declare_block"
     ],
     [
       "return_block",
