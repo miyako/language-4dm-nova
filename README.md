@@ -13,7 +13,7 @@ tree-sitter generate
 
 ## updates
 
-* `0.6.0`: `C_` and `ARRAY ` are now regular commands
+* `0.9.0`: added variadic parameter. added local, exposed, shared, singleton. fix classic commands. added declare and init in one line.
 * `0.3.0`: added `try`
 
 
