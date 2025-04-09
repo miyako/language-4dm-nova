@@ -1,38 +1,33 @@
+;declare
+
 (class_extends) @keyword.construct 
 (declare_block)@keyword.construct
 
+;function
 
-
-
+(function_block)@keyword.construct
 (function_arguments
  (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
 )
-
 (function_result
  (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
 )
-
-
-
 (class_constructor) @keyword.construct
 
-
+;var, property
 
 (var_declaration_block
  ((var) @keyword.construct) 
  (local_variable_name)? @identifier.variable
  (interprocess_variable_name)? @identifier.variable
- ;optional to allow for process variable as generic node
  (class)? @identifier.type.class
-) 
-
+) @identifier.variable
 (property_declaration_block
- (property) @keyword.construct
- ;property name is a generic node
- (class) @identifier.type.class
-)
+ ((property) @keyword.construct) 
+ (class)? @identifier.type.class
+) @identifier.variable
 
 (alias_block
  (alias_name
@@ -58,9 +53,6 @@
 (return) @keyword.condition
 (break) @keyword.condition
 (continue) @keyword.condition
-
-(comment) @comment
-(comment_block) @comment
 
 ; conditions
 
@@ -115,14 +107,9 @@
 (local_variable) @identifier.variable
 (constant)? @identifier.property
 
-[
-"+=" "-=" "*=" "/=" "~|"
-"&&" "&" "||" "|"
-"<<" "<=" "<"
-">>" ">=" ">"
-":=" 
-"??" "?+" "?-"
-"+" "-" "*" "/"
-"=" "#"
-"^" "%"
-"?" ":"] @operator
+(operator) @operator
+
+;comment
+
+(comment) @comment
+(comment_block) @comment @start.before @end.after

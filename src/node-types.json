@@ -351,11 +351,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
           "type": "shared",
+          "named": true
+        },
+        {
+          "type": "singleton",
           "named": true
         }
       ]
@@ -1442,6 +1446,11 @@
     "fields": {}
   },
   {
+    "type": "operator",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "property",
     "named": true,
     "fields": {}
@@ -1631,6 +1640,11 @@
   },
   {
     "type": "shared",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "singleton",
     "named": true,
     "fields": {}
   },
@@ -2235,6 +2249,10 @@
         },
         {
           "type": "numeric_parameter",
+          "named": true
+        },
+        {
+          "type": "operator",
           "named": true
         },
         {

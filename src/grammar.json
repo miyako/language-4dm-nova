@@ -805,7 +805,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "_binary_operator"
+                "name": "operator"
               },
               {
                 "type": "SYMBOL",
@@ -1489,17 +1489,20 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "shared"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "shared"
-                }
-              ]
+              "type": "REPEAT",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "singleton"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "shared"
+                  }
+                ]
+              }
             },
             {
               "type": "BLANK"
@@ -2742,7 +2745,7 @@
         }
       ]
     },
-    "_binary_operator": {
+    "operator": {
       "type": "PREC",
       "value": -90,
       "content": {
@@ -2912,6 +2915,10 @@
     [
       "_statement",
       "try_block"
+    ],
+    [
+      "class_constructor",
+      "function_block"
     ],
     [
       "declare_block",

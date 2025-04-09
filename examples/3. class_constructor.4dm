@@ -1,1 +1,1 @@
-class constructor
+singleton shared class constructor($param1:Text)

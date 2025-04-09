@@ -2,9 +2,11 @@
 3. class_constructor
 ==================
 
-class constructor
+singleton shared class constructor
 
 ---
 
 (source
-  (class_constructor))
+  (class_constructor
+    (singleton)
+    (shared)))

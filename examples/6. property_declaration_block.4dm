@@ -1,2 +1,2 @@
-property a : Text
-property a; b : Text
+property a : 4D.Entity:="fdsf"
+property a; b : Text:="sdfs"

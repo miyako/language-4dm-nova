@@ -143,7 +143,7 @@ module.exports = grammar({
       $.interprocess_variable,
       $.numeric_parameter,
       $.constant,
-      seq($.value, $._binary_operator, $.value)
+      seq($.value, $.operator, $.value)
     )),
     
     
@@ -263,7 +263,7 @@ module.exports = grammar({
       
     _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
     class_constructor: $ => seq(
-      optional(choice($.shared, $.shared)),
+      optional(repeat(choice($.singleton, $.shared))),
       $._class_constructor
     ),
     
@@ -429,7 +429,7 @@ module.exports = grammar({
     operator
     */
     
-    _binary_operator: $ => prec(PREC.operator, 
+    operator: $ => prec(PREC.operator, 
       choice(
       '+=', '-=', '*=', '/=', '~|',
       '&&', '||', '&', '|', 
@@ -440,8 +440,7 @@ module.exports = grammar({
       '??', '?+', '?-',
       '+', '-', '*', '/', '=', '#', '^', '%'
       )
-    ),  
-    
+    ),      
     /* 
     comment
     */
@@ -456,6 +455,8 @@ module.exports = grammar({
   conflicts: $ => [
     [$._statement, $.catch_block],
     [$._statement, $.try_block],
+    
+    [$.class_constructor, $.function_block],
     
     [$.declare_block, $.function_block],
     [$.function_block],
