@@ -1723,7 +1723,7 @@
       "type": "PATTERN",
       "value": "(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)"
     },
-    "for_each": {
+    "_for_each": {
       "type": "PREC",
       "value": -40,
       "content": {
@@ -1740,37 +1740,12 @@
         ]
       }
     },
-    "_end_for_each_e": {
-      "type": "PATTERN",
-      "value": "(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)"
-    },
-    "_end_for_each_f": {
-      "type": "PATTERN",
-      "value": "(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)"
-    },
-    "end_for_each": {
-      "type": "PREC",
-      "value": -40,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_end_for_each_e"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_end_for_each_f"
-          }
-        ]
-      }
-    },
-    "for_each_block": {
+    "for_each": {
       "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "for_each"
+          "name": "_for_each"
         },
         {
           "type": "STRING",
@@ -1834,48 +1809,40 @@
               "type": "BLANK"
             }
           ]
-        },
+        }
+      ]
+    },
+    "_end_for_each_e": {
+      "type": "PATTERN",
+      "value": "(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)"
+    },
+    "_end_for_each_f": {
+      "type": "PATTERN",
+      "value": "(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)"
+    },
+    "end_for_each": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_each_e"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_end_for_each_f"
+          }
+        ]
+      }
+    },
+    "for_each_block": {
+      "type": "SEQ",
+      "members": [
         {
-          "type": "STRING",
-          "value": ")"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "while"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "until"
-                    }
-                  ]
-                },
-                {
-                  "type": "STRING",
-                  "value": "("
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "value"
-                },
-                {
-                  "type": "STRING",
-                  "value": ")"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "for_each"
         },
         {
           "type": "REPEAT",
@@ -3143,6 +3110,10 @@
     ],
     [
       "case_block"
+    ],
+    [
+      "ternary_block",
+      "for_each"
     ],
     [
       "ternary_block",

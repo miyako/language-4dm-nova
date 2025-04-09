@@ -1003,7 +1003,17 @@
   {
     "type": "for_each",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "for_each_block",
@@ -1118,10 +1128,6 @@
           "named": true
         },
         {
-          "type": "until",
-          "named": true
-        },
-        {
           "type": "use_block",
           "named": true
         },
@@ -1131,10 +1137,6 @@
         },
         {
           "type": "var_declaration_block",
-          "named": true
-        },
-        {
-          "type": "while",
           "named": true
         },
         {

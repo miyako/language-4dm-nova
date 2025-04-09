@@ -298,20 +298,32 @@ module.exports = grammar({
     ),
     _for_each_e: $ => /(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
     _for_each_f: $ => /(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
-    for_each   : $ => prec(PREC.keyword, choice($._for_each_e, $._for_each_f)),
+    _for_each  : $ => prec(PREC.keyword, choice($._for_each_e, $._for_each_f)),
+    for_each   : $ => seq(
+      $._for_each,
+      '(', 
+      $.value, 
+      ';', 
+      $.value, 
+      optional(choice(seq(
+        ';', 
+        $.value), 
+        seq(
+          ';', 
+          $.value, 
+          ';', 
+          $.value
+        ))
+      )
+    ),
     _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
     _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
     end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
     for_each_block: $ => seq(
       $.for_each,
-      '(', $.value, ';', $.value, 
-      optional(choice(seq(';', $.value), seq(';', $.value, ';', $.value))),
-      ')',
-      optional(seq(choice($.while, $.until), '(', $.value, ')')),
       repeat( $._statement),
       $.end_for_each
     ),
-    
     /*
     while, repeat
     */
@@ -548,7 +560,7 @@ module.exports = grammar({
     [$._statement, $.if_block],
     [$._statement, $.case_block],
     [$.case_block],    
-        
+    [$.ternary_block, $.for_each],    
     [$.ternary_block, $._statement],
     [$.ternary_block],
     [$.for_each_block, $._while],
