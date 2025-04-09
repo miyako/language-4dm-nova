@@ -57,576 +57,528 @@ ARRAY TIME:C1223($a; 0; 0)
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number)))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (constant
+          (number)))
+      (value
+        (constant
+          (number))))))

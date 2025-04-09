@@ -13,7 +13,11 @@ End try
 Try
 	
 	ALERT:C41("alert")
-	
+	Try
+		
+		ALERT:C41("alert")
+		
+	End try
 Catch
 	
 End try
@@ -27,20 +31,18 @@ End try
       (classic_command_expression
         (classic_command)
         (command_suffix)
-        (expression_argument
-          (value
-            (constant
-              (string)))))))
+        (value
+          (constant
+            (string))))))
   (try_block
     (try)
     (value
       (classic_command_expression
         (classic_command)
         (command_suffix)
-        (expression_argument
-          (value
-            (constant
-              (string))))))
+        (value
+          (constant
+            (string)))))
     (end_try))
   (try_block
     (try)
@@ -48,10 +50,19 @@ End try
       (classic_command_expression
         (classic_command)
         (command_suffix)
-        (expression_argument
+        (value
+          (constant
+            (string)))))
+    (try_block
+      (try)
+      (value
+        (classic_command_expression
+          (classic_command)
+          (command_suffix)
           (value
             (constant
-              (string))))))
+              (string)))))
+      (end_try))
     (catch_block
       (catch)
       (end_try))))

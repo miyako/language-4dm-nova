@@ -38,7 +38,6 @@
 (classic_command_expression
  (classic_command) @start.before @end.after
  (command_suffix)? @comment
- (expression_argument)?
 ) @identifier.function
 
 (constant
@@ -96,10 +95,8 @@
 (case)? @keyword.condition
 (end_case) @keyword.condition
 
-(for_each_block
- (for_each) @keyword.condition
- (end_for_each) @keyword.condition
-)
+(for_each) @keyword.condition
+(end_for_each)  @keyword.condition
 
 ;injection
 
@@ -119,7 +116,7 @@
 ;operator
 
 (operator) @operator
-
+["-"] @operator
 ;comment
 
 (comment) @comment

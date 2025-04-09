@@ -358,6 +358,10 @@
       "required": false,
       "types": [
         {
+          "type": "function_arguments",
+          "named": true
+        },
+        {
           "type": "shared",
           "named": true
         },
@@ -397,10 +401,6 @@
         },
         {
           "type": "command_suffix",
-          "named": true
-        },
-        {
-          "type": "expression_argument",
           "named": true
         },
         {
@@ -838,21 +838,6 @@
     "type": "exposed",
     "named": true,
     "fields": {}
-  },
-  {
-    "type": "expression_argument",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "value",
-          "named": true
-        }
-      ]
-    }
   },
   {
     "type": "for",
@@ -1379,10 +1364,6 @@
       "required": true,
       "types": [
         {
-          "type": "expression_argument",
-          "named": true
-        },
-        {
           "type": "interprocess_variable_name",
           "named": true
         },
@@ -1427,10 +1408,6 @@
       "required": true,
       "types": [
         {
-          "type": "expression_argument",
-          "named": true
-        },
-        {
           "type": "local_variable_name",
           "named": true
         },
@@ -1459,10 +1436,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "expression_argument",
-          "named": true
-        },
         {
           "type": "numeric_parameter_name",
           "named": true
@@ -2278,6 +2251,10 @@
       "types": [
         {
           "type": "classic_command_expression",
+          "named": true
+        },
+        {
+          "type": "conditions",
           "named": true
         },
         {

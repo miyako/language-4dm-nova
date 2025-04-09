@@ -15,33 +15,26 @@ cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
   (value
     (local_variable
       (local_variable_name)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (local_variable
-      (local_variable_name)
-      (expression_argument)))
+      (local_variable_name)))
   (value
     (classic_command_expression
-      (classic_command)
-      (expression_argument)))
+      (classic_command)))
   (value
     (classic_command_expression
-      (classic_command)
-      (expression_argument)))
+      (classic_command)))
   (value
     (classic_command_expression
-      (classic_command)
-      (expression_argument)))
+      (classic_command)))
   (value
     (value
       (classic_command_expression
-        (classic_command)
-        (expression_argument)))
+        (classic_command)))
     (operator)
     (value
       (classic_command_expression
-        (classic_command)
-        (expression_argument)))))
+        (classic_command)))))

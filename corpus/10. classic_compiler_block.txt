@@ -33,324 +33,300 @@ C_VARIANT:C1683($a; $b; $c)
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))))
   (value
     (classic_command_expression
       (classic_command)
       (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))))))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name)))
+      (value
+        (local_variable
+          (local_variable_name))))))

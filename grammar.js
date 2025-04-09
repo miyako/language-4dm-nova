@@ -76,7 +76,7 @@ module.exports = grammar({
       $.string, 
       $.classic_constant_expression
     ),
-    expression_argument: $ => choice(
+    _expression_argument: $ => choice(
       '()',
       seq('(', $.value, repeat(seq(';', $.value)), ')')
     ),
@@ -94,9 +94,9 @@ module.exports = grammar({
     _name: $ => /([\p{Letter}_]+)([\p{Letter}_0-9]*)/, 
     _node: $ => choice(
       seq('.', $._name),
+      $._expression_argument,
       seq('[', $.value, ']'),
-      seq('{', $.value, '}'),
-      $.expression_argument
+      seq('{', $.value, '}')
     ),  
     local_variable_name: $ => seq('$', $._name),  
     local_variable: $ => seq(
@@ -122,19 +122,20 @@ module.exports = grammar({
       ':',
       $.value
     )),  
-    _object_literal_block: $ => prec.left(
+    _object_literal_block: $ => prec.right(
       choice('{}',
       seq('{', $._name, ':', $.value, '}')
       ) 
     ),
-    _collection_literal_block: $ => prec.left(
+    _collection_literal_block: $ => prec.right(
       choice('[]', 
       seq('[', $.value, repeat(seq(';', $.value)), ']')
       )
     ),
-    literal_block: $ => choice($._object_literal_block, $._collection_literal_block),
-    
-
+    literal_block: $ => seq(
+      choice($._object_literal_block, $._collection_literal_block),
+      optional(repeat($._node))
+    ),
     value: $ => prec.right(choice(
       $.ternary_block,
       $.literal_block,
@@ -144,6 +145,7 @@ module.exports = grammar({
       $.numeric_parameter,
       $.system_variable,
       $.constant,
+      $.conditions,
       seq($.value, $.operator, $.value)
     )),
     
@@ -266,12 +268,13 @@ module.exports = grammar({
     exposed: $ => prec(PREC.keyword, $._exposed),  
     _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/,   
     function: $ => prec(PREC.keyword, $._function),
-      
+    /* constructor */  
     _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
-    class_constructor: $ => seq(
+    class_constructor: $ => prec.right(seq(
       optional(repeat(choice($.singleton, $.shared))),
-      $._class_constructor
-    ),
+      $._class_constructor,
+      optional($.function_arguments)
+    )),
     
     /* 
     property, var 
@@ -314,7 +317,8 @@ module.exports = grammar({
           ';', 
           $.value
         ))
-      )
+      ),
+      ')'
     ),
     _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
     _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
@@ -395,11 +399,11 @@ module.exports = grammar({
     _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
     end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
     _condition: $ => seq('(', $.value, ')'),
-    _conditions : $ => seq(
+    _conditions : $ => prec.right(seq(
       $._condition,  
       optional(repeat(seq($.operator, $._condition)))
-    ),
-    conditions : $ => choice(seq('(', $._conditions, ')'), $._conditions),
+    )),
+    conditions : $ => prec.right(choice(seq('(', $._conditions, ')'), $._conditions)),
     if: $ => seq(
       $._if, 
       $.conditions
@@ -536,33 +540,38 @@ module.exports = grammar({
   },
   
   conflicts: $ => [
-    [$._statement, $.catch_block],
-    [$._statement, $.try_block],
-    [$._statement],
+    [$.try_block, $._statement],        
     [$.class_constructor, $.function_block],
-    
-    [$.declare_block, $.function_block],
     [$.function_block],
     [$.declare_block],
 
-    [$.ternary_block, $.property_declaration_block],    
+    [$.property_declaration_block, $.ternary_block],    
     [$.property_declaration_block],
     
-    [$.var_declaration_block],
     [$.var_declaration_block, $.ternary_block],
+    [$.var_declaration_block],
+    
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
     [$.return_block],
+    
     [$.local_variable],
     [$.interprocess_variable],
+    [$.system_variable],
     [$.literal_block],
     
+
+    
     [$._statement, $.if_block],
-    [$._statement, $.case_block],
-    [$.case_block],    
-    [$.ternary_block, $.for_each],    
+    [$._statement, $._condition],
+    
+    [$.case_block, $._statement],
+    [$.case_block],   
+
+    [$.ternary_block, $.for_each],         
     [$.ternary_block, $._statement],
     [$.ternary_block],
+    
     [$.for_each_block, $._while],
     [$._while]
 
