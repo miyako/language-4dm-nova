@@ -273,6 +273,12 @@ module.exports = grammar({
       optional(choice($.shared, $.shared)),
       $._class_constructor
     ),
+    
+    /* 
+    property, var 
+    declare and assign default value
+    */
+    
     _var: $ => /(v|V)(a|A)(r|R)/,
     var: $ => prec(PREC.keyword, $._var),
     var_declaration_block: $ => seq(
@@ -288,8 +294,8 @@ module.exports = grammar({
       $.property,
       $._name, 
       repeat(seq(';', $._name)), 
-      ':', 
-      $.class
+      optional(seq(':', $.class)), 
+      optional(seq(':=', $.value))
     ),
     _for_each_e: $ => /(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
     _for_each_f: $ => /(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
