@@ -311,6 +311,10 @@ module.exports = grammar({
       repeat( $._statement),
       $.end_for_each
     ),
+    
+    /*
+    while, repeat
+    */
     _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
     _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
     _while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
@@ -322,7 +326,7 @@ module.exports = grammar({
       $.conditions
     ),
     while_block: $ => seq(
-      $._while,
+      $.while,
       repeat($._statement),
       $.end_while
     ),
@@ -341,17 +345,34 @@ module.exports = grammar({
       repeat($._statement),
       $.until
     ),
-    _for_e: $ => /(f|F)(o|O)(r|R)/,
-    _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
-    for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
+    /*
+    for
+    */
+    _for_e : $ => /(f|F)(o|O)(r|R)/,
+    _for_f : $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
+    _for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
+    for    : $ => seq(
+      $._for, 
+      '(', 
+      $.value, 
+      ';', 
+      $.value, 
+      ';', 
+      $.value, 
+      optional(seq(';', $.value)), 
+      ')'
+    ),
     _end_for_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)/,
     _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
     end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
     for_block: $ => seq(
-      seq($.for, '(', $.value, ';', $.value, ';', $.value, optional(seq(';', $.value)), ')'),
+      $.for,
       repeat($._statement),
       $.end_for
     ),
+    /*
+    if
+    */
     _if_e: $ => /(i|I)(f|F)/,
     _if_f: $ => /(s|S)(i|I)/,
     _if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
@@ -382,6 +403,9 @@ module.exports = grammar({
           seq($.if, repeat($._statement), $.else_block_if)
         )
     ),
+    /*
+    case
+    */
     _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
     _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
     case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),    
@@ -393,7 +417,10 @@ module.exports = grammar({
       repeat($._statement), 
       $.end_case
     ),
-    case: $ => prec(PREC.keyword, seq(':', '(', $.value, ')')),
+    case: $ => seq(
+      ':', 
+      $.conditions
+    ),
     case_block: $ => seq(
       choice(
         seq($.case_of, 
