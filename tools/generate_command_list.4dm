@@ -5,6 +5,8 @@ $l:=New collection:C1472
 For ($i; 1; 1818)
 	$command:=Command name:C538($i)
 	Case of 
+		: ($i=948)  //begin sql
+		: ($i=949)  //end sql
 		: ($command="")
 		: ($command="_4D@")
 		: ($command="C_@") || ($command="ARRAY @")
