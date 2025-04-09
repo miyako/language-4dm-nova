@@ -9,8 +9,10 @@ alias name name.name
 
 (source
   (alias_block
-    (alias_name
-      (alias)))
+    (alias)
+    (alias_name)
+    (alias_path))
   (alias_block
-    (alias_name
-      (alias))))
+    (alias)
+    (alias_name)
+    (alias_path)))

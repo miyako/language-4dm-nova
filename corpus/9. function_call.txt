@@ -40,6 +40,7 @@ cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
       (classic_command_expression
         (classic_command)
         (expression_argument)))
+    (operator)
     (value
       (classic_command_expression
         (classic_command)

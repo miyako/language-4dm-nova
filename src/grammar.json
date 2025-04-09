@@ -113,6 +113,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "system_variable"
+        },
+        {
+          "type": "SYMBOL",
           "name": "try_block"
         },
         {
@@ -1359,28 +1363,20 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "alias"
-        },
-        {
-          "type": "SYMBOL",
           "name": "_name"
         }
       ]
     },
-    "alias_block": {
+    "alias_path": {
       "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "alias_name"
+          "name": "_name"
         },
         {
-          "type": "SEQ",
+          "type": "CHOICE",
           "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_name"
-            },
             {
               "type": "REPEAT",
               "content": {
@@ -1396,8 +1392,28 @@
                   }
                 ]
               }
+            },
+            {
+              "type": "BLANK"
             }
           ]
+        }
+      ]
+    },
+    "alias_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "alias"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "alias_name"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "alias_path"
         }
       ]
     },
@@ -2695,6 +2711,127 @@
           "name": "end_use"
         }
       ]
+    },
+    "_ok": {
+      "type": "PATTERN",
+      "value": "(o|O)(k|K)"
+    },
+    "_document": {
+      "type": "PATTERN",
+      "value": "(d|D)(o|O)(c|C)(u|U)(m|M)(e|E)(n|N)(t|T)"
+    },
+    "_error_formula": {
+      "type": "PATTERN",
+      "value": "(e|E)(r|R)(r|R)(o|O)(r|R) (f|F)(o|O)(r|R)(m|M)(u|U)(l|L)(a|A)"
+    },
+    "_error_line": {
+      "type": "PATTERN",
+      "value": "(e|E)(r|R)(r|R)(o|O)(r|R) (l|L)(i|I)(n|N)(e|E)"
+    },
+    "_error_method": {
+      "type": "PATTERN",
+      "value": "(e|E)(r|R)(r|R)(o|O)(r|R) (m|M)(e|E)(t|T)(h|H)(o|O)(d|D)"
+    },
+    "_error": {
+      "type": "PATTERN",
+      "value": "(e|E)(r|R)(r|R)(o|O)(r|R)"
+    },
+    "_flddelimit": {
+      "type": "PATTERN",
+      "value": "(f|F)(l|L)(d|D)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)"
+    },
+    "_recdelimit": {
+      "type": "PATTERN",
+      "value": "(r|R)(e|E)(c|C)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)"
+    },
+    "_mousedown": {
+      "type": "PATTERN",
+      "value": "(m|M)(o|O)(u|U)(s|S)(e|E)(d|D)(o|O)(w|W)(n|N)"
+    },
+    "_mousex": {
+      "type": "PATTERN",
+      "value": "(m|M)(o|O)(u|U)(s|S)(e|E)(x|X)"
+    },
+    "_mousey": {
+      "type": "PATTERN",
+      "value": "(m|M)(o|O)(u|U)(s|S)(e|E)(y|Y)"
+    },
+    "_keycode": {
+      "type": "PATTERN",
+      "value": "(k|K)(e|E)(y|Y)(c|C)(o|O)(d|D)(e|E)"
+    },
+    "_modifiers": {
+      "type": "PATTERN",
+      "value": "(m|M)(o|O)(d|D)(i|I)(f|F)(i|I)(e|E)(r|R)(s|S)"
+    },
+    "_mouseproc": {
+      "type": "PATTERN",
+      "value": "(m|M)(o|O)(u|U)(s|S)(e|E)(p|P)(r|R)(o|O)(c|C)"
+    },
+    "system_variable": {
+      "type": "PREC",
+      "value": -40,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_ok"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_document"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_error_formula"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_error_line"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_error_method"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_error"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_flddelimit"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_recdelimit"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_mousedown"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_mousex"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_mousey"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_keycode"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_modifiers"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_mouseproc"
+          }
+        ]
+      }
     },
     "_return": {
       "type": "PATTERN",

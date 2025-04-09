@@ -9,11 +9,19 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
+          "type": "alias",
+          "named": true
+        },
+        {
           "type": "alias_name",
+          "named": true
+        },
+        {
+          "type": "alias_path",
           "named": true
         }
       ]
@@ -22,17 +30,12 @@
   {
     "type": "alias_name",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "alias",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
+  },
+  {
+    "type": "alias_path",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "begin_sql",
@@ -161,6 +164,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -302,6 +309,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -615,6 +626,10 @@
           "named": true
         },
         {
+          "type": "system_variable",
+          "named": true
+        },
+        {
           "type": "try_block",
           "named": true
         },
@@ -743,6 +758,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -942,6 +961,10 @@
           "named": true
         },
         {
+          "type": "system_variable",
+          "named": true
+        },
+        {
           "type": "try_block",
           "named": true
         },
@@ -1075,6 +1098,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -1307,6 +1334,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -1584,6 +1615,10 @@
           "named": true
         },
         {
+          "type": "system_variable",
+          "named": true
+        },
+        {
           "type": "try_block",
           "named": true
         },
@@ -1745,6 +1780,10 @@
           "named": true
         },
         {
+          "type": "system_variable",
+          "named": true
+        },
+        {
           "type": "try_block",
           "named": true
         },
@@ -1792,6 +1831,11 @@
   },
   {
     "type": "string",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "system_variable",
     "named": true,
     "fields": {}
   },
@@ -1921,6 +1965,10 @@
           "named": true
         },
         {
+          "type": "system_variable",
+          "named": true
+        },
+        {
           "type": "try",
           "named": true
         },
@@ -2045,6 +2093,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -2186,6 +2238,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {
@@ -2401,6 +2457,10 @@
         },
         {
           "type": "sql_injection_block",
+          "named": true
+        },
+        {
+          "type": "system_variable",
           "named": true
         },
         {

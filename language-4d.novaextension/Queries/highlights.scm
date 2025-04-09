@@ -30,9 +30,10 @@
 ) @identifier.variable
 
 (alias_block
- (alias_name
-  (alias) @keyword.construct) @identifier.function
-)
+ (alias) @keyword.construct
+ (alias_name) 
+ (alias_path) 
+) @identifier.variable 
 
 (classic_command_expression
  (classic_command) @start.before @end.after
@@ -46,6 +47,9 @@
   (constant_suffix)? @comment
 ))
 
+(ternary_block) @identifier.decorator
+(literal_block) @identifier.decorator
+
 (return_block
  (return) @keyword.condition
 )
@@ -54,7 +58,7 @@
 (break) @keyword.condition
 (continue) @keyword.condition
 
-; conditions
+;conditions
 
 (use_block
  (use) @keyword.condition
@@ -94,18 +98,22 @@
  (end_for_each) @keyword.condition
 )
 
-; injection
+;injection
 
 (sql_injection_block
  (begin_sql) @keyword.condition
  (end_sql) @keyword.condition
 )
 
-; allow out-of-context symbolisation for these only
+;out-of-context symbolisation
 
+(system_variable) @identifier.property
 (numeric_parameter) @identifier.decorator
 (local_variable) @identifier.variable
+(interprocess_variable_name) @identifier.variable
 (constant)? @identifier.property
+
+;operator
 
 (operator) @operator
 

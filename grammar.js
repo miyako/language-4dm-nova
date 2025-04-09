@@ -41,6 +41,7 @@ module.exports = grammar({
       $.return,
       $.break, 
       $.continue,
+      $.system_variable,
       $.try_block,
       $.try_line,
       $.catch_block,
@@ -238,11 +239,16 @@ module.exports = grammar({
     _alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S)/,    
     alias: $ => prec(PREC.keyword, $._alias),
     alias_name: $ => seq(
-      $.alias, $._name
+      $._name
+    ), 
+    alias_path: $ => seq(
+      $._name, 
+      optional(repeat(seq('.', $._name)))
     ), 
     alias_block: $ => seq(
+      $.alias, 
       $.alias_name,
-      seq($._name, repeat(seq('.', $._name)))
+      $.alias_path
     ),
     _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
     class_extends: $ => seq(
@@ -415,6 +421,36 @@ module.exports = grammar({
       $.end_use
     ),
     
+    _ok: $ => /(o|O)(k|K)/,
+    _document: $ => /(d|D)(o|O)(c|C)(u|U)(m|M)(e|E)(n|N)(t|T)/,
+    _error_formula: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (f|F)(o|O)(r|R)(m|M)(u|U)(l|L)(a|A)/,
+    _error_line: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (l|L)(i|I)(n|N)(e|E)/,
+    _error_method: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (m|M)(e|E)(t|T)(h|H)(o|O)(d|D)/,
+    _error: $ => /(e|E)(r|R)(r|R)(o|O)(r|R)/,
+    _flddelimit: $ => /(f|F)(l|L)(d|D)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
+    _recdelimit: $ => /(r|R)(e|E)(c|C)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
+    _mousedown: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(d|D)(o|O)(w|W)(n|N)/,
+    _mousex: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(x|X)/,
+    _mousey: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(y|Y)/,
+    _keycode: $ => /(k|K)(e|E)(y|Y)(c|C)(o|O)(d|D)(e|E)/,
+    _modifiers: $ => /(m|M)(o|O)(d|D)(i|I)(f|F)(i|I)(e|E)(r|R)(s|S)/,
+    _mouseproc: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(p|P)(r|R)(o|O)(c|C)/,
+    system_variable: $ => prec(PREC.keyword, choice(
+      $._ok,
+      $._document,
+      $._error_formula,
+      $._error_line,
+      $._error_method,
+      $._error,
+      $._flddelimit,
+      $._recdelimit,
+      $._mousedown,
+      $._mousex,
+      $._mousey,
+      $._keycode,
+      $._modifiers,
+      $._mouseproc
+    )),
     _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
     _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
     _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
@@ -428,7 +464,6 @@ module.exports = grammar({
     /*
     operator
     */
-    
     operator: $ => prec(PREC.operator, 
       choice(
       '+=', '-=', '*=', '/=', '~|',

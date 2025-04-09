@@ -25,6 +25,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -32,6 +33,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -39,6 +41,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -46,6 +49,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -53,6 +57,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -60,6 +65,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -67,6 +73,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -74,6 +81,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (local_variable
         (local_variable_name))))
@@ -81,6 +89,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (constant
         (date))))
@@ -88,6 +97,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (constant
         (date))))
@@ -95,10 +105,12 @@ $1.prop:=$value ? "a" : "b"
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (value
         (constant
           (string)))
+      (operator)
       (value
         (local_variable
           (local_variable_name)))))
@@ -106,6 +118,7 @@ $1.prop:=$value ? "a" : "b"
     (value
       (numeric_parameter
         (numeric_parameter_name)))
+    (operator)
     (value
       (ternary_block
         (value

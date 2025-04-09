@@ -13,6 +13,7 @@ $object:={test:{test:$test}}
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (ternary_block
         (value
@@ -28,6 +29,7 @@ $object:={test:{test:$test}}
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (literal_block
         (value
@@ -37,6 +39,7 @@ $object:={test:{test:$test}}
     (value
       (local_variable
         (local_variable_name)))
+    (operator)
     (value
       (literal_block
         (value
