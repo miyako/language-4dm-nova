@@ -207,6 +207,7 @@ module.exports = grammar({
       seq(':', $.class)
     ),
     function_block: $ => seq(
+      optional(choice($.shared, $.local, $.exposed)),
       $.function_name,
       $.function_arguments,
       optional($.function_result)
@@ -258,8 +259,18 @@ module.exports = grammar({
       $._class_extends,
       seq(choice($._class_store_4d, $._name), repeat(seq('.', $._name)))
     ),
+    _shared: $ => /(s|S)(h|H)(a|A)(r|R)(e|E)(d|D)/,    
+    shared: $ => prec(PREC.keyword, $._shared),
+    _singleton: $ => /(s|S)(i|I)(n|N)(g|G)(l|L)(e|E)(t|T)(o|O)(n|N)/,    
+    singleton: $ => prec(PREC.keyword, $._singleton),    
+    _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,    
+    local: $ => prec(PREC.keyword, $._local),  
+    _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,    
+    exposed: $ => prec(PREC.keyword, $._exposed),  
+            
     _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
     class_constructor: $ => seq(
+      optional(choice($.shared, $.shared)),
       $._class_constructor
     ),
     _var: $ => /(v|V)(a|A)(r|R)/,
@@ -268,8 +279,8 @@ module.exports = grammar({
       $.var, 
       choice($._name, $.local_variable_name), 
       repeat(seq(';', choice($._name, $.local_variable_name))), 
-      ':', 
-      $.class
+      optional(seq(':', $.class)), 
+      optional(seq(':=', $.value))
     ),
     _property: $ => /(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)/, 
     property: $ => prec(PREC.keyword, $._property),
@@ -451,6 +462,8 @@ module.exports = grammar({
     [$.function_block],
     [$.declare_block],
     
+    [$.var_declaration_block],
+    [$.var_declaration_block, $.ternary_block],
     [$.return_block, $._statement],
     [$.return_block, $.ternary_block],
     [$.return_block],
