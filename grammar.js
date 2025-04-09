@@ -81,7 +81,7 @@ module.exports = grammar({
       seq('(', $.value, repeat(seq(';', $.value)), ')')
     ),
     command_suffix: $ => /(:C[0-9]+)/,
-    classsic_command_expression: $ => prec.right(seq(
+    classic_command_expression: $ => prec.right(seq(
       $.classic_command, 
       optional($.command_suffix), 
       repeat($._node))),
@@ -115,12 +115,6 @@ module.exports = grammar({
       repeat($._node)
     )),
     
-    class_name: $ => $._class_store,
-    class_instance: $ => seq(
-      $.class_name, 
-      repeat($._node)
-    ),
-    
     ternary_block: $ => prec.left(seq(
       $.value,
       '?',
@@ -144,11 +138,10 @@ module.exports = grammar({
     value: $ => prec.right(choice(
       $.ternary_block,
       $.literal_block,
-      $.classsic_command_expression, 
+      $.classic_command_expression, 
       $.local_variable, 
       $.interprocess_variable,
       $.numeric_parameter,
-      $.class_instance,
       $.constant,
       seq($.value, $._binary_operator, $.value)
     )),
@@ -159,11 +152,6 @@ module.exports = grammar({
     _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,
     _scope: $ => (choice($._local, $._exposed, seq($._local, $._exposed), seq($._exposed, $._local))),
     _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/, 
-    _class_store_4d: $ => /[4](d|D)/,
-    _class_store_ds: $ => /(d|D)(s|S)/,
-    _class_store_cs: $ => /(c|C)(s|S)/,
-    _class_store: $ => prec(PREC.keyword, seq(choice($._class_store_4d, $._class_store_ds, $._class_store_cs), optional($.command_suffix))),
-
     _basic_type_text: $ => /(t|T)(e|E)(x|X)(t|T)/,
     _basic_type_date: $ => /(d|D)(a|A)(t|T)(e|E)/,
     _basic_type_time: $ => /(t|T)(i|I)(m|M)(e|E)/,
@@ -190,7 +178,7 @@ module.exports = grammar({
       $._basic_type_variant,
       $._basic_type_object
     ),    
-    class: $ => choice($._basic_type, seq($._class_store, repeat(seq('.', $._name)))),  
+    class: $ => choice($._basic_type, seq($.classic_command_expression, repeat(seq('.', $._name)))),  
     function: $ => prec(PREC.keyword, $._function),
     function_name: $ => seq(
       optional($._scope), $.function, repeat($._name)
@@ -257,7 +245,7 @@ module.exports = grammar({
     _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
     class_extends: $ => seq(
       $._class_extends,
-      seq(choice($._class_store_4d, $._name), repeat(seq('.', $._name)))
+      seq($._name, repeat(seq('.', $._name)))
     ),
     _shared: $ => /(s|S)(h|H)(a|A)(r|R)(e|E)(d|D)/,    
     shared: $ => prec(PREC.keyword, $._shared),
@@ -467,6 +455,9 @@ module.exports = grammar({
     [$.declare_block, $.function_block],
     [$.function_block],
     [$.declare_block],
+
+    [$.ternary_block, $.property_declaration_block],    
+    [$.property_declaration_block],
     
     [$.var_declaration_block],
     [$.var_declaration_block, $.ternary_block],
@@ -475,7 +466,6 @@ module.exports = grammar({
     [$.return_block],
     [$.local_variable],
     [$.interprocess_variable],
-    [$.class_instance],
     [$.literal_block],
     
     [$._statement, $.if_block],

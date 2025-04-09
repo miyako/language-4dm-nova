@@ -2458,6 +2458,8 @@ const wchar_t *constant_tokens[] = {
 };
 
 const wchar_t *command_tokens[] = {
+    L"DS",
+    L"CS",
     L"C_VARIANT",
     L"C_TIME",
     L"C_TEXT",
@@ -2484,6 +2486,7 @@ const wchar_t *command_tokens[] = {
     L"ARRAYDATE",
     L"ARRAYBOOLEAN",
     L"ARRAYBLOB",
+    L"4D",
     L"ZIPREADARCHIVE",
     L"ZIPCREATEARCHIVE",
     L"YEAROF",

@@ -44,7 +44,7 @@
   (alias) @keyword.construct) @identifier.function
 )
 
-(classsic_command_expression
+(classic_command_expression
  (classic_command) @start.before @end.after
  (command_suffix)? @comment
  (expression_argument)?
@@ -55,12 +55,6 @@
   (classic_constant) @start.before @end.after
   (constant_suffix)? @comment
 ))
-
-(class_instance
- (class_name) @start.before @end.after
- (command_suffix)? @comment
- (expression_argument)?
-) @identifier.type.class
 
 (return_block
  (return) @keyword.condition

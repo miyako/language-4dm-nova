@@ -420,7 +420,7 @@
       "type": "PATTERN",
       "value": "(:C[0-9]+)"
     },
-    "classsic_command_expression": {
+    "classic_command_expression": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
@@ -636,26 +636,6 @@
         ]
       }
     },
-    "class_name": {
-      "type": "SYMBOL",
-      "name": "_class_store"
-    },
-    "class_instance": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "class_name"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_node"
-          }
-        }
-      ]
-    },
     "ternary_block": {
       "type": "PREC_LEFT",
       "value": 0,
@@ -798,7 +778,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "classsic_command_expression"
+            "name": "classic_command_expression"
           },
           {
             "type": "SYMBOL",
@@ -811,10 +791,6 @@
           {
             "type": "SYMBOL",
             "name": "numeric_parameter"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "class_instance"
           },
           {
             "type": "SYMBOL",
@@ -890,56 +866,6 @@
     "_function": {
       "type": "PATTERN",
       "value": "(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)"
-    },
-    "_class_store_4d": {
-      "type": "PATTERN",
-      "value": "[4](d|D)"
-    },
-    "_class_store_ds": {
-      "type": "PATTERN",
-      "value": "(d|D)(s|S)"
-    },
-    "_class_store_cs": {
-      "type": "PATTERN",
-      "value": "(c|C)(s|S)"
-    },
-    "_class_store": {
-      "type": "PREC",
-      "value": -40,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_class_store_4d"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_class_store_ds"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_class_store_cs"
-              }
-            ]
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "command_suffix"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          }
-        ]
-      }
     },
     "_basic_type_text": {
       "type": "PATTERN",
@@ -1054,7 +980,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_class_store"
+              "name": "classic_command_expression"
             },
             {
               "type": "REPEAT",
@@ -1558,17 +1484,8 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_class_store_4d"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_name"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_name"
             },
             {
               "type": "REPEAT",
@@ -1805,12 +1722,46 @@
           }
         },
         {
-          "type": "STRING",
-          "value": ":"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ":"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "class"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
-          "type": "SYMBOL",
-          "name": "class"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ":="
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -3042,6 +2993,13 @@
       "declare_block"
     ],
     [
+      "ternary_block",
+      "property_declaration_block"
+    ],
+    [
+      "property_declaration_block"
+    ],
+    [
       "var_declaration_block"
     ],
     [
@@ -3064,9 +3022,6 @@
     ],
     [
       "interprocess_variable"
-    ],
-    [
-      "class_instance"
     ],
     [
       "literal_block"
