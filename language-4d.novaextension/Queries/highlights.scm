@@ -1,3 +1,9 @@
+(class_extends) @keyword.construct 
+
+
+
+
+
 (function_arguments
  (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
@@ -8,13 +14,6 @@
  (class) @identifier.type.class
 )
 
-(function_block
- (function_name
-  (function) @keyword.construct) @identifier.function
- (function_arguments)?
- (function_result)?
-)
-
 (declare_block
  (declare) @keyword.construct
  (function_arguments)?
@@ -23,7 +22,7 @@
 
 (class_constructor) @keyword.construct
 
-(class_extends) @keyword.construct
+
 
 (var_declaration_block
  ((var) @keyword.construct) 

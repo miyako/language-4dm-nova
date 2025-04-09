@@ -31,7 +31,7 @@ C_VARIANT:C1683($a; $b; $c)
 
 (source
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -44,7 +44,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -57,7 +57,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -70,7 +70,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -83,7 +83,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -96,7 +96,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -109,7 +109,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -122,7 +122,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -135,7 +135,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -148,7 +148,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -161,7 +161,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -174,7 +174,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -187,21 +187,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (local_variable
-            (local_variable_name))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -215,7 +201,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -229,7 +215,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -243,7 +229,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -257,7 +243,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -271,7 +257,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -285,7 +271,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -299,7 +285,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -313,7 +299,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -327,7 +313,7 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -341,7 +327,21 @@ C_VARIANT:C1683($a; $b; $c)
           (local_variable
             (local_variable_name))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (local_variable
+            (local_variable_name))))))
+  (value
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument

@@ -10,7 +10,17 @@ class extends cs.aComponent.aClass
 ---
 
 (source
-  (class_extends)
-  (class_extends)
-  (class_extends)
-  (class_extends))
+  (class_extends
+    (class))
+  (class_extends
+    (class
+      (classic_command_expression
+        (classic_command))))
+  (class_extends
+    (class
+      (classic_command_expression
+        (classic_command))))
+  (class_extends
+    (class
+      (classic_command_expression
+        (classic_command)))))

@@ -24,23 +24,23 @@ cs.aComponent.aClass.method() + cs.aComponent.aClass.method()
       (local_variable_name)
       (expression_argument)))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument)))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument)))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument)))
   (value
     (value
-      (classsic_command_expression
+      (classic_command_expression
         (classic_command)
         (expression_argument)))
     (value
-      (classsic_command_expression
+      (classic_command_expression
         (classic_command)
         (expression_argument)))))

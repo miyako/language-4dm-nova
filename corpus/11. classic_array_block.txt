@@ -55,7 +55,7 @@ ARRAY TIME:C1223($a; 0; 0)
 
 (source
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -65,30 +65,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -101,7 +78,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -111,30 +88,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -147,7 +101,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -157,30 +111,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -193,7 +124,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -203,30 +134,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -239,7 +147,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -249,30 +157,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -285,7 +170,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -295,30 +180,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (expression_argument
         (value
@@ -331,7 +193,145 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -342,32 +342,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -381,7 +356,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -392,32 +367,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -431,7 +381,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -442,32 +392,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -481,7 +406,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -492,32 +417,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -531,7 +431,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -542,32 +442,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
-      (classic_command)
-      (command_suffix)
-      (expression_argument
-        (value
-          (local_variable
-            (local_variable_name)))
-        (value
-          (constant
-            (number))))))
-  (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -581,7 +456,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -592,7 +467,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -606,7 +481,7 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument
@@ -617,7 +492,132 @@ ARRAY TIME:C1223($a; 0; 0)
           (constant
             (number))))))
   (value
-    (classsic_command_expression
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
+      (classic_command)
+      (command_suffix)
+      (expression_argument
+        (value
+          (local_variable
+            (local_variable_name)))
+        (value
+          (constant
+            (number))))))
+  (value
+    (classic_command_expression
       (classic_command)
       (command_suffix)
       (expression_argument

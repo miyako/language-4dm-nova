@@ -24,7 +24,7 @@ End try
   (try_line
     (try)
     (value
-      (classsic_command_expression
+      (classic_command_expression
         (classic_command)
         (command_suffix)
         (expression_argument
@@ -34,7 +34,7 @@ End try
   (try_block
     (try)
     (value
-      (classsic_command_expression
+      (classic_command_expression
         (classic_command)
         (command_suffix)
         (expression_argument
@@ -45,7 +45,7 @@ End try
   (try_block
     (try)
     (value
-      (classsic_command_expression
+      (classic_command_expression
         (classic_command)
         (command_suffix)
         (expression_argument
