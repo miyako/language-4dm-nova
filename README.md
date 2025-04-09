@@ -1,7 +1,7 @@
 # language-4dm-nova
 add syntax highlighting to .4dm files.
 
-<img width="658" alt="0.3.0" src="https://github.com/miyako/language-4dm-nova/assets/1725068/c38e9cb8-9268-4132-b562-d7f1b0c5bd7c">
+<img src="https://github.com/user-attachments/assets/9d4a111c-c3f0-4b8d-a4c6-50f02a27957c" width=400 height=auto />
 
 ## to compile
 
@@ -13,7 +13,7 @@ tree-sitter generate
 
 ## updates
 
-* `0.6.0`: `C_` and `ARRAY ` are now regular commands
+* `0.9.0`: added variadic parameter. added local, exposed, shared, singleton. fix classic commands. added declare and init in one line.
 * `0.3.0`: added `try`
 
 
