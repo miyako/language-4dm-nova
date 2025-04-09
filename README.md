@@ -54,11 +54,10 @@ tree-sitter generate
 
 * [`ternary_block`]
 * [`literal_block`]
-* [`classsic_command_expression`]
+* [`classic_command_expression`]
 * [`local_variable`]
 * [`interprocess_variable`]
 * [`numeric_parameter`]
-* [`class_instance`]
 * [`constant`]
 * [`value`, `_binary_operator`, `value`] - circular
 
