@@ -7,7 +7,7 @@
     </meta>
     
     <detectors>
-        <extension priority="1.0">4dm,c4d</extension>
+        <extension priority="1.0">4dm,c4d,4qs</extension>
         <match-content lines="1" priority="0.3">\/\/%attributes = \{[^}]*\}</match-content>
     </detectors>
     
@@ -36,14 +36,12 @@
     
     <brackets>
         <pair open="{"  close="}"   />
-        <pair open="["  close="]"   />
         <pair open="[[" close="]]"  />
+        <pair open="["  close="]"   />
         <pair open="("  close=")"   />
     </brackets>
     
     <surrounding-pairs>
-        <pair open="{" close="}"    />
-        <pair open="[" close="]"    />
         <pair open="(" close=")"    />
         <pair open="&quot;" close="&quot;"  />
     </surrounding-pairs>
