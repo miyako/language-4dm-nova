@@ -94,7 +94,6 @@
 
 (case_of) @keyword.condition
 (case)? @keyword.condition
-(else)? @keyword.condition
 (end_case) @keyword.condition
 
 (for_each_block

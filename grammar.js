@@ -313,12 +313,13 @@ module.exports = grammar({
     ),
     _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
     _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
-    while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
+    _while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
     _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
     _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
     end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
-    _while: $ => seq(
-        seq($.while, '(', $.value, ')')
+    while: $ => seq(
+      $._while, 
+      $.conditions
     ),
     while_block: $ => seq(
       $._while,
@@ -330,14 +331,15 @@ module.exports = grammar({
     repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
     _until_e: $ => /(u|U)(n|N)(t|T)(i|I)(l|L)/,
     _until_f: $ => /(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)/,
-    until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
-    _until: $ => seq(
-      seq($.until, '(', $.value, ')')
+    _until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
+    until: $ => seq(
+      $._until, 
+      $.conditions
     ),
     repeat_block: $ => seq(
       $.repeat,
       repeat($._statement),
-      $._until
+      $.until
     ),
     _for_e: $ => /(f|F)(o|O)(r|R)/,
     _for_f: $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
