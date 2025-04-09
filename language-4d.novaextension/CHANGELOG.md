@@ -1,3 +1,7 @@
+## Version 0.9.0
+
+variadic parameters, declare and init var, retire classic compiler/array, storage, shared, singleton, local, exposed, obsolete commands, type
+
 ## Version 0.5.1
 
 update operators
