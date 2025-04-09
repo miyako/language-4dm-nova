@@ -1,5 +1,5 @@
 (class_extends) @keyword.construct 
-
+(declare_block)@keyword.construct
 
 
 
@@ -14,11 +14,7 @@
  (class) @identifier.type.class
 )
 
-(declare_block
- (declare) @keyword.construct
- (function_arguments)?
- (function_result)?
-)
+
 
 (class_constructor) @keyword.construct
 
