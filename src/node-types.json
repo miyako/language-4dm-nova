@@ -349,7 +349,17 @@
   {
     "type": "class_constructor",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "shared",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "class_extends",
@@ -827,6 +837,11 @@
     "fields": {}
   },
   {
+    "type": "exposed",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "expression_argument",
     "named": true,
     "fields": {},
@@ -1154,6 +1169,10 @@
       "required": true,
       "types": [
         {
+          "type": "exposed",
+          "named": true
+        },
+        {
           "type": "function_arguments",
           "named": true
         },
@@ -1163,6 +1182,14 @@
         },
         {
           "type": "function_result",
+          "named": true
+        },
+        {
+          "type": "local",
+          "named": true
+        },
+        {
+          "type": "shared",
           "named": true
         }
       ]
@@ -1390,6 +1417,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "local",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "local_variable",
@@ -1635,6 +1667,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "shared",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "source",
@@ -2273,6 +2310,10 @@
         },
         {
           "type": "local_variable_name",
+          "named": true
+        },
+        {
+          "type": "value",
           "named": true
         },
         {

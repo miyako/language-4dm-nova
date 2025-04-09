@@ -30,7 +30,7 @@
  (local_variable_name)? @identifier.variable
  (interprocess_variable_name)? @identifier.variable
  ;optional to allow for process variable as generic node
- (class) @identifier.type.class
+ (class)? @identifier.type.class
 ) 
 
 (property_declaration_block
