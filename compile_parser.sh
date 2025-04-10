@@ -46,3 +46,9 @@ cp $PRODUCT_PATH $WORKINGDIR/language-4d.novaextension/Syntaxes/$PRODUCT_NAME
  xcrun notarytool submit "$DMG_PATH" --keychain-profile "notarytool" --wait
  xcrun stapler staple "$DMG_PATH"
 
+# replace
+PRODUCT_DMG_PATH="${BASEDIR}/language-4d.novaextension.dmg"
+PRODUCT_SRC_PATH="${BASEDIR}/language-4d.novaextension"
+rm -f "${PRODUCT_DMG_PATH}"
+hdiutil create -format UDBZ -plist -srcfolder "${PRODUCT_SRC_PATH}" "${PRODUCT_DMG_PATH}"
+
