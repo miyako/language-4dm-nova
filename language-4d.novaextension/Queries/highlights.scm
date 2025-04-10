@@ -116,7 +116,7 @@
 ;operator
 
 (operator) @operator
-["-"] @operator
+["-" ":="] @operator
 ;comment
 
 (comment) @comment
