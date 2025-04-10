@@ -5,7 +5,7 @@
 
 ;function
 
-(function_block)@keyword.construct
+(function_block) @keyword.construct
 (function_arguments
  (local_variable_name)? @identifier.variable
  (class) @identifier.type.class
@@ -17,17 +17,13 @@
 (class_constructor) @keyword.construct
 
 ;var, property
-
 (var_declaration_block
- ((var) @keyword.construct) 
  (local_variable_name)? @identifier.variable
- (interprocess_variable_name)? @identifier.variable
- (class)? @identifier.type.class
-) @identifier.variable
+;let classic_command_expression be themselves
+) @keyword.construct 
 (property_declaration_block
- ((property) @keyword.construct) 
- (class)? @identifier.type.class
-) @identifier.variable
+;let classic_command_expression be themselves
+) @keyword.construct  
 
 (alias_block
  (alias) @keyword.construct
@@ -116,7 +112,9 @@
 ;operator
 
 (operator) @operator
-["-" ":="] @operator
+;unary operator is not scoped for the moment (too many conflicts)
+;assign is scoped in var, property, etc
+["-" ":=" ":"] @operator
 ;comment
 
 (comment) @comment
