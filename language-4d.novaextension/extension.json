@@ -1,5 +1,5 @@
 {
-    "identifier": "com.4d.4d",
+    "identifier": "com.4d.language.4d",
     "name": "language-4d",
     "organization": "4D SAS",
     "description": "add syntax highlighting to .4dm files.",
