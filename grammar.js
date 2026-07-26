@@ -1,581 +1,505 @@
+/// <reference types="tree-sitter-cli/dsl" />
+// tree-sitter-fourd — targets 4D 21 R4.
+//
+// Skeleton: the hard structural decisions are wired, the long tail of
+// statements and types is left as TODO.
+
+// C ordering: the short-circuit operators sit BELOW their bitwise counterparts,
+// so `$a | $b && $c` groups as `($a | $b) && $c`.
 const PREC = {
-  comment:    -100,
-  operator:   -90,
-  token:      -80,
-  constant:   -50,
-  keyword:    -40
+  ASSIGN:    0,   // :=  +=  ...  (usable inside Formula(...) etc.)
+  TERNARY:   1,
+  LOGIC_OR:  2,   // ||   short-circuit
+  LOGIC_AND: 3,   // &&   short-circuit
+  OR:        4,   // |
+  AND:       5,   // &
+  EQUALITY:  6,   // =  #
+  RELATION:  7,   // <  >  <=  >=
+  SHIFT:     8,   // << >>
+  ADDITIVE:  9,   // +  -
+  MULTIPLY: 10,   // *  /  %  backslash (integer division)
+  UNARY:    11,   // -  ->  (pointer creation)
+  POSTFIX:  12,   // .member  [i]  {i}  [[i]]  ->  (deref)
+};
+
+// Multi-word keyword. A plain string literal would demand exactly one space;
+// this tolerates whatever the method editor emits. prec 2 puts it above
+// `identifier` so `End if` never lexes as two identifiers. Longest-match means
+// `End for each` still beats `End for` without extra bookkeeping.
+function kw(...words) {
+  // First letter of each word is case-insensitive: hand-edited files contain
+  // `case of` / `end case`, which 4D accepts and its editor normalizes.
+  const ci = w => '[' + w[0].toUpperCase() + w[0].toLowerCase() + ']' + w.slice(1);
+  return token(prec(2, new RegExp(words.map(ci).join('\\s+'))));
 }
-  
+
 module.exports = grammar({
   name: 'fourd',
 
-  externals: $=> [
-    $.classic_command,
-    $.classic_constant
+  // The scanner emits _terminator for meaningful newlines; any newline it
+  // declines to claim falls through to extras and is discarded.
+  // The line continuation belongs HERE, not in the scanner. The scanner is only
+  // invoked in states where some external token is valid, so a '\' immediately
+  // after '{' was never seen by it. As an extra it is skipped everywhere.
+  // Longest-match keeps it clear of '\' the integer-division operator, which is
+  // never followed by a newline.
+  extras: $ => [
+    /[ \t\r\n\uFEFF]/,   // include the BOM: real files start with one (or two)
+    $.line_continuation,
+    $.line_comment,
+    $.block_comment,
   ],
+
+  externals: $ => [
+    $._terminator,
+    $._function_start,
+    $.char_ref_open,
+    $.char_ref_close,
+    $.time_literal,
+    $.date_literal,
+    $.sql_content,
+    $.command_name,      // untokenized: SET WINDOW TITLE
+    $.constant_name,     // untokenized: Is text
+    $.system_variable,   // reserved: OK, Error, Document
+    $._error_sentinel,   // never used in a rule; see scanner.c
+  ],
+
+  // No declared conflicts. The `Try` ambiguity resolves itself: try_statement
+  // requires a _terminator immediately after `Try`, try_expression requires
+  // '('. One token of lookahead separates them, so this is plain LR(1).
+
+  word: $ => $.identifier,
+
   rules: {
-    source: $ => repeat($._statement),
-    _statement: $ => choice(
-      $.value,
-      $.sql_injection_block,
-      $.function_block,
-      $.declare_block,
-      $.alias_block,
-      $.comment,
-      $.class_constructor,
-      $.class_extends,
-      $.var_declaration_block,
-      $.property_declaration_block,
-      $.case_block,
-      $.case,
-      $.else_block_case,
-      $.use_block,
-      $.if_block,
-      $.else_block_if,
-      $.for_each_block,
-      $.repeat_block,
-      $.while_block,
-      $.for_block,
-      $.for_each_block,
-      $.return_block,
-      $.return,
-      $.break, 
-      $.continue,
-      $.try_block,
-      $.try_line,
-      $.catch_block,
-      $.comment_block
+    // Ordering here is load-bearing, not cosmetic. Function bodies are
+    // repeat($._statement) with no closing token, so if bare statements were
+    // also legal AFTER a function, every trailing statement would be ambiguous
+    // between "last statement of the body" and "next top-level statement".
+    // Forbidding statements after the first function removes the ambiguity and
+    // matches the language: a method file has statements and no functions, a
+    // class file has functions and no free statements.
+    source_file: $ => seq(
+      optional($.attributes_header),   // // %attributes = { ... }
+      repeat(choice($.extends_clause, $.property_declaration)),
+      repeat($._statement),
+      repeat($.function_declaration),
     ),
-    
-    time: $ => prec(PREC.constant,
-      seq('?', /[0-9]{2}/, ':', /[0-9]{2}/, ':', /[0-9]{2}/, '?')
+
+    // ---------------------------------------------------------------- classes
+
+    extends_clause: $ => seq(kw('Class', 'extends'), field('super', $.identifier), $._terminator),
+
+    // Mirrors var_declaration: `property a; b : Text` declares several names
+    // sharing one type, and `: Type := default` / bare `:= default` are the
+    // one-line initialization forms.
+    property_declaration: $ => seq(
+      'property',
+      field('name', $.identifier),
+      repeat(seq(';', field('name', $.identifier))),
+      optional(seq(':', field('type', $._type))),
+      optional(seq(':=', field('default', $._expression))),
+      $._terminator,
     ),
-    date: $ => prec(PREC.constant,
+
+    // Bodies are IMPLICITLY terminated: 4D ends a function at the next
+    // Function/Class constructor or at EOF. The scanner's zero-width
+    // _function_start marker is what lets repeat($._statement) know to stop —
+    // and what stops a process variable named `local` from reading as a
+    // modifier.
+    function_declaration: $ => seq(
+      $._function_start,
+      repeat(field('modifier', $.modifier)),
       choice(
-      seq('!', /[0-9]{2,4}/, '-', /[0-9]{2}/, '-', /[0-9]{2}/, '!'),
-      seq('!', /[0-9]{2}/, '-', /[0-9]{2}/, '-', /[0-9]{2,4}/, '!'),
-      '!00-00-00!'
-      )
-    ),
-    _hex_literal: $ => /0[xX][0-9a-fA-F]+/,
-    _dec_literal: $ => /[0-9]+/,
-    _num_literal: $ => seq(/[0-9]+[.,][0-9]+/),
-    _exp_literal: $ => seq(/[0-9]+[.,][0-9]+[eE]-?[0-9]+/),
-    number : $ => prec(PREC.constant,
-      choice($._dec_literal, $._hex_literal, $._exp_literal, $._num_literal)
-    ),
-    string: $ => prec(PREC.constant,
-      seq('"',
-      repeat(choice('\\r', '\\n', '\\"', '\\t', '\\\\', '\\"', /[^"]/)), 
-      '"')
-    ),
-    constant: $ => choice(
-      $.time,
-      $.date,
-      $.number,
-      $.string, 
-      $.classic_constant_expression
-    ),
-    _expression_argument: $ => choice(
-      '()',
-      seq('(', $.value, repeat(seq(';', $.value)), ')')
-    ),
-    command_suffix: $ => /(:C[0-9]+)/,
-    classic_command_expression: $ => prec.right(seq(
-      $.classic_command, 
-      optional($.command_suffix), 
-      repeat($._node))),
-    constant_suffix: $ => /(:K[0-9]+:[0-9]+)/,
-    classic_constant_expression: $ => prec.right(seq(
-      $.classic_constant, 
-      optional($.constant_suffix)
-      )
-    ), 
-    _name: $ => /([\p{Letter}_]+)([\p{Letter}_0-9]*)/, 
-    _node: $ => choice(
-      seq('.', $._name),
-      $._expression_argument,
-      seq('[', $.value, ']'),
-      seq('{', $.value, '}')
-    ),  
-    local_variable_name: $ => seq('$', $._name),  
-    local_variable: $ => seq(
-      $.local_variable_name, 
-      repeat($._node)
-    ),
-    interprocess_variable_name: $ => seq('<>', $._name),
-    interprocess_variable: $ => seq(
-      $.interprocess_variable_name, 
-      repeat($._node)
-    ),
-    
-    numeric_parameter_name: $ => prec(PREC.token, seq('$', /[0-9]+/)),  
-    numeric_parameter: $ => prec.right(seq(
-      $.numeric_parameter_name, 
-      repeat($._node)
-    )),
-    
-    ternary_block: $ => prec.left(seq(
-      $.value,
-      '?',
-      $.value,
-      ':',
-      $.value
-    )),  
-    _object_literal_block: $ => prec.right(
-      choice('{}',
-      seq('{', $._name, ':', $.value, '}')
-      ) 
-    ),
-    _collection_literal_block: $ => prec.right(
-      choice('[]', 
-      seq('[', $.value, repeat(seq(';', $.value)), ']')
-      )
-    ),
-    literal_block: $ => seq(
-      choice($._object_literal_block, $._collection_literal_block),
-      optional(repeat($._node))
-    ),
-    value: $ => prec.right(choice(
-      $.ternary_block,
-      $.literal_block,
-      $.classic_command_expression, 
-      $.local_variable, 
-      $.interprocess_variable,
-      $.numeric_parameter,
-      $.system_variable,
-      $.constant,
-      $.conditions,
-      seq($.value, $.operator, $.value)
-    )),
-    
-    
-
-
-    
-    
-    
-    _basic_type_text: $ => /(t|T)(e|E)(x|X)(t|T)/,
-    _basic_type_date: $ => /(d|D)(a|A)(t|T)(e|E)/,
-    _basic_type_time: $ => /(t|T)(i|I)(m|M)(e|E)/,
-    _basic_type_boolean: $ => /(b|B)(o|O)(o|O)(l|L)(e|E)(a|A)(n|N)/,
-    _basic_type_integer: $ => /(i|I)(n|N)(t|T)(e|E)(g|G)(e|E)(r|R)/,
-    _basic_type_real: $ => /(r|R)(e|E)(a|A)(l|L)/,
-    _basic_type_pointer: $ => /(p|P)(o|O)(i|I)(n|N)(t|T)(e|E)(r|R)/,
-    _basic_type_picture: $ => /(p|P)(i|I)(c|C)(t|T)(u|U)(r|R)(e|E)/,
-    _basic_type_blob: $ => /(b|B)(l|L)(o|O)(b|B)/,
-    _basic_type_collection: $ => /(c|C)(o|O)(l|L)(l|L)(e|E)(c|C)(t|T)(i|I)(o|O)(n|N)/,
-    _basic_type_variant: $ => /(v|V)(a|A)(r|R)(i|I)(a|A)(n|N)(t|T)/,
-    _basic_type_object: $ => /(o|O)(b|B)(j|J)(e|E)(c|C)(t|T)/,
-    _basic_type: $ => choice(
-      $._basic_type_text,
-      $._basic_type_date,
-      $._basic_type_time,
-      $._basic_type_boolean,
-      $._basic_type_integer,
-      $._basic_type_real,
-      $._basic_type_pointer,
-      $._basic_type_picture,
-      $._basic_type_blob,
-      $._basic_type_collection,
-      $._basic_type_variant,
-      $._basic_type_object
-    ),    
-    class: $ => choice($._basic_type, seq(choice($.classic_command_expression, $._name), repeat(seq('.', $._name)))),  
-    _function_argument: $ => seq(
-      choice($.local_variable_name, '...'), 
-      repeat(seq(';', choice($.local_variable_name, '...'))),
-      ':', 
-      $.class
-    ),
-    function_arguments: $ => seq(
-      '(', 
-      optional(choice($._function_argument, seq($._function_argument, repeat(seq(';', $._function_argument))))), 
-      ')'
-    ),
-    function_result: $ => choice(
-      seq('->', $.local_variable_name, ':', $.class),
-      seq(':', $.class)
-    ),
-    function_block: $ => seq(
-      optional(repeat(choice($.shared, $.local, $.exposed))),
-      $.function,
-      repeat($._name),
-      $.function_arguments,
-      optional($.function_result)
-    ),
-    _declare: $ => /#(d|D)(e|E)(c|C)(l|L)(a|A)(r|R)(e|E)/,
-    declare: $ => prec(PREC.keyword, $._declare),
-    declare_block: $ => seq(
-      $.declare,
-      $.function_arguments,
-      optional($.function_result)
-    ),
-    _try: $ => /(t|T)(r|R)(y|Y)/,  
-    try: $ => prec(PREC.keyword, $._try), 
-    try_line: $ => seq(
-      $.try,
-      '(', $._statement, 
-      ')'
-    ),
-    _catch: $ => /(c|C)(a|A)(t|T)(c|C)(h|H)/, 
-    catch: $ => prec(PREC.keyword, $._catch), 
-    _end_try: $ => /(e|E)(n|N)(d|D) (t|T)(r|R)(y|Y)/,  
-    end_try: $ => prec(PREC.keyword, $._end_try),  
-    catch_block: $ => seq(
-      $.catch, 
-      repeat($._statement), 
-      $.end_try
-    ),
-    try_block: $ => seq(
-        choice(
-          seq($.try, repeat($._statement), $.end_try),
-          seq($.try, repeat($._statement), $.catch_block)
-        )
-    ),
-    _try_statement: $ => choice(
-      $.try_line,
-      $.try_block
-    ),
-    /* alias */
-    _alias: $ => /(a|A)(l|L)(i|I)(a|A)(s|S)/,    
-    alias: $ => prec(PREC.keyword, $._alias),
-    alias_name: $ => seq(
-      $._name
-    ), 
-    alias_path: $ => seq(
-      $._name, 
-      optional(repeat(seq('.', $._name)))
-    ), 
-    alias_block: $ => seq(
-      $.alias, 
-      $.alias_name,
-      $.alias_path
-    ),
-    _class_extends: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) (e|E)(x|X)(t|T)(e|E)(n|N)(d|D)(s|S)/,
-    class_extends: $ => seq(
-      $._class_extends,
-      $.class
-    ),
-    /* function */
-    _shared: $ => /(s|S)(h|H)(a|A)(r|R)(e|E)(d|D)/,    
-    shared: $ => prec(PREC.keyword, $._shared),
-    _singleton: $ => /(s|S)(i|I)(n|N)(g|G)(l|L)(e|E)(t|T)(o|O)(n|N)/,    
-    singleton: $ => prec(PREC.keyword, $._singleton),    
-    _local: $ => /(l|L)(o|O)(c|C)(a|A)(l|L)/,    
-    local: $ => prec(PREC.keyword, $._local),  
-    _exposed: $ => /(e|E)(x|X)(p|P)(o|O)(s|S)(e|E)(d|D)/,    
-    exposed: $ => prec(PREC.keyword, $._exposed),  
-    _function: $ => /(f|F)(u|U)(n|N)(c|C)(t|T)(i|I)(o|O)(n|N)/,   
-    function: $ => prec(PREC.keyword, $._function),
-    /* constructor */  
-    _class_constructor: $ => /((c|C)(l|L)(a|A)(s|S)(s|S)) ((c|C)(o|O)(n|N)(s|S)(t|T)(r|R)(u|U)(c|C)(t|T)(o|O)(r|R))/,
-    class_constructor: $ => prec.right(seq(
-      optional(repeat(choice($.singleton, $.shared))),
-      $._class_constructor,
-      optional($.function_arguments)
-    )),
-    
-    /* 
-    property, var 
-    declare and assign default value
-    */
-    
-    _var: $ => /(v|V)(a|A)(r|R)/,
-    var: $ => prec(PREC.keyword, $._var),
-    var_declaration_block: $ => seq(
-      $.var, 
-      choice($._name, $.local_variable_name), 
-      repeat(seq(';', choice($._name, $.local_variable_name))), 
-      optional(seq(':', $.class)), 
-      optional(seq(':=', $.value))
-    ),
-    _property: $ => /(p|P)(r|R)(o|O)(p|P)(e|E)(r|R)(t|T)(y|Y)/, 
-    property: $ => prec(PREC.keyword, $._property),
-    property_declaration_block: $ => seq(
-      $.property,
-      $._name, 
-      repeat(seq(';', $._name)), 
-      optional(seq(':', $.class)), 
-      optional(seq(':=', $.value))
-    ),
-    _for_each_e: $ => /(f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
-    _for_each_f: $ => /(p|P)(o|O)(u|U)(r|R) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
-    _for_each  : $ => prec(PREC.keyword, choice($._for_each_e, $._for_each_f)),
-    for_each   : $ => seq(
-      $._for_each,
-      '(', 
-      $.value, 
-      ';', 
-      $.value, 
-      optional(choice(seq(
-        ';', 
-        $.value), 
-        seq(
-          ';', 
-          $.value, 
-          ';', 
-          $.value
-        ))
+        kw('Class', 'constructor'),
+        seq(choice('Function', 'function'),   // keyword case is not enforced in the wild
+            // get/set computed-attribute accessors, plus the ORDA markers:
+            // `Function event restrict`, `Function query attr`, `Function orderBy attr`
+            optional(field('accessor', choice('get', 'set', 'event', 'query', 'orderBy'))),
+            // Optional: `Function get($range : Object)` is a function NAMED
+            // get — keyword lexing claims it as accessor, and the name slot
+            // stays empty. Parses fine; consumers read accessor-with-no-name.
+            optional(field('name', choice($.identifier, $.multiword_name)))),
       ),
-      ')'
+      optional($.parameter_list),
+      // Same two return forms as #DECLARE: `-> $out : Type` or `: Type`.
+      optional(choice(
+        seq('->', field('return', $.parameter)),
+        seq(':', field('return_type', $._type)),
+      )),
+      $._terminator,
+      field('body', repeat($._statement)),
     ),
-    _end_for_each_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R) (e|E)(a|A)(c|C)(h|H)/,
-    _end_for_each_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(h|H)(a|A)(q|Q)(u|U)(e|E)/,
-    end_for_each   : $ => prec(PREC.keyword, choice($._end_for_each_e, $._end_for_each_f)),
-    for_each_block: $ => seq(
-      $.for_each,
-      repeat( $._statement),
-      $.end_for_each
+
+    // Deliberately permissive. Which modifier is legal where (exposed only on
+    // ORDA/singleton functions, session only on classes, ...) is a lint rule,
+    // not a grammar rule.
+    modifier: $ => choice(
+      'shared', 'session', 'singleton', 'exposed', 'local', 'server', 'onHTTPGet',
     ),
-    /*
-    while, repeat
-    */
-    _while_e: $ => /(w|W)(h|H)(i|I)(l|L)(e|E)/,
-    _while_f: $ => /(t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
-    _while   : $ => prec(PREC.keyword, choice($._while_e, $._while_f)),
-    _end_while_e: $ => /(e|E)(n|N)(d|D) (w|W)(h|H)(i|I)(l|L)(e|E)/,
-    _end_while_f: $ => /(f|F)(i|I)(n|N) (t|T)(a|A)(n|N)(t|T) (q|Q)(u|U)(e|E)/,
-    end_while   : $ => prec(PREC.keyword, choice($._end_while_e, $._end_while_f)),
-    while: $ => seq(
-      $._while, 
-      $.conditions
+
+    parameter_list: $ => seq(
+      '(',
+      optional(seq($.parameter, repeat(seq(';', $.parameter)))),
+      ')',
     ),
-    while_block: $ => seq(
-      $.while,
-      repeat($._statement),
-      $.end_while
+
+    // Two shapes: `$name : Type`, or the variadic `... : Type` — the ellipsis
+    // is NAMELESS in the documented form (`#DECLARE(... : Real)`), must sit
+    // last, and its extra arguments are reached via ${N} indirection. The
+    // optional name after '...' is permissiveness, not documentation.
+    // "Last position only" is a lint rule, not a grammar rule (§5.6 stance).
+    parameter: $ => choice(
+      seq(field('name', $.local_variable),
+          optional(seq(':', field('type', $._type)))),
+      seq('...',
+          optional(field('name', $.local_variable)),
+          optional(seq(':', field('type', $._type)))),
     ),
-    _repeat_e: $ => /(r|R)(e|E)(p|P)(e|E)(a|A)(t|T)/,
-    _repeat_f: $ => /(r|R)(e|E)(p|P)(e|E)(t|T)(e|E)(r|R)/,
-    repeat   : $ => prec(PREC.keyword, choice($._repeat_e, $._repeat_f)),
-    _until_e: $ => /(u|U)(n|N)(t|T)(i|I)(l|L)/,
-    _until_f: $ => /(j|J)(u|U)(s|S)(q|Q)(u|U)(e|E)/,
-    _until   : $ => prec(PREC.keyword, choice($._until_e, $._until_f)),
-    until: $ => seq(
-      $._until, 
-      $.conditions
+
+    // ------------------------------------------------------------ statements
+
+    _statement: $ => choice(
+      $.var_declaration,
+      $.if_statement,
+      $.case_statement,
+      $.while_statement,
+      $.repeat_statement,
+      $.for_statement,
+      $.for_each_statement,
+      $.try_statement,
+      $.use_statement,
+      $.sql_block,
+      $.declare_statement,
+      $.jump_statement,
+      $.expression_statement,
     ),
-    repeat_block: $ => seq(
-      $.repeat,
-      repeat($._statement),
-      $.until
-    ),
-    /*
-    for
-    */
-    _for_e : $ => /(f|F)(o|O)(r|R)/,
-    _for_f : $ => /(b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
-    _for   : $ => prec(PREC.keyword, choice($._for_e, $._for_f)),
-    for    : $ => seq(
-      $._for, 
-      '(', 
-      $.value, 
-      ';', 
-      $.value, 
-      ';', 
-      $.value, 
-      optional(seq(';', $.value)), 
-      ')'
-    ),
-    _end_for_e: $ => /(e|E)(n|N)(d|D) (f|F)(o|O)(r|R)/,
-    _end_for_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (b|B)(o|O)(u|U)(c|C)(l|L)(e|E)/,
-    end_for  : $ => prec(PREC.keyword, choice($._end_for_e, $._end_for_f)),
-    for_block: $ => seq(
-      $.for,
-      repeat($._statement),
-      $.end_for
-    ),
-    /*
-    if
-    */
-    _if_e: $ => /(i|I)(f|F)/,
-    _if_f: $ => /(s|S)(i|I)/,
-    _if   : $ => prec(PREC.keyword, choice($._if_e, $._if_f)),
-    _else_e: $ => /(e|E)(l|L)(s|S)(e|E)/,
-    _else_f: $ => /(s|S)(i|I)(n|N)(o|O)(n|N)/,
-    else   : $ => prec(PREC.keyword, choice($._else_e, $._else_f)),
-    _end_if_e: $ => /(e|E)(n|N)(d|D) (i|I)(f|F)/,
-    _end_if_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (s|S)(i|I)/,
-    end_if   : $ => prec(PREC.keyword, choice($._end_if_e, $._end_if_f)),
-    _condition: $ => seq('(', $.value, ')'),
-    _conditions : $ => prec.right(seq(
-      $._condition,  
-      optional(repeat(seq($.operator, $._condition)))
+
+    // An EXPRESSION, not a statement: `Formula(Form.x.y:=$1)` assigns inside
+    // an argument list. Statement-position assignments come out as
+    // expression_statement(assignment). Lowest precedence, right-assoc.
+    assignment: $ => prec.right(PREC.ASSIGN, seq(
+      field('left', $._expression),
+      field('operator', choice(':=', '+=', '-=', '*=', '/=')),
+      field('right', $._expression),
     )),
-    conditions : $ => prec.right(choice(seq('(', $._conditions, ')'), $._conditions)),
-    if: $ => seq(
-      $._if, 
-      $.conditions
+
+    // Names are plain tokens, not expressions — required now that ':=' is an
+    // expression operator, and truer to the docs (no interprocess/array vars).
+    // Real code separates names with ',' as well as ';'.
+    var_declaration: $ => seq(
+      'var',
+      field('name', $._var_name),
+      repeat(seq(choice(';', ','), field('name', $._var_name))),
+      optional(seq(':', field('type', $._type))),
+      optional(seq(':=', field('value', $._expression))),
+      $._terminator,
     ),
-    else_block_if: $ => seq(
-      $.else, 
-      repeat($._statement), 
-      $.end_if
+
+    _var_name: $ => choice(
+      $.local_variable, $.identifier,
+      $.interprocess_variable,        // docs exclude it; the corpus does not
+      $.parameter_indirection,        // `var ${2}` — legacy positional params
     ),
-    if_block: $ =>  seq(
-        choice(
-          seq($.if, repeat($._statement), $.end_if),
-          seq($.if, repeat($._statement), $.else_block_if)
-        )
-    ),
-    /*
-    case
-    */
-    _case_of_e: $ => /(c|C)(a|A)(s|S)(e|E) (o|O)(f|F)/,
-    _case_of_f: $ => /(a|A)(u|U) (c|C)(a|A)(s|S) (o|O)(u|U)/,
-    case_of   : $ => prec(PREC.keyword, choice($._case_of_e, $._case_of_f)),    
-    _end_case_e: $ => /(e|E)(n|N)(d|D) (c|C)(a|A)(s|S)(e|E)/,
-    _end_case_f: $ => /(f|F)(i|I)(n|N) (d|D)(e|E) (c|C)(a|A)(s|S)/,
-    end_case   : $ => prec(PREC.keyword, choice($._end_case_e, $._end_case_f)),
-    else_block_case: $ => seq(
-      $.else, 
-      repeat($._statement), 
-      $.end_case
-    ),
-    case: $ => seq(
-      ':', 
-      $.conditions
-    ),
-    case_block: $ => seq(
+
+    // 21 R4 keywords are lowercase, which keeps them clear of the Capitalized /
+    // ALL-CAPS builtin namespace. `defer` is call-shaped, not a block.
+    jump_statement: $ => seq(
       choice(
-        seq($.case_of, 
-          repeat(seq($.case, repeat($._statement))), 
-          $.end_case),
-        seq($.case_of, 
-          repeat(seq($.case, repeat($._statement))), 
-          $.else_block_case)
-        )
+        seq('return', optional($._expression)),
+        'break',
+        'continue',
+        seq('throw', optional(seq('(', optional($._argument_list), ')'))),
+        seq('defer', '(', $._expression, ')'),
+      ),
+      $._terminator,
     ),
-    _begin_sql_e: $ => /(b|B)(e|E)(g|G)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
-    _begin_sql_f: $ => /(d|D)(e|E)(b|B)(u|U)(t|T) (s|S)(q|Q)(l|L)/,
-    begin_sql   : $ => prec(PREC.keyword, choice($._begin_sql_e, $._begin_sql_f)),
-    _end_sql_e: $ => /(e|E)(n|N)(d|D) (s|S)(q|Q)(l|L)/,
-    _end_sql_f: $ => /(f|F)(i|I)(n|N) (s|S)(q|Q)(l|L)/,
-    end_sql   : $ => prec(PREC.keyword, choice($._end_sql_e, $._end_sql_f)),
-    sql_injection_block: $ => seq(
-      $.begin_sql,
-      repeat(/.+?/),
-      $.end_sql
-    ),      
-    _use_e: $ => /(u|U)(s|S)(e|E)/,
-    _use_f: $ => /(u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
-    use   : $ => prec(PREC.keyword, choice($._use_e, $._use_f)),
-    _use: $ => seq(
-        seq($.use, '(', $.value, ')')
+
+    // #DECLARE($p : Text) -> $out : Object
+    // token() so it outlengths '#', which is the not-equal operator.
+    declare_statement: $ => seq(
+      token('#DECLARE'),
+      optional($.parameter_list),
+      // Both return forms: `-> $out : Type` names the output variable;
+      // `: Type` alone pairs with a `return` statement — same as Function.
+      optional(choice(
+        seq('->', field('return', $.parameter)),
+        seq(':', field('return_type', $._type)),
+      )),
+      $._terminator,
     ),
-    _end_use_e: $ => /(e|E)(n|N)(d|D) (u|U)(s|S)(e|E)/,
-    _end_use_f: $ => /(f|F)(i|I)(n|N) (u|U)(t|T)(i|I)(l|L)(i|I)(s|S)(e|E)(r|R)/,
-    end_use   : $ => prec(PREC.keyword, choice($._end_use_e, $._end_use_f)),
-    use_block: $ => seq(
-      $._use,
+
+    // The parenthesis after `If` is NOT statement syntax — it is the start of
+    // an ordinary parenthesized expression. 4D happily accepts
+    //   If ($a=1) | ($b=2) | Match regex:C1019("\\d"; $c)
+    // where the condition is the whole `|` chain. Hard-coding '(' ... ')'
+    // here truncated the condition at the first ')' and errored on the '|'.
+    // Same reasoning applies to While / Until / case branches below. For and
+    // For each keep their parens: there the parens genuinely delimit a
+    // ';'-separated header.
+    if_statement: $ => seq(
+      'If', field('condition', $._expression), $._terminator,
+      field('consequence', repeat($._statement)),
+      optional(seq('Else', $._terminator, field('alternative', repeat($._statement)))),
+      kw('End', 'if'), $._terminator,
+    ),
+
+    // Branches are implicitly terminated, same shape as function bodies: the
+    // next ':' / 'Else' / 'End case' closes the previous one. No scanner help
+    // needed — no statement can begin with ':', and ':=' out-lexes it.
+    case_statement: $ => seq(
+      kw('Case', 'of'), $._terminator,
+      repeat($.case_branch),
+      optional(seq('Else', $._terminator, field('alternative', repeat($._statement)))),
+      kw('End', 'case'), $._terminator,
+    ),
+
+    case_branch: $ => seq(
+      ':', field('condition', $._expression), $._terminator,
+      field('body', repeat($._statement)),
+    ),
+
+    while_statement: $ => seq(
+      'While', field('condition', $._expression), $._terminator,
       repeat($._statement),
-      $.end_use
+      kw('End', 'while'), $._terminator,
     ),
-    
-    _ok: $ => /(o|O)(k|K)/,
-    _document: $ => /(d|D)(o|O)(c|C)(u|U)(m|M)(e|E)(n|N)(t|T)/,
-    _error_formula: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (f|F)(o|O)(r|R)(m|M)(u|U)(l|L)(a|A)/,
-    _error_line: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (l|L)(i|I)(n|N)(e|E)/,
-    _error_method: $ => /(e|E)(r|R)(r|R)(o|O)(r|R) (m|M)(e|E)(t|T)(h|H)(o|O)(d|D)/,
-    _error: $ => /(e|E)(r|R)(r|R)(o|O)(r|R)/,
-    _flddelimit: $ => /(f|F)(l|L)(d|D)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
-    _recdelimit: $ => /(r|R)(e|E)(c|C)(d|D)(e|E)(l|L)(i|I)(m|M)(i|I)(t|T)/,
-    _mousedown: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(d|D)(o|O)(w|W)(n|N)/,
-    _mousex: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(x|X)/,
-    _mousey: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(y|Y)/,
-    _keycode: $ => /(k|K)(e|E)(y|Y)(c|C)(o|O)(d|D)(e|E)/,
-    _modifiers: $ => /(m|M)(o|O)(d|D)(i|I)(f|F)(i|I)(e|E)(r|R)(s|S)/,
-    _mouseproc: $ => /(m|M)(o|O)(u|U)(s|S)(e|E)(p|P)(r|R)(o|O)(c|C)/,
-    system_variable: $ => prec(PREC.keyword, choice(
-      $._ok,
-      $._document,
-      $._error_formula,
-      $._error_line,
-      $._error_method,
-      $._error,
-      $._flddelimit,
-      $._recdelimit,
-      $._mousedown,
-      $._mousex,
-      $._mousey,
-      $._keycode,
-      $._modifiers,
-      $._mouseproc
-    )),
-    _return: $ => /(r|R)(e|E)(t|T)(u|U)(r|R)(n|N)/,
-    _break: $ => /(b|B)(r|R)(e|E)(a|A)(k|K)/,
-    _continue: $ => /(c|C)(o|O)(n|N)(t|T)(i|I)(n|N)(u|U)(e|E)/,
-    return: $ => prec(PREC.keyword, $._return),
-    break: $ => prec(PREC.keyword, $._break),
-    continue: $ => prec(PREC.keyword, $._continue),
-    return_block: $ => seq(
-      $.return, 
-      $.value
+
+    repeat_statement: $ => seq(
+      'Repeat', $._terminator,
+      repeat($._statement),
+      'Until', field('condition', $._expression), $._terminator,
     ),
-    /*
-    operator
-    */
-    operator: $ => prec(PREC.operator, 
-      choice(
-      '+=', '-=', '*=', '/=', '~|',
-      '&&', '||', '&', '|', 
-      '<<', '>>', 
-      '<=', '>=', 
-      '<', '>', 
-      ':=', 
-      '??', '?+', '?-',
-      '+', '-', '*', '/', '=', '#', '^', '%'
-      )
-    ),      
-    /* 
-    comment
-    */
-    comment_block: $ => prec(PREC.comment,seq(
-      '/*',
-      /[^*]*\*+([^/*][^*]*\*+)*/,
-      '/'
+
+    for_statement: $ => seq(
+      'For', '(',
+        field('counter', $._expression), ';',
+        field('start', $._expression), ';',
+        field('end', $._expression),
+        optional(seq(';', field('step', $._expression))),
+      ')', $._terminator,
+      repeat($._statement),
+      kw('End', 'for'), $._terminator,
+    ),
+
+    for_each_statement: $ => seq(
+      kw('For', 'each'), '(',
+        field('item', $._expression), ';',
+        field('collection', $._expression),
+        repeat(seq(';', $._expression)),
+      ')',
+      optional(seq(choice('Until', 'While'), field('guard', $._expression))),
+      $._terminator,
+      repeat($._statement),
+      kw('End', 'for', 'each'), $._terminator,
+    ),
+
+    // `Use (sharedObj)` ... `End use` — shared-object/collection access
+    // blocks. The parens are part of the expression, like If conditions.
+    use_statement: $ => seq(
+      'Use', field('object', $._expression), $._terminator,
+      repeat($._statement),
+      kw('End', 'use'), $._terminator,
+    ),
+
+    try_statement: $ => seq(
+      'Try', $._terminator,
+      field('body', repeat($._statement)),
+      optional(seq('Catch', $._terminator, field('handler', repeat($._statement)))),
+      kw('End', 'try'), $._terminator,
+    ),
+
+    sql_block: $ => seq(
+      kw('Begin', 'SQL'), $._terminator,
+      field('body', optional($.sql_content)),
+      kw('End', 'SQL'), $._terminator,
+    ),
+
+    // Real code carries JS-habit trailing semicolons (`$b.analyse();`);
+    // 4D tolerates them, so we do.
+    expression_statement: $ => seq($._expression, optional(';'), $._terminator),
+
+    // ----------------------------------------------------------- expressions
+
+    _expression: $ => choice(
+      $.assignment,
+      $.binary_expression,
+      $.unary_expression,
+      $.ternary_expression,
+      $.try_expression,
+      $.postfix_expression,
+      $._primary,
+    ),
+
+    binary_expression: $ => {
+      const table = [
+        // '||' and '&&' must precede '|' and '&' in no particular order here —
+        // the lexer's longest-match rule is what keeps them distinct.
+        [PREC.LOGIC_OR,  '||'],
+        [PREC.LOGIC_AND, '&&'],
+        [PREC.OR,       choice('|', '^|')],
+        [PREC.AND,      '&'],
+        [PREC.EQUALITY, choice('=', '#')],
+        [PREC.RELATION, choice('<', '>', '<=', '>=')],
+        // '??' bit test, '?+' bit set, '?-' bit clear. Longest-match keeps
+        // them clear of ternary '?', which in practice is followed by a space.
+        [PREC.SHIFT,    choice('<<', '>>', '??', '?+', '?-')],
+        [PREC.ADDITIVE, choice('+', '-')],
+        // '\\' is integer division. It is also the line-continuation marker;
+        // the scanner tells them apart by whether anything but whitespace
+        // follows to end of line.
+        [PREC.MULTIPLY, choice('*', '/', '%', '\\', '^')],
+      ];
+      return choice(...table.map(([p, op]) => prec.left(p, seq(
+        field('left', $._expression),
+        field('operator', op),
+        field('right', $._expression),
+      ))));
+    },
+
+    // Space is the tiebreaker against ?HH:MM:SS? — the scanner only claims a
+    // time literal when a digit immediately follows '?'.
+    ternary_expression: $ => prec.right(PREC.TERNARY, seq(
+      field('condition', $._expression), '?',
+      field('consequence', $._expression), ':',
+      field('alternative', $._expression),
     )),
-    comment: $ => prec(PREC.comment,seq('//', /.*/))
+
+    try_expression: $ => prec(PREC.UNARY, seq('Try', '(', $._expression, ')')),
+
+    unary_expression: $ => prec.right(PREC.UNARY, seq(
+      choice('-', '+', '->'),      // '->' prefix = pointer creation
+      $._expression,
+    )),
+
+    postfix_expression: $ => prec.left(PREC.POSTFIX, choice(
+      seq($._expression, '->'),                                        // deref
+      seq($._expression, '.', field('member', choice($.identifier, $.local_variable))),
+      seq($._expression, '(', optional($._argument_list), ')'),
+      seq($._expression, '[', $._expression, ']'),                     // collection index
+      seq($._expression, '{', $._expression, '}'),                     // legacy array element
+      seq($._expression, $.char_ref_open, $._expression, $.char_ref_close),
+    )),
+
+    _argument_list: $ => seq($._argument, repeat(seq(choice(';', ','), $._argument))),
+
+    // Commands accept marker parameters that are not expressions: the
+    // trailing '*' (e.g. `Lowercase($c; *)`) and the '>' / '<' sort/locking
+    // markers (`ORDER BY([T]; [T]F; >)`). '>' and '<' cannot begin an
+    // expression, so this stays LR(1)-clean.
+    _argument: $ => choice($._expression, '*', '>', '<', '&', '|'),
+
+    _primary: $ => choice(
+      // Tokenized forms — regex, no scanner involvement.
+      $.command,
+      $.constant,
+      // Untokenized fallbacks. These MUST be reachable from a rule or the
+      // parser never marks them valid, valid_symbols[COMMAND_NAME] stays false,
+      // and the scanner's builtin table is dead code.
+      $.command_name,
+      $.constant_name,
+      $.multiword_name,
+      // Reserved and unshadowable, so they win over `identifier` outright.
+      // Table-driven rather than a keyword list because some are multi-word.
+      $.system_variable,
+      $.field_reference,
+      $.table_reference,
+      $.collection_literal,
+      $.object_literal,
+      $.string,
+      $.number,
+      $.time_literal,
+      $.date_literal,
+      $.local_variable,
+      $.parameter_indirection,
+      $.interprocess_variable,
+      $.identifier,
+      seq('(', $._expression, ')'),
+    ),
+
+    // Untokenized multi-word command/constant/plugin-command names:
+    // `WP UpdateWidget(...)`, `Form event code`, `Is BLOB`. Adjacent
+    // identifiers are illegal everywhere else in the expression grammar, so a
+    // greedy identifier run is unambiguous. The real scanner's command_name /
+    // constant_name tokens still win where its builtin table matches.
+    // Later words may be bare numbers (`TEST Sign Fake 2`); the first must be
+    // an identifier so this can never start where a number literal belongs.
+    multiword_name: $ => prec.right(seq($.identifier, repeat1(choice($.identifier, $.number)))),
+
+    // Tokenized source. These two rules absorb ~1300 commands and several
+    // thousand constants, every embedded space, and the French/English split —
+    // builtins are always stored in English with a :C or :K suffix.
+    // Leading digits are legal in the wild: methods named `00_Start`, and the
+    // tokenized namespace `4D:C1709`. Number wins ties via token prec, so
+    // `123` stays a number while `00_Start` and `4D` lex as identifiers.
+    command:  $ => token(new RegExp('[A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF][A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF ]*:C[0-9]+')),
+    constant: $ => token(new RegExp('[A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF][A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF ]*:K[0-9]+:[0-9]+')),
+
+    // [Employees:1]Name:2 — the :N suffixes are also what distinguish a table
+    // reference from a collection literal at expression start.
+    field_reference: $ => token(seq(
+      '[', /[A-Za-z_0-9][A-Za-z0-9_ ]*/, optional(/:\d+/), ']',
+      /[A-Za-z_0-9][A-Za-z0-9_ ]*/, optional(/:\d+/),
+    )),
+
+    // `[CLIENTS:1]` with no trailing field — pointer targets etc. The :N
+    // suffix is what lexically separates it from a collection literal;
+    // field_reference still wins by longest match when a field follows.
+    table_reference: $ => token(seq('[', /[A-Za-z_0-9][A-Za-z0-9_ ]*/, /:\d+/, ']')),
+
+    collection_literal: $ => seq('[', optional($._argument_list), ']'),
+
+    object_literal: $ => seq(
+      '{',
+      optional(seq($.object_pair, repeat(seq(';', $.object_pair)))),
+      '}',
+    ),
+    // Property names are UNQUOTED in literal syntax — `{a: 1}`, not `{"a": 1}`
+    // — and pairs are separated by ';', not ','. The notation resembles JSON
+    // but is not JSON.
+    object_pair: $ => seq(
+      field('key', choice($.identifier, $.local_variable, $.string)),
+      ':', field('value', $._expression),
+    ),
+
+    // ${N} parameter indirection: the index is a full expression (`${$i}`).
+    // '${' is one token, so it cannot collide with local_variable — that
+    // token requires an alphanumeric after '$' and dies on '{'.
+    parameter_indirection: $ => seq('${', field('index', $._expression), '}'),
+
+    local_variable:        $ => token(seq('$', /[A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF]+/)),
+    interprocess_variable: $ => token(seq('<>', /[A-Za-z_\u00C0-\uFEFE\uFF00-\uFFFF][A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF]*/)),
+    // Defined BEFORE identifier: lexical ties (`1e3`, `0xFF` match both at
+    // equal length) resolve by rule order, earlier wins. No token prec here —
+    // tree-sitter checks precedence before match LENGTH, so any prec on
+    // number would make the 2-char `00` beat the 8-char `00_Start`.
+    number: $ => /0[xX][0-9A-Fa-f]+|\d+(\.\d+)?([eE][-+]?\d+)?/,
+    string: $ => token(seq('"', repeat(choice(/[^"\\\n]/, /\\./)), '"')),
+
+    // Digit-leading branch requires a letter after the digits, so a pure
+    // number can never lex as identifier. Unicode letters are legal (`ƒ`);
+    // U+FEFF is carved out of the ranges so a BOM stays an extra.
+    identifier:            $ => new RegExp('([A-Za-z_\u00C0-\uFEFE\uFF00-\uFFFF]|[0-9]+[A-Za-z_\u00C0-\uFEFE\uFF00-\uFFFF])[A-Za-z0-9_\u00C0-\uFEFE\uFF00-\uFFFF]*'),
+
+    // Decimal with optional fraction and exponent (range is IEEE double,
+    // ±1.7e±308), or 0x/0X hexadecimal — official command docs use
+    // 0xFFFFFFFF as a literal. Longest-match keeps 0xFF from splitting into
+    // number 0 + identifier xFF. No binary/octal form exists in 4D.
+
+    // A dotted path: `Text`, `cs.MyClass`, `cs.AIKit.OpenAIChatHelper`,
+    // `4D.File`, and the tokenized namespaces `cs:C1710.X` / `4D:C1709.X`
+    // (commands, now that the command token admits a leading digit).
+    // `cs` is an ordinary identifier; bare `4D` is not, hence the literal.
+    _type: $ => prec.right(seq(
+      choice($.identifier, $.command, '4D'),
+      repeat(seq('.', $.identifier)),
+    )),
+
+    attributes_header: $ => token(seq('//', /\s*/, '%attributes', /[^\n]*/)),
+    line_continuation: $ => token(seq('\\', /[ \t\r]*/, '\n')),
+    // A '\' at end of a comment line continues the COMMENT onto the next
+    // line — commented-out multi-line calls rely on this (their continuation
+    // lines are not separately commented).
+    line_comment:      $ => token(seq('//', /([^\n]*\\[ \t\r]*\n)*[^\n]*/)),
+    block_comment:     $ => token(seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '/')),
   },
-  
-  conflicts: $ => [
-    [$.try_block, $._statement],        
-    [$.class_constructor, $.function_block],
-    [$.function_block],
-    [$.declare_block],
-
-    [$.property_declaration_block, $.ternary_block],    
-    [$.property_declaration_block],
-    
-    [$.var_declaration_block, $.ternary_block],
-    [$.var_declaration_block],
-    
-    [$.return_block, $._statement],
-    [$.return_block, $.ternary_block],
-    [$.return_block],
-    
-    [$.local_variable],
-    [$.interprocess_variable],
-    [$.system_variable],
-    [$.literal_block],
-    
-
-    
-    [$._statement, $.if_block],
-    [$._statement, $._condition],
-    
-    [$.case_block, $._statement],
-    [$.case_block],   
-
-    [$.ternary_block, $.for_each],         
-    [$.ternary_block, $._statement],
-    [$.ternary_block],
-    
-    [$.for_each_block, $._while],
-    [$._while]
-
-  ]
-
-  
 });
