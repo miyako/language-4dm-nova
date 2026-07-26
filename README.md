@@ -75,11 +75,11 @@ was downloaded (quarantined), clear the flag first:
   names. Tokenized builtins (`ALERT:C41`) get `identifier.core.function`;
   untokenized multi-word plugin commands (`VP SET CELL STYLE`) get
   `identifier.function`, so component calls read differently from builtins.
-- **Closing keywords are regex tokens** (`End if`, `End case`, `Case of`,
-  `For each`, `Class extends`, `Class constructor`) and cannot be addressed
-  by name in queries. Both highlights and folds capture them positionally
-  with anchored wildcards (`_ @keyword .` — the hidden terminator never
-  appears in the tree, so the closer is always the last child).
+- **Closing keywords are regex tokens** (`End if`, `Case of`, `For each`,
+  `Class constructor`) which queries cannot name — and anchored wildcards do
+  NOT reach them, because query anchors ignore anonymous nodes. The grammar
+  aliases every such token to a named `keyword` node instead, so highlighting
+  is one pattern (`(keyword) @keyword`) and folds anchor on named nodes.
 - **Folds keep headers visible**: each fold starts after the header's last
   structural node (condition, `)`, parameter list) with `scope.byLine`, so
   collapsing an `If` leaves the condition line on screen, and collapsing a

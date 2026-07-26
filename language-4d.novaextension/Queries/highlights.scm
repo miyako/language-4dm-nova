@@ -54,23 +54,12 @@
   "#DECLARE"
 ] @keyword
 
-; ---- Keywords that are regex tokens (End if, Case of, ...) ------------------
-; These are anonymous regex tokens, unaddressable by name; anchored wildcards
-; capture them positionally. The hidden _terminator never appears in the tree,
-; so the closing keyword is always the last child.
-(if_statement _ @keyword .)
-(case_statement . _ @keyword)
-(case_statement _ @keyword .)
-(while_statement _ @keyword .)
-(for_statement _ @keyword .)
-(for_each_statement . _ @keyword)
-(for_each_statement _ @keyword .)
-(try_statement _ @keyword .)
-(use_statement _ @keyword .)
-(sql_block . _ @keyword)
-(sql_block _ @keyword .)
-(extends_clause . _ @keyword)
-((function_declaration _ @keyword) (#match? @keyword "^[Cc]lass[ \t]+constructor$"))
+; ---- Keywords that are regex tokens (End if, Case of, For each, ...) -------
+; These are aliased to a named `keyword` node in the grammar precisely so
+; queries can target them: tree-sitter anchors ignore anonymous nodes, so the
+; earlier anchored-wildcard approach (`_ @keyword .`) bound to the last NAMED
+; child instead — painting conditions and body statements, never the closer.
+(keyword) @keyword
 
 ; ---- Operators & punctuation ------------------------------------------------
 [
