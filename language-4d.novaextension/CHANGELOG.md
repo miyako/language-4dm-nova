@@ -1,27 +1,11 @@
-## Version 0.9.0
+## Version 21.4.0
 
-variadic parameters, declare and init var, retire classic compiler/array, storage, shared, singleton, local, exposed, obsolete commands, type
+Initial release.
 
-## Version 0.5.1
-
-update operators
-
-## Version 0.5.0
-
-update external parser for v20 R8
-
-## Version 0.4.0
-
-restored folding
-
-## Version 0.3.0
-
-try catch block
-
-## Version 0.2.0
-
-external parser for v20 english constants 
-
-## Version 0.1.0
-
-external parser for v20 english commands 
+- Syntax highlighting for 4D 21 R4 source (tokenized commands/constants,
+  variables and sigils, literals including time/date/hex, multi-word plugin
+  commands, operators including `??` `?+` `?-` `^|`)
+- Structure folding for `If`, `Case of` (and each branch), `For`, `For each`,
+  `While`, `Repeat`, `Try`, `Begin SQL`, and function bodies
+- Symbols for class functions (with arguments), properties, and superclasses
+- SQL injection inside `Begin SQL … End SQL` blocks
