@@ -1,8 +1,10 @@
 {
-    "identifier": "com.4d.language.4d",
-    "name": "language-4d",
-    "organization": "4D SAS",
-    "description": "add syntax highlighting to .4dm files.",
-    "version": "0.10.2",
-    "categories": ["languages"]
+    "identifier": "com.4d.tree-sitter-fourd",
+    "name": "4D Language",
+    "organization": "tree-sitter-fourd",
+    "description": "Syntax highlighting, structure folding, and symbols for 4D (.4dm) files, powered by a Tree-sitter grammar validated against 11,000+ real-world source files.",
+    "version": "21.4.0",
+    "categories": ["languages"],
+    "license": "MIT",
+    "min_runtime": "10.0"
 }

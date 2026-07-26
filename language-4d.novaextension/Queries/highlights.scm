@@ -1,121 +1,85 @@
-;declare
+; 4D syntax highlighting for Nova — captures are Nova THEME SELECTORS.
 
-(class_extends) @keyword.construct 
-(declare_block)@keyword.construct
+; ---- Comments & header ------------------------------------------------------
+(line_comment) @comment
+(block_comment) @comment
+(attributes_header) @processing
 
-;function
+; ---- Literals ---------------------------------------------------------------
+(string) @string
+(number) @value.number
+(time_literal) @value.number
+(date_literal) @value.number
 
-(function_block) @keyword.construct
-(function_arguments
- (local_variable_name)? @identifier.variable
- (class) @identifier.type.class
-)
-(function_result
- (local_variable_name)? @identifier.variable
- (class) @identifier.type.class
-)
-(class_constructor) @keyword.construct
+; ---- Builtins (tokenized :Cnnn / :Knnn:n and scanner-recognized names) ------
+(command) @identifier.core.function
+(command_name) @identifier.core.function
+(constant) @identifier.constant
+(constant_name) @identifier.constant
+(system_variable) @identifier.core.global
 
-;var, property
-(var_declaration_block
- (local_variable_name)? @identifier.variable
-;let classic_command_expression be themselves
-) @keyword.construct 
-(property_declaration_block
-;let classic_command_expression be themselves
-) @keyword.construct  
+; Untokenized multi-word plugin/component commands: VP SET CELL STYLE(...)
+(multiword_name) @identifier.function
 
-(alias_block
- (alias) @keyword.construct
- (alias_name) 
- (alias_path) 
-) @identifier.variable 
-
-(classic_command_expression
- (classic_command) @start.before @end.after
- (command_suffix)? @comment
-) @identifier.function
-
-(constant
- (classic_constant_expression
-  (classic_constant) @start.before @end.after
-  (constant_suffix)? @comment
-))
-
-(ternary_block) @identifier.decorator
-(literal_block) @identifier.decorator
-
-(return_block
- (return) @keyword.condition
-)
-
-(return) @keyword.condition
-(break) @keyword.condition
-(continue) @keyword.condition
-
-;conditions
-
-(use_block
- (use) @keyword.condition
- (end_use) @keyword.condition
-)
-
-(for_block
- (for) @keyword.condition
- (end_for) @keyword.condition
-)
-
-(repeat_block
- (repeat) @keyword.condition
- (until) @keyword.condition
-)
-
-(while_block
- (while) @keyword.condition
- (end_while) @keyword.condition
-)
-
-(try) @keyword.condition
-(catch)? @keyword.condition 
-(end_try) @keyword.condition
-
-;if
-(if) @keyword.condition
-(else) @keyword.condition
-(end_if) @keyword.condition
-
-
-
-
-(case_of) @keyword.condition
-(case)? @keyword.condition
-(end_case) @keyword.condition
-
-(for_each) @keyword.condition
-(end_for_each)  @keyword.condition
-
-;injection
-
-(sql_injection_block
- (begin_sql) @keyword.condition
- (end_sql) @keyword.condition
-)
-
-;out-of-context symbolisation
-
-(system_variable) @identifier.variable
-(numeric_parameter) @identifier.decorator
+; ---- Variables --------------------------------------------------------------
 (local_variable) @identifier.variable
-(interprocess_variable_name) @identifier.variable
-(constant)? @identifier.property
+(interprocess_variable) @identifier.global
+(parameter_indirection) @identifier.argument
 
-;operator
+; ---- Database references ----------------------------------------------------
+(field_reference) @identifier.property
+(table_reference) @identifier.type
 
-(operator) @operator
-;unary operator is not scoped for the moment (too many conflicts)
-;assign is scoped in var, property, etc
-["-" ":=" ":"] @operator
-;comment
+; ---- Members & calls --------------------------------------------------------
+(postfix_expression member: (identifier) @identifier.property)
+(postfix_expression member: (local_variable) @identifier.property)
 
-(comment) @comment
-(comment_block) @comment @start.before @end.after
+; ---- Declarations -----------------------------------------------------------
+(modifier) @keyword
+(function_declaration accessor: _ @keyword)
+(function_declaration name: (identifier) @definition.method)
+(var_declaration name: (identifier) @identifier.variable)
+(property_declaration name: (identifier) @definition.property)
+(parameter name: (local_variable) @identifier.argument)
+(var_declaration type: (identifier) @identifier.type)
+(property_declaration type: (identifier) @identifier.type)
+(parameter type: (identifier) @identifier.type)
+(function_declaration return_type: (identifier) @identifier.type)
+
+; ---- Keywords that are plain string tokens ----------------------------------
+[
+  "If" "Else" "While" "Repeat" "Until" "For" "Try" "Catch"
+  "var" "property" "Function" "function"
+  "return" "break" "continue" "throw" "defer"
+  "#DECLARE"
+] @keyword
+
+; ---- Keywords that are regex tokens (End if, Case of, ...) ------------------
+; These are anonymous regex tokens, unaddressable by name; anchored wildcards
+; capture them positionally. The hidden _terminator never appears in the tree,
+; so the closing keyword is always the last child.
+(if_statement _ @keyword .)
+(case_statement . _ @keyword)
+(case_statement _ @keyword .)
+(while_statement _ @keyword .)
+(for_statement _ @keyword .)
+(for_each_statement . _ @keyword)
+(for_each_statement _ @keyword .)
+(try_statement _ @keyword .)
+(sql_block . _ @keyword)
+(sql_block _ @keyword .)
+(extends_clause . _ @keyword)
+((function_declaration _ @keyword) (#match? @keyword "^[Cc]lass[ \t]+constructor$"))
+
+; ---- Operators & punctuation ------------------------------------------------
+[
+  ":=" "+=" "-=" "*=" "/="
+  "=" "#" "<" ">" "<=" ">="
+  "+" "-" "*" "/" "%" "\\" "^"
+  "&" "|" "&&" "||" "^|" "<<" ">>"
+  "??" "?+" "?-" "->" "?" "..."
+] @operator
+
+["(" ")" "[" "]" "{" "}"] @bracket
+(char_ref_open) @bracket
+(char_ref_close) @bracket

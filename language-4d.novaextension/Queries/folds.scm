@@ -1,88 +1,36 @@
-((case_block
-  (case_of) @start
-  (case)
-  (end_case) @end)
- (#set! role block)
-)
+; Structure folding for 4D. Closing keywords (End if, End case...) are regex
+; tokens, captured positionally as the last child; @start on the header's
+; last structural node plus scope.byLine keeps the header line visible.
 
-((case_block
-  (case_of) @start
-  (case)
-  (else_block_case
-   (else) @end))
- (#set! role block)
-)
+((if_statement condition: (_) @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((else_block_case
-  (else) @start
-  (end_case) @end)
- (#set! role block)
-)
+((while_statement condition: (_) @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-;if
+((repeat_statement "Repeat" @start "Until" @end)
+ (#set! role block) (#set! scope.byLine))
 
-((if_block
-  (if) @start
-  (end_if) @end)
- (#set! role block)
-)
+((for_statement ")" @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((else_block_if
-  (else) @start
-  (end_if) @end)
- (#set! role block)
-)
+((for_each_statement ")" @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((if_block
-  (if) @start
-  (else_block_if
-   (else) @end))
- (#set! role block)
-)
+((case_statement . _ @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((for_each_block
-  (for_each) @start
-  (end_for_each) @end)
- (#set! role block)
-)
+; Each case branch folds from its condition to after its last statement.
+((case_branch condition: (_) @start _ @end.after .)
+ (#set! role block) (#set! scope.byLine))
 
-;while, repeat, for, for each
+((try_statement "Try" @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((while_block
-  (while) @start
-  (end_while) @end)
- (#set! role block)
-)
+((sql_block . _ @start _ @end .)
+ (#set! role block) (#set! scope.byLine))
 
-((repeat_block
-  (repeat) @start
-  (until) @end)
- (#set! role block)
-)
-
-((for_block
-  (for) @start
-  (end_for) @end)
- (#set! role block)
-)
-
-;try
-
-((try_block
-  (try) @start
-  (end_try) @end)
- (#set! role block)
-)
-
-((try_block
-  (try) @start
-  (catch_block
-   (catch) @end))
- (#set! role block)
-)
-
-((catch_block
-  (catch) @start
-  (end_try) @end)
- (#set! role block)
-)
+; Function bodies: fold after the parameter list; the return clause stays on
+; the header line, so byLine leaves the whole signature visible.
+((function_declaration (parameter_list) @start _ @end.after .)
+ (#set! role function) (#set! scope.byLine))
