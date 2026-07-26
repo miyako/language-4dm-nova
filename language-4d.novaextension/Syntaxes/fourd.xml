@@ -1,23 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  4D syntax definition for Nova.
+
+  The `name` attribute is load-bearing three times over: Nova looks for
+  Syntaxes/libtree-sitter-fourd.dylib exporting tree_sitter_fourd() based on
+  it, and query files resolve against the parser it names. Do not rename one
+  without renaming all.
+-->
 <syntax name="fourd">
     <meta>
         <name>4D</name>
+        <!-- 4D runs interpreted during development but ships compiled;
+             `compiled` groups it with C/Swift/Rust for tab accent colors. -->
         <type>compiled</type>
         <preferred-file-extension>4dm</preferred-file-extension>
     </meta>
 
     <detectors>
+        <!-- Project-mode method files. The extension alone is decisive. -->
         <extension priority="1.0">4dm</extension>
-        <!-- attributes header at the top of exported project methods -->
+        <!-- Exported methods open with an attributes header; catches 4D code
+             saved under a different or missing extension. Low priority so it
+             never outbids a real extension match from another syntax. -->
         <match-content lines="1" priority="0.6">^//%attributes\s*=</match-content>
     </detectors>
 
     <indentation>
+        <!--
+          4D indentation is keyword-driven, not brace-driven — bodies indent
+          after block openers and function headers, never after `{`.
+
+          Both expressions use (?i:) because 4D accepts lowercase keywords
+          (`case of`, `function`) even though its editor normalizes them.
+
+          Three tokens appear in BOTH lists, giving them "dedent this line,
+          indent the next" behavior, which matches 4D structure exactly:
+            - `Else`        one level out, then its branch body one level in
+            - `Catch`       same, inside Try blocks
+            - `: (...)`     Case of branch labels sit one level inside
+                            Case of, with branch bodies one deeper
+        -->
         <increase>
-            <expression>^\s*((?i:If|Else|While|Repeat|Try|Catch|Case of|For each|For|Begin SQL)\b|:\s*\(|(\w+\s+)*(?i:Function|Class constructor)\b)</expression>
+            <expression>^\s*((?i:If|Else|While|Repeat|Try|Catch|Case of|For each|For|Use|Begin SQL)\b|:(?!=)|((?i:shared|session|singleton|exposed|local|server|onHTTPGet)\s+)*((?i:Function)\b|(?i:Class constructor)))</expression>
         </increase>
         <decrease>
-            <expression>^\s*(?i:End (if|case|while|for each|for|try|SQL)|Else|Until\b|Catch\b)</expression>
+            <expression>^\s*((?i:End (if|case|while|for each|for|try|use|SQL))\b|(?i:Else|Until|Catch)\b|:(?!=)|((?i:shared|session|singleton|exposed|local|server|onHTTPGet)\s+)*((?i:Function)\b|(?i:Class constructor)))</expression>
         </decrease>
     </indentation>
 
@@ -36,6 +63,9 @@
     </comments>
 
     <brackets>
+        <!-- The default set, stated explicitly. `[[` char references and
+             `[Table]Field` references are just nested/sequenced brackets as
+             far as matching and ping highlighting are concerned. -->
         <pair open="{" close="}" />
         <pair open="[" close="]" />
         <pair open="(" close=")" />
@@ -45,8 +75,17 @@
         <pair open="{" close="}" />
         <pair open="[" close="]" />
         <pair open="(" close=")" />
+        <!-- Strings in 4D are double-quoted only; deliberately no ' or ` pair
+             so selecting text and typing those characters REPLACES it, as 4D
+             developers expect. -->
         <pair open="&quot;" close="&quot;" />
     </surrounding-pairs>
+
+    <!-- Lets other tree-sitter languages inject 4D: a Markdown fence tagged
+         ```4d (or 4dm/fourd) reparses its body with this syntax. -->
+    <injection>
+        <expression>^(?i:4d|4dm|fourd)$</expression>
+    </injection>
 
     <tree-sitter>
         <highlights />
