@@ -1,0 +1,10 @@
+{
+    "identifier": "org.fourd.tree-sitter-fourd",
+    "name": "4D Language",
+    "organization": "tree-sitter-fourd",
+    "description": "Syntax highlighting, structure folding, and symbols for 4D (.4dm) files, powered by a Tree-sitter grammar validated against 11,000+ real-world source files.",
+    "version": "1.0.0",
+    "categories": ["languages"],
+    "license": "MIT",
+    "min_runtime": "10.0"
+}
