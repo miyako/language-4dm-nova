@@ -7,7 +7,7 @@ files from the 4d / 4d-depot GitHub organizations).
 
 ## Layout
 
-    4D.novaextension/       the extension bundle (needs the dylib, see below)
+    language-4d.novaextension/       the extension bundle (needs the dylib, see below)
       extension.json
       Syntaxes/fourd.xml    syntax definition: detection, indentation, comments
       Queries/              Nova tree-sitter queries
