@@ -24,7 +24,7 @@ files from the 4d / 4d-depot GitHub organizations).
 **`src/` is already a matched set — build it as-is.** If the grammar evolves, regenerate
 (`tree-sitter generate`) and copy the new `src/parser.c` over — but keep
 scanner and grammar in lockstep per the table above. The script compiles
-every `.c` file in `parser-src/`.
+every `.c` file in `src/`.
 
 On macOS with Xcode command line tools:
 
