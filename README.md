@@ -61,9 +61,3 @@ Extensions → Activate Project as Extension for development.
   backslash-continued `//` comment runs the grammar absorbs into one token.
 - The SQL injection uses the scanner's `sql_content` token spanning the
   block body.
-- `alt-hand-written-grammar/` holds a corrected minimal scanner and a full
-  Nova query set for the classic 2-external grammar, should that architecture
-  be revived — its queries use the heading pattern (`scope.level` +
-  `scope.extend`) because that grammar's function headers are siblings of
-  their bodies, and `#replace!` transforms to extract function names, which
-  are hidden tokens there.
