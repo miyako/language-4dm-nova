@@ -16,7 +16,7 @@ files from the 4d / 4d-depot GitHub organizations).
         symbols.scm         class functions (+arguments), properties, superclass
         arguments.scm       parameter subquery for signature help
         injections.scm      SQL inside Begin SQL ... End SQL
-    parser-src/             C sources compiled into the parser dylib
+    src/                    C sources compiled into the parser dylib
     compile_parser.sh       builds and installs the dylib (macOS only)
 
 ## Which grammar is this? (read before building)
