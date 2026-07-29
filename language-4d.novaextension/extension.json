@@ -2,9 +2,68 @@
     "identifier": "org.fourd.tree-sitter-fourd",
     "name": "4D Language",
     "organization": "tree-sitter-fourd",
-    "description": "Syntax highlighting, structure folding, and symbols for 4D (.4dm) files, powered by a Tree-sitter grammar validated against 11,000+ real-world source files.",
-    "version": "21.4.0",
+    "description": "4D language support and tool4d language-server integration.",
+    "version": "21.5.0",
     "categories": ["languages"],
     "license": "MIT",
-    "min_runtime": "10.0"
+    "min_runtime": "10.0",
+    "repository": "https://github.com/miyako/language-4dm-nova",
+    "bugs": "https://github.com/your-account/language-4dm-nova/issues",
+    "main": "main.js",
+    "activationEvents": [
+        "onLanguage:fourd",
+        "onWorkspaceContains:**/*.4DProject"
+    ],
+    "entitlements": {
+        "process": true,
+        "filesystem": "read"
+    },
+    "config": [
+        {
+            "key": "com.example.4d.toolPath",
+            "title": "tool4d Executable",
+            "description": "Optional explicit path to tool4d. When empty, the extension searches PATH, 4D Analyzer storage, and conventional installation locations.",
+            "type": "path"
+        },
+        {
+            "key": "com.example.4d.projectPath",
+            "title": "4D Project File",
+            "description": "Optional explicit .4DProject file. Relative paths are resolved against the Nova workspace.",
+            "type": "path"
+        },
+        {
+            "key": "com.example.4d.startupTimeout",
+            "title": "Startup Timeout",
+            "description": "Seconds to wait for tool4d to connect to the local LSP bridge.",
+            "type": "number",
+            "default": 30
+        },
+        {
+            "key": "com.example.4d.shutdownTimeout",
+            "title": "Shutdown Timeout",
+            "description": "Seconds to wait before tool4d is forcefully terminated.",
+            "type": "number",
+            "default": 5
+        },
+        {
+            "key": "com.example.4d.skipOnStartup",
+            "title": "Skip On Startup",
+            "description": "Prevent execution of project startup database methods.",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "key": "com.example.4d.dataless",
+            "title": "Open Without Data",
+            "description": "Open the project without a data file.",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "key": "com.example.4d.logLevel",
+            "title": "tool4d Log Level",
+            "description": "Optional diagnostic log level passed to tool4d.",
+            "type": "string"
+        }
+    ]
 }
