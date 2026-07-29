@@ -159,8 +159,8 @@ lipo -create \
 chmod 755 "${BRIDGE_UNIVERSAL_BINARY}"
 
 # Confirm that the resulting binary contains both required architectures.
-lipo -verify_arch arm64 x86_64 "${BRIDGE_UNIVERSAL_BINARY}"
-lipo -info "${BRIDGE_UNIVERSAL_BINARY}"
+lipo "$BRIDGE_UNIVERSAL_BINARY" -verify_arch arm64 x86_64
+echo "Bridge architectures: $(lipo "$BRIDGE_UNIVERSAL_BINARY" -archs)"
 
 codesign \
     --verbose \
