@@ -3,7 +3,7 @@ use std::{
     env,
     ffi::OsStr,
     fs,
-    io::{self, BufRead, BufReader, Write},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{Ipv4Addr, SocketAddr, TcpListener, TcpStream},
     path::{Path, PathBuf},
     process::{ChildStdout, Command, ExitCode, Stdio},
@@ -102,6 +102,66 @@ enum BridgeCommand {
         #[arg(long)]
         address: SocketAddr,
     },
+
+    /// Validate .4dm files and report diagnostics.
+    ///
+    /// Starts tool4d in LSP mode, opens each file, collects diagnostics,
+    /// and exits. Designed for non-interactive use by CI and AI agents.
+    Validate {
+        /// Path to the tool4d executable.
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+
+        /// Explicit path to a .4DProject file.
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+
+        /// Workspace in which to search for a .4DProject file.
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+
+        /// Local TCP port on which the adapter listens for tool4d.
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+
+        /// Number of seconds to wait for tool4d to connect.
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+
+        /// Number of seconds to wait before force-killing tool4d.
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+
+        /// Prevent execution of project startup database methods.
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+
+        /// Open the project without a data file.
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+
+        /// Diagnostic log level passed to tool4d.
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+
+        /// Output raw LSP diagnostics as a JSON array.
+        #[arg(long)]
+        json: bool,
+
+        /// One or more .4dm files to validate.
+        #[arg(required = true)]
+        files: Vec<PathBuf>,
+    },
 }
 
 fn main() -> ExitCode {
@@ -109,8 +169,14 @@ fn main() -> ExitCode {
         Ok(()) => ExitCode::SUCCESS,
 
         Err(error) => {
-            // Standard output is reserved exclusively for LSP data.
-            eprintln!("tool4d-lsp-stdio: {error:#}");
+            let message = format!("{error:#}");
+
+            // The validate subcommand signals "has errors" with an empty
+            // error message. Only print non-empty errors.
+            if !message.is_empty() {
+                eprintln!("tool4d-lsp-stdio: {message}");
+            }
+
             ExitCode::FAILURE
         }
     }
@@ -152,6 +218,32 @@ fn run() -> Result<()> {
 
             supervise_relay(relay, None, &cancellation)
         }
+
+        BridgeCommand::Validate {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            files,
+        } => validate(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            &files,
+        ),
     }
 }
 
@@ -240,6 +332,414 @@ fn launch(
     let relay = Relay::start(stream).context("failed to start the LSP stream relay")?;
 
     supervise_relay(relay, Some(&mut child), &cancellation)
+}
+
+// ---------------------------------------------------------------------------
+// Validate subcommand
+// ---------------------------------------------------------------------------
+
+#[allow(clippy::too_many_arguments)]
+fn validate(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    files: &[PathBuf],
+) -> Result<()> {
+    let tool = resolve_tool(requested_tool)?;
+    let project = resolve_project(explicit_project, workspace)?;
+    let cancellation = install_signal_handlers()?;
+
+    let listener = create_listener(requested_port)?;
+    let listener_address = listener
+        .local_addr()
+        .context("failed to obtain the bridge listener address")?;
+
+    let port = listener_address.port();
+
+    let mut command = Command::new(&tool);
+
+    command
+        .arg(format!("--project={}", project.display()))
+        .arg(format!("--lsp={port}"))
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit());
+
+    if skip_onstartup {
+        command.arg("--skip-onstartup");
+    }
+
+    if dataless {
+        command.arg("--dataless");
+    }
+
+    if let Some(log_level) = log_level {
+        command.arg(format!("--log-level={log_level}"));
+    }
+
+    configure_process_supervision(&mut command);
+
+    eprintln!("tool4d-lsp-stdio: listening for tool4d on {listener_address}");
+    log_command(&tool, command.get_args());
+
+    let mut child = command
+        .spawn()
+        .with_context(|| format!("failed to start {}", tool.display()))?;
+
+    if let Some(stdout) = child.stdout.take() {
+        forward_tool4d_stdout(stdout);
+    }
+
+    let mut child = match ChildGuard::new(child, shutdown_timeout) {
+        Ok(child) => child,
+        Err((mut child, error)) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error).context("failed to install process supervision for tool4d");
+        }
+    };
+
+    let mut stream = accept_with_timeout(&listener, &mut child, startup_timeout, &cancellation)?;
+    drop(listener);
+
+    // Drive the LSP protocol directly.
+    let result = run_validate_session(&mut stream, &project, files);
+
+    // Always attempt graceful shutdown.
+    let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
+    let _ = read_lsp_message(&mut stream, Duration::from_secs(5));
+    let _ = send_lsp_notification(&mut stream, "exit", serde_json::json!(null));
+
+    // ChildGuard ensures tool4d is cleaned up on drop.
+    drop(child);
+
+    let all_diagnostics = result.context("LSP validation session failed")?;
+
+    // Format output.
+    let has_errors = format_diagnostics(&all_diagnostics, json_output)?;
+
+    if has_errors {
+        bail!("");
+    }
+
+    Ok(())
+}
+
+/// A collected diagnostic from the LSP server.
+#[derive(serde::Serialize)]
+struct CollectedDiagnostic {
+    file: String,
+    uri: String,
+    diagnostics: Vec<serde_json::Value>,
+}
+
+fn run_validate_session(
+    stream: &mut TcpStream,
+    project: &Path,
+    files: &[PathBuf],
+) -> Result<Vec<CollectedDiagnostic>> {
+    let project_dir = project
+        .parent()
+        .and_then(|p| p.parent())
+        .unwrap_or(project.parent().unwrap_or(Path::new(".")));
+
+    let root_uri = format!(
+        "file://{}",
+        project_dir
+            .canonicalize()
+            .unwrap_or_else(|_| project_dir.to_path_buf())
+            .display()
+    );
+
+    // Send initialize request.
+    let initialize_params = serde_json::json!({
+        "processId": std::process::id(),
+        "capabilities": {},
+        "rootUri": root_uri,
+        "workspaceFolders": [{
+            "uri": root_uri,
+            "name": project_dir.file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+        }]
+    });
+
+    send_lsp_request(stream, 1, "initialize", initialize_params)?;
+
+    // Read until we get the initialize response (id=1).
+    let timeout = Duration::from_secs(60);
+    loop {
+        let msg = read_lsp_message(stream, timeout).context("waiting for initialize response")?;
+        if msg.get("id") == Some(&serde_json::json!(1)) {
+            break;
+        }
+    }
+
+    // Send initialized notification.
+    send_lsp_notification(stream, "initialized", serde_json::json!({}))?;
+
+    // Open each file and collect diagnostics.
+    let mut all_diagnostics = Vec::new();
+    let per_file_timeout = Duration::from_secs(30);
+
+    for file_path in files {
+        let canonical = file_path
+            .canonicalize()
+            .unwrap_or_else(|_| file_path.to_path_buf());
+
+        let file_uri = format!("file://{}", canonical.display());
+
+        let contents = fs::read_to_string(&canonical)
+            .with_context(|| format!("failed to read {}", file_path.display()))?;
+
+        let did_open_params = serde_json::json!({
+            "textDocument": {
+                "uri": file_uri,
+                "languageId": "4dm",
+                "version": 1,
+                "text": contents
+            }
+        });
+
+        send_lsp_notification(stream, "textDocument/didOpen", did_open_params)?;
+
+        // Read messages until we get publishDiagnostics for this file.
+        let started = Instant::now();
+        let mut found = false;
+
+        while started.elapsed() < per_file_timeout {
+            let remaining = per_file_timeout.saturating_sub(started.elapsed());
+            if remaining.is_zero() {
+                break;
+            }
+
+            match read_lsp_message(stream, remaining) {
+                Ok(msg) => {
+                    if msg.get("method") == Some(&serde_json::json!("textDocument/publishDiagnostics")) {
+                        if let Some(params) = msg.get("params") {
+                            let diag_uri = params.get("uri").and_then(|u| u.as_str()).unwrap_or("");
+                            if diag_uri == file_uri {
+                                let diagnostics = params
+                                    .get("diagnostics")
+                                    .cloned()
+                                    .unwrap_or(serde_json::json!([]));
+
+                                let diag_array = match diagnostics {
+                                    serde_json::Value::Array(arr) => arr,
+                                    _ => vec![],
+                                };
+
+                                all_diagnostics.push(CollectedDiagnostic {
+                                    file: file_path.display().to_string(),
+                                    uri: file_uri.clone(),
+                                    diagnostics: diag_array,
+                                });
+
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                Err(_) => break,
+            }
+        }
+
+        if !found {
+            eprintln!(
+                "tool4d-lsp-stdio: timed out waiting for diagnostics for {}",
+                file_path.display()
+            );
+            all_diagnostics.push(CollectedDiagnostic {
+                file: file_path.display().to_string(),
+                uri: file_uri,
+                diagnostics: vec![],
+            });
+        }
+    }
+
+    Ok(all_diagnostics)
+}
+
+fn format_diagnostics(all: &[CollectedDiagnostic], json_output: bool) -> Result<bool> {
+    if json_output {
+        let json_array: Vec<&serde_json::Value> = all
+            .iter()
+            .flat_map(|d| d.diagnostics.iter())
+            .collect();
+
+        // Build per-file output matching LSP publishDiagnostics shape.
+        let output: Vec<serde_json::Value> = all
+            .iter()
+            .map(|d| {
+                serde_json::json!({
+                    "uri": d.uri,
+                    "diagnostics": d.diagnostics
+                })
+            })
+            .collect();
+
+        let stdout = io::stdout();
+        serde_json::to_writer_pretty(stdout.lock(), &output)
+            .context("failed to write JSON output")?;
+        println!();
+
+        let has_errors = json_array.iter().any(|d| d.get("severity") == Some(&serde_json::json!(1)));
+        return Ok(has_errors);
+    }
+
+    let mut has_errors = false;
+
+    for collected in all {
+        for diag in &collected.diagnostics {
+            let range = diag.get("range").and_then(|r| r.get("start"));
+            let line = range
+                .and_then(|s| s.get("line"))
+                .and_then(|l| l.as_u64())
+                .map(|l| l + 1) // LSP lines are 0-based
+                .unwrap_or(1);
+            let col = range
+                .and_then(|s| s.get("character"))
+                .and_then(|c| c.as_u64())
+                .map(|c| c + 1) // LSP columns are 0-based
+                .unwrap_or(1);
+
+            let severity_num = diag
+                .get("severity")
+                .and_then(|s| s.as_u64())
+                .unwrap_or(1);
+
+            let severity = match severity_num {
+                1 => {
+                    has_errors = true;
+                    "error"
+                }
+                2 => "warning",
+                3 => "info",
+                4 => "hint",
+                _ => "unknown",
+            };
+
+            let message = diag
+                .get("message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("(no message)");
+
+            println!("{}:{}:{}: {}: {}", collected.file, line, col, severity, message);
+        }
+    }
+
+    Ok(has_errors)
+}
+
+// ---------------------------------------------------------------------------
+// LSP JSON-RPC helpers for validate mode
+// ---------------------------------------------------------------------------
+
+fn send_lsp_request(
+    stream: &mut TcpStream,
+    id: u64,
+    method: &str,
+    params: serde_json::Value,
+) -> Result<()> {
+    let message = serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "method": method,
+        "params": params
+    });
+
+    write_lsp_message(stream, &message)
+}
+
+fn send_lsp_notification(
+    stream: &mut TcpStream,
+    method: &str,
+    params: serde_json::Value,
+) -> Result<()> {
+    let message = serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": method,
+        "params": params
+    });
+
+    write_lsp_message(stream, &message)
+}
+
+fn write_lsp_message(stream: &mut TcpStream, message: &serde_json::Value) -> Result<()> {
+    let body = serde_json::to_vec(message).context("failed to serialize LSP message")?;
+
+    let header = format!("Content-Length: {}\r\n\r\n", body.len());
+
+    stream
+        .write_all(header.as_bytes())
+        .context("failed to write LSP header")?;
+    stream
+        .write_all(&body)
+        .context("failed to write LSP body")?;
+    stream.flush().context("failed to flush LSP message")?;
+
+    Ok(())
+}
+
+fn read_lsp_message(
+    stream: &mut TcpStream,
+    timeout: Duration,
+) -> Result<serde_json::Value> {
+    stream
+        .set_read_timeout(Some(timeout))
+        .context("failed to set read timeout")?;
+
+    // Read headers until \r\n\r\n.
+    let mut header_buf = Vec::new();
+    let mut byte = [0u8; 1];
+
+    loop {
+        match stream.read_exact(&mut byte) {
+            Ok(()) => {
+                header_buf.push(byte[0]);
+                if header_buf.ends_with(b"\r\n\r\n") {
+                    break;
+                }
+                if header_buf.len() > 64 * 1024 {
+                    bail!("LSP header too large");
+                }
+            }
+            Err(e) => return Err(e).context("failed to read LSP header"),
+        }
+    }
+
+    // Parse Content-Length.
+    let header_str =
+        std::str::from_utf8(&header_buf).context("LSP header is not valid UTF-8")?;
+
+    let content_length = header_str
+        .lines()
+        .find_map(|line| {
+            let line = line.trim();
+            if line.to_ascii_lowercase().starts_with("content-length:") {
+                line.split_once(':')
+                    .and_then(|(_, v)| v.trim().parse::<usize>().ok())
+            } else {
+                None
+            }
+        })
+        .context("missing Content-Length in LSP header")?;
+
+    // Read body.
+    let mut body = vec![0u8; content_length];
+    stream
+        .read_exact(&mut body)
+        .context("failed to read LSP body")?;
+
+    serde_json::from_slice(&body).context("failed to parse LSP message as JSON")
 }
 
 fn create_listener(requested_port: Option<u16>) -> Result<TcpListener> {
