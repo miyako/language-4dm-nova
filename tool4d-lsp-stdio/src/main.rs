@@ -356,6 +356,30 @@ fn validate(
     let project = resolve_project(explicit_project, workspace)?;
     let cancellation = install_signal_handlers()?;
 
+    // Resolve relative file paths against workspace or project root.
+    let base_dir = workspace
+        .map(Path::to_path_buf)
+        .or_else(|| {
+            explicit_project
+                .and_then(|p| p.parent())
+                .and_then(|p| p.parent())
+                .map(Path::to_path_buf)
+        })
+        .unwrap_or_else(|| env::current_dir().unwrap_or_default());
+
+    let resolved_files: Vec<(PathBuf, PathBuf)> = files
+        .iter()
+        .map(|f| {
+            let display_path = f.clone();
+            let resolved = if f.is_relative() {
+                base_dir.join(f)
+            } else {
+                f.to_path_buf()
+            };
+            (resolved, display_path)
+        })
+        .collect();
+
     let listener = create_listener(requested_port)?;
     let listener_address = listener
         .local_addr()
@@ -410,7 +434,7 @@ fn validate(
     drop(listener);
 
     // Drive the LSP protocol directly.
-    let result = run_validate_session(&mut stream, &project, files);
+    let result = run_validate_session(&mut stream, &project, &resolved_files);
 
     // Always attempt graceful shutdown.
     let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
@@ -443,7 +467,7 @@ struct CollectedDiagnostic {
 fn run_validate_session(
     stream: &mut TcpStream,
     project: &Path,
-    files: &[PathBuf],
+    files: &[(PathBuf, PathBuf)],
 ) -> Result<Vec<CollectedDiagnostic>> {
     let project_dir = project
         .parent()
@@ -487,7 +511,7 @@ fn run_validate_session(
     let mut all_diagnostics = Vec::new();
     let per_file_timeout = Duration::from_secs(5);
 
-    for file_path in files {
+    for (file_path, display_path) in files {
         let canonical = file_path
             .canonicalize()
             .unwrap_or_else(|_| file_path.to_path_buf());
@@ -500,7 +524,7 @@ fn run_validate_session(
         );
 
         let contents = fs::read_to_string(&canonical)
-            .with_context(|| format!("failed to read {}", file_path.display()))?;
+            .with_context(|| format!("failed to read {}", display_path.display()))?;
 
         let did_open_params = serde_json::json!({
             "textDocument": {
@@ -545,7 +569,7 @@ fn run_validate_session(
                                 };
 
                                 all_diagnostics.push(CollectedDiagnostic {
-                                    file: file_path.display().to_string(),
+                                    file: display_path.display().to_string(),
                                     uri: diag_uri.to_string(),
                                     diagnostics: diag_array,
                                 });
@@ -564,10 +588,10 @@ fn run_validate_session(
             // Clean files may not produce diagnostics at all.
             eprintln!(
                 "tool4d-lsp-stdio: validate: no diagnostics received for {} (treating as clean)",
-                file_path.display()
+                display_path.display()
             );
             all_diagnostics.push(CollectedDiagnostic {
-                file: file_path.display().to_string(),
+                file: display_path.display().to_string(),
                 uri: file_uri,
                 diagnostics: vec![],
             });
