@@ -493,14 +493,29 @@ fn run_validate_session(
     // 1. Send initialize request.
     let initialize_params = serde_json::json!({
         "processId": std::process::id(),
-        "capabilities": {},
+        "capabilities": {
+            "textDocument": {
+                "publishDiagnostics": {
+                    "relatedInformation": true
+                }
+            }
+        },
         "rootUri": root_uri,
         "workspaceFolders": [{
             "uri": root_uri,
             "name": project_dir.file_name()
                 .unwrap_or_default()
                 .to_string_lossy()
-        }]
+        }],
+        "initializationOptions": {
+            "diagnostics": {
+                "enable": true,
+                "scope": "Workspace"
+            },
+            "dependencies": {
+                "enable": true
+            }
+        }
     });
 
     send_lsp_request(stream, 1, "initialize", initialize_params)?;
@@ -518,93 +533,88 @@ fn run_validate_session(
     // 2. Send initialized notification.
     send_lsp_notification(stream, "initialized", serde_json::json!({}))?;
 
-    // 3. Wait for dependency/installComponents/done (or timeout).
-    let readiness_timeout = Duration::from_secs(30);
-    let started = Instant::now();
+    // 3. Send didOpen for each file (required before requesting diagnostics).
+    for (uri, _display) in &file_uris {
+        let file_path = uri.strip_prefix("file://").unwrap_or(uri);
+        let content = std::fs::read_to_string(file_path)
+            .with_context(|| format!("failed to read {file_path}"))?;
+        send_lsp_notification(
+            stream,
+            "textDocument/didOpen",
+            serde_json::json!({
+                "textDocument": {
+                    "uri": uri,
+                    "languageId": "4d",
+                    "version": 1,
+                    "text": content
+                }
+            }),
+        )?;
+        eprintln!("tool4d-lsp-stdio: validate: didOpen {uri}");
+    }
+
+    // 4. Wait briefly for server to process (installComponents, etc.).
+    let settle_timeout = Duration::from_secs(5);
+    let settle_start = Instant::now();
     loop {
-        let remaining = readiness_timeout.saturating_sub(started.elapsed());
+        let remaining = settle_timeout.saturating_sub(settle_start.elapsed());
         if remaining.is_zero() {
-            eprintln!("tool4d-lsp-stdio: validate: timed out waiting for installComponents/done, proceeding");
             break;
         }
         match read_lsp_message(stream, remaining) {
             Ok(msg) => {
                 log_lsp_incoming(&msg);
-                if msg.get("method").and_then(|m| m.as_str()) == Some("dependency/installComponents/done") {
-                    eprintln!("tool4d-lsp-stdio: validate: server ready");
-                    break;
-                }
             }
-            Err(_) => {
-                eprintln!("tool4d-lsp-stdio: validate: no installComponents/done received, proceeding");
-                break;
-            }
+            Err(_) => break,
         }
     }
 
-    // 4. Send experimental/checkSyntax request.
-    // Only need one request — the response contains diagnostics for all workspace files.
-    // Use the first file URI (or project URI) as the param.
-    let check_uri = file_uris
-        .first()
-        .map(|(uri, _)| uri.clone())
-        .unwrap_or_else(|| root_uri.clone());
-
-    eprintln!("tool4d-lsp-stdio: validate: sending experimental/checkSyntax uri={check_uri}");
-
-    send_lsp_request(
-        stream,
-        2,
-        "experimental/checkSyntax",
-        serde_json::json!({ "uri": check_uri }),
-    )?;
-
-    // 5. Read until we get the response (id=2).
-    let check_timeout = Duration::from_secs(120);
-    let response = loop {
-        let msg = read_lsp_message(stream, check_timeout)
-            .context("waiting for checkSyntax response")?;
-        log_lsp_incoming(&msg);
-        if msg.get("id") == Some(&serde_json::json!(2)) {
-            break msg;
-        }
-    };
-
-    // 6. Parse response and filter by requested files.
-    let result = response
-        .get("result")
-        .context("checkSyntax response has no result")?;
-
-    let items = result
-        .get("items")
-        .and_then(|i| i.as_array())
-        .cloned()
-        .unwrap_or_default();
-
+    // 5. Send textDocument/diagnostic for each file (pull diagnostics model).
     let mut all_diagnostics = Vec::new();
+    let mut request_id = 2u64;
 
-    for (expected_uri, display_name) in &file_uris {
-        // Find matching report in response items.
-        let matching_items: Vec<serde_json::Value> = items
-            .iter()
-            .filter(|item| {
-                item.get("uri")
-                    .and_then(|u| u.as_str())
-                    .is_some_and(|u| uris_match(u, expected_uri))
-            })
-            .flat_map(|item| {
-                item.get("items")
-                    .and_then(|i| i.as_array())
-                    .cloned()
-                    .unwrap_or_default()
-            })
-            .collect();
+    for (uri, display_name) in &file_uris {
+        eprintln!("tool4d-lsp-stdio: validate: requesting diagnostics for {uri}");
+        send_lsp_request(
+            stream,
+            request_id,
+            "textDocument/diagnostic",
+            serde_json::json!({
+                "textDocument": { "uri": uri }
+            }),
+        )?;
+
+        let diag_timeout = Duration::from_secs(60);
+        let response = loop {
+            let msg = read_lsp_message(stream, diag_timeout)
+                .context("waiting for diagnostic response")?;
+            log_lsp_incoming(&msg);
+            if msg.get("id") == Some(&serde_json::json!(request_id)) {
+                break msg;
+            }
+        };
+
+        // tool4d returns null when clean (known bug); treat as empty.
+        let items = response
+            .get("result")
+            .and_then(|r| r.get("items"))
+            .and_then(|i| i.as_array())
+            .cloned()
+            .unwrap_or_default();
+
+        eprintln!(
+            "tool4d-lsp-stdio: validate: got {} diagnostic(s) for {}",
+            items.len(),
+            display_name
+        );
 
         all_diagnostics.push(CollectedDiagnostic {
             file: display_name.clone(),
-            uri: expected_uri.clone(),
-            diagnostics: matching_items,
+            uri: uri.clone(),
+            diagnostics: items,
         });
+
+        request_id += 1;
     }
 
     Ok(all_diagnostics)
@@ -697,18 +707,6 @@ fn path_to_file_uri(path: &Path) -> String {
 }
 
 /// Lenient URI comparison: strips the `file://` scheme and compares paths.
-fn uris_match(a: &str, b: &str) -> bool {
-    if a == b {
-        return true;
-    }
-    fn strip_file_scheme(uri: &str) -> &str {
-        uri.strip_prefix("file:///")
-            .or_else(|| uri.strip_prefix("file://"))
-            .unwrap_or(uri)
-    }
-    strip_file_scheme(a) == strip_file_scheme(b)
-}
-
 /// Logs an incoming LSP message to stderr for debugging.
 fn log_lsp_incoming(msg: &serde_json::Value) {
     if let Some(method) = msg.get("method").and_then(|m| m.as_str()) {
