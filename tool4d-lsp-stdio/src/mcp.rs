@@ -11,6 +11,7 @@ use std::{
     time::Duration,
 };
 
+use anyhow::Context;
 use rmcp::{
     handler::server::wrapper::Parameters, schemars, tool, tool_router, ErrorData,
 };
@@ -40,11 +41,11 @@ impl LspConnection {
     fn request(&self, method: &str, params: Value) -> anyhow::Result<Value> {
         let id = self.next_request_id();
         let mut stream = self.stream.lock().map_err(|e| anyhow::anyhow!("{e}"))?;
-        send_lsp_request(&mut *stream, id, method, params)?;
+        send_lsp_request(&mut stream, id, method, params)?;
 
         let timeout = Duration::from_secs(60);
         loop {
-            let msg = read_lsp_message(&mut *stream, timeout)?;
+            let msg = read_lsp_message(&mut stream, timeout)?;
             if msg.get("id") == Some(&serde_json::json!(id)) {
                 return Ok(msg);
             }
@@ -55,7 +56,18 @@ impl LspConnection {
     /// Send an LSP notification (no response expected).
     fn notify(&self, method: &str, params: Value) -> anyhow::Result<()> {
         let mut stream = self.stream.lock().map_err(|e| anyhow::anyhow!("{e}"))?;
-        send_lsp_notification(&mut *stream, method, params)
+        send_lsp_notification(&mut stream, method, params)
+    }
+
+    /// Performs a best-effort graceful LSP `shutdown`/`exit`, for use by
+    /// one-shot CLI subcommands and the persistent `mcp` worker before their
+    /// tool4d process is torn down.
+    pub fn shutdown(&self) {
+        if let Ok(mut stream) = self.stream.lock() {
+            let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
+            let _ = read_lsp_message(&mut stream, Duration::from_secs(5));
+            let _ = send_lsp_notification(&mut stream, "exit", serde_json::json!(null));
+        }
     }
 
     /// Resolve a relative file path against the workspace.
@@ -68,6 +80,264 @@ impl LspConnection {
         };
         let canonical = absolute.canonicalize().unwrap_or(absolute);
         path_to_file_uri(&canonical)
+    }
+}
+
+// ── Synchronous LSP capability implementations ─────────────────────────
+//
+// These are the shared implementations behind both the MCP tool handlers
+// below (invoked asynchronously via `tokio::task::spawn_blocking`) and the
+// one-shot CLI subcommands / persistent-server IPC dispatch in `main.rs`
+// and `ipc.rs`. Keeping a single sync implementation avoids duplicating the
+// LSP request/response handling in three places.
+impl LspConnection {
+    pub fn validate_files(&self, files: &[String]) -> anyhow::Result<String> {
+        let mut all_results = Vec::new();
+
+        for file in files {
+            let uri = self.resolve_uri(file);
+
+            let abs_path = Path::new(uri.strip_prefix("file://").unwrap_or(&uri));
+            let content = std::fs::read_to_string(abs_path)
+                .with_context(|| format!("failed to read {file}"))?;
+
+            self.notify(
+                "textDocument/didOpen",
+                serde_json::json!({
+                    "textDocument": {
+                        "uri": uri,
+                        "languageId": "4d",
+                        "version": 1,
+                        "text": content
+                    }
+                }),
+            )?;
+
+            let response = self.request(
+                "textDocument/diagnostic",
+                serde_json::json!({ "textDocument": { "uri": uri } }),
+            )?;
+
+            // Parse diagnostics (handle tool4d null-result bug).
+            let items = response
+                .get("result")
+                .and_then(|r| r.get("items"))
+                .and_then(|i| i.as_array())
+                .cloned()
+                .unwrap_or_default();
+
+            for item in &items {
+                let range = item.get("range").and_then(|r| r.get("start"));
+                let line = range
+                    .and_then(|r| r.get("line"))
+                    .and_then(|l| l.as_u64())
+                    .unwrap_or(0)
+                    + 1;
+                let col = range
+                    .and_then(|r| r.get("character"))
+                    .and_then(|c| c.as_u64())
+                    .unwrap_or(0)
+                    + 1;
+                let severity = match item.get("severity").and_then(|s| s.as_u64()).unwrap_or(1) {
+                    1 => "error",
+                    2 => "warning",
+                    3 => "info",
+                    _ => "hint",
+                };
+                let message = item
+                    .get("message")
+                    .and_then(|m| m.as_str())
+                    .unwrap_or("unknown");
+
+                all_results.push(format!("{file}:{line}:{col}: {severity}: {message}"));
+            }
+
+            if items.is_empty() {
+                all_results.push(format!("{file}: clean (no diagnostics)"));
+            }
+
+            let _ = self.notify(
+                "textDocument/didClose",
+                serde_json::json!({ "textDocument": { "uri": uri } }),
+            );
+        }
+
+        Ok(all_results.join("\n"))
+    }
+
+    pub fn completion(&self, file: &str, line: u32, character: u32) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        let response = self.request(
+            "textDocument/completion",
+            serde_json::json!({
+                "textDocument": { "uri": uri },
+                "position": { "line": line, "character": character }
+            }),
+        )?;
+
+        let result = response.get("result").cloned().unwrap_or(Value::Null);
+
+        let items = if let Some(arr) = result.as_array() {
+            arr.clone()
+        } else if let Some(arr) = result.get("items").and_then(|i| i.as_array()) {
+            arr.clone()
+        } else {
+            return Ok("No completions available.".to_string());
+        };
+
+        let formatted: Vec<String> = items
+            .iter()
+            .take(50) // Limit to avoid huge responses.
+            .map(|item| {
+                let label = item.get("label").and_then(|l| l.as_str()).unwrap_or("?");
+                let detail = item.get("detail").and_then(|d| d.as_str()).unwrap_or("");
+                if detail.is_empty() {
+                    label.to_string()
+                } else {
+                    format!("{label} — {detail}")
+                }
+            })
+            .collect();
+
+        if formatted.is_empty() {
+            Ok("No completions available.".to_string())
+        } else {
+            Ok(formatted.join("\n"))
+        }
+    }
+
+    pub fn hover(&self, file: &str, line: u32, character: u32) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        let response = self.request(
+            "textDocument/hover",
+            serde_json::json!({
+                "textDocument": { "uri": uri },
+                "position": { "line": line, "character": character }
+            }),
+        )?;
+
+        let result = response.get("result").cloned().unwrap_or(Value::Null);
+
+        if result.is_null() {
+            return Ok("No hover information available at this position.".to_string());
+        }
+
+        if let Some(contents) = result.get("contents") {
+            if let Some(s) = contents.as_str() {
+                return Ok(s.to_string());
+            }
+            if let Some(value) = contents.get("value").and_then(|v| v.as_str()) {
+                return Ok(value.to_string());
+            }
+            if let Some(arr) = contents.as_array() {
+                let parts: Vec<String> = arr
+                    .iter()
+                    .filter_map(|item| {
+                        item.as_str()
+                            .map(String::from)
+                            .or_else(|| item.get("value").and_then(|v| v.as_str()).map(String::from))
+                    })
+                    .collect();
+                return Ok(parts.join("\n\n"));
+            }
+        }
+
+        Ok(serde_json::to_string_pretty(&result).unwrap_or_default())
+    }
+
+    pub fn goto_definition(&self, file: &str, line: u32, character: u32) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        let response = self.request(
+            "textDocument/definition",
+            serde_json::json!({
+                "textDocument": { "uri": uri },
+                "position": { "line": line, "character": character }
+            }),
+        )?;
+
+        let result = response.get("result").cloned().unwrap_or(Value::Null);
+
+        if result.is_null() {
+            return Ok("No definition found at this position.".to_string());
+        }
+
+        format_locations(&result).map_err(|e| anyhow::anyhow!(e.message))
+    }
+
+    pub fn document_symbols(&self, file: &str) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        let response = self.request(
+            "textDocument/documentSymbol",
+            serde_json::json!({ "textDocument": { "uri": uri } }),
+        )?;
+
+        let result = response.get("result").cloned().unwrap_or(Value::Null);
+
+        if result.is_null() {
+            return Ok("No symbols found.".to_string());
+        }
+
+        if let Some(arr) = result.as_array() {
+            let formatted: Vec<String> = arr
+                .iter()
+                .map(|sym| {
+                    let name = sym.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+                    let kind = sym
+                        .get("kind")
+                        .and_then(|k| k.as_u64())
+                        .map(symbol_kind_name)
+                        .unwrap_or("unknown");
+                    let line = sym
+                        .get("range")
+                        .or_else(|| sym.get("location").and_then(|l| l.get("range")))
+                        .and_then(|r| r.get("start"))
+                        .and_then(|s| s.get("line"))
+                        .and_then(|l| l.as_u64())
+                        .map(|l| l + 1)
+                        .unwrap_or(0);
+                    format!("  {name} ({kind}) line {line}")
+                })
+                .collect();
+
+            if formatted.is_empty() {
+                Ok("No symbols found.".to_string())
+            } else {
+                Ok(formatted.join("\n"))
+            }
+        } else {
+            Ok("No symbols found.".to_string())
+        }
+    }
+
+    pub fn open_file(&self, file: &str) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        let abs_path = Path::new(uri.strip_prefix("file://").unwrap_or(&uri));
+        let content = std::fs::read_to_string(abs_path)
+            .with_context(|| format!("failed to read {file}"))?;
+
+        self.notify(
+            "textDocument/didOpen",
+            serde_json::json!({
+                "textDocument": {
+                    "uri": uri,
+                    "languageId": "4d",
+                    "version": 1,
+                    "text": content
+                }
+            }),
+        )?;
+
+        Ok(format!("Opened {file}"))
+    }
+
+    pub fn close_file(&self, file: &str) -> anyhow::Result<String> {
+        let uri = self.resolve_uri(file);
+        self.notify(
+            "textDocument/didClose",
+            serde_json::json!({ "textDocument": { "uri": uri } }),
+        )?;
+
+        Ok(format!("Closed {file}"))
     }
 }
 
@@ -159,91 +429,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let mut all_results = Vec::new();
-
-            for file in &params.files {
-                let uri = lsp.resolve_uri(file);
-
-                // Open the file.
-                let abs_path = Path::new(
-                    uri.strip_prefix("file://").unwrap_or(&uri),
-                );
-                let content = std::fs::read_to_string(abs_path)
-                    .map_err(|e| ErrorData::internal_error(format!("failed to read {file}: {e}"), None))?;
-
-                lsp.notify(
-                    "textDocument/didOpen",
-                    serde_json::json!({
-                        "textDocument": {
-                            "uri": uri,
-                            "languageId": "4d",
-                            "version": 1,
-                            "text": content
-                        }
-                    }),
-                )
-                .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-                // Request diagnostics (pull model).
-                let response = lsp
-                    .request(
-                        "textDocument/diagnostic",
-                        serde_json::json!({ "textDocument": { "uri": uri } }),
-                    )
-                    .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-                // Parse diagnostics (handle tool4d null-result bug).
-                let items = response
-                    .get("result")
-                    .and_then(|r| r.get("items"))
-                    .and_then(|i| i.as_array())
-                    .cloned()
-                    .unwrap_or_default();
-
-                for item in &items {
-                    let range = item.get("range").and_then(|r| r.get("start"));
-                    let line = range
-                        .and_then(|r| r.get("line"))
-                        .and_then(|l| l.as_u64())
-                        .unwrap_or(0)
-                        + 1;
-                    let col = range
-                        .and_then(|r| r.get("character"))
-                        .and_then(|c| c.as_u64())
-                        .unwrap_or(0)
-                        + 1;
-                    let severity = match item
-                        .get("severity")
-                        .and_then(|s| s.as_u64())
-                        .unwrap_or(1)
-                    {
-                        1 => "error",
-                        2 => "warning",
-                        3 => "info",
-                        _ => "hint",
-                    };
-                    let message = item
-                        .get("message")
-                        .and_then(|m| m.as_str())
-                        .unwrap_or("unknown");
-
-                    all_results.push(format!("{file}:{line}:{col}: {severity}: {message}"));
-                }
-
-                if items.is_empty() {
-                    all_results.push(format!("{file}: clean (no diagnostics)"));
-                }
-
-                // Close the file.
-                let _ = lsp.notify(
-                    "textDocument/didClose",
-                    serde_json::json!({
-                        "textDocument": { "uri": uri }
-                    }),
-                );
-            }
-
-            Ok(all_results.join("\n"))
+            lsp.validate_files(&params.files)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -256,56 +443,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            let response = lsp
-                .request(
-                    "textDocument/completion",
-                    serde_json::json!({
-                        "textDocument": { "uri": uri },
-                        "position": {
-                            "line": params.line,
-                            "character": params.character
-                        }
-                    }),
-                )
-                .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            let result = response.get("result").cloned().unwrap_or(Value::Null);
-
-            // Format completions.
-            let items = if let Some(arr) = result.as_array() {
-                arr.clone()
-            } else if let Some(arr) = result.get("items").and_then(|i| i.as_array()) {
-                arr.clone()
-            } else {
-                return Ok("No completions available.".to_string());
-            };
-
-            let formatted: Vec<String> = items
-                .iter()
-                .take(50) // Limit to avoid huge responses.
-                .map(|item| {
-                    let label = item
-                        .get("label")
-                        .and_then(|l| l.as_str())
-                        .unwrap_or("?");
-                    let detail = item
-                        .get("detail")
-                        .and_then(|d| d.as_str())
-                        .unwrap_or("");
-                    if detail.is_empty() {
-                        label.to_string()
-                    } else {
-                        format!("{label} — {detail}")
-                    }
-                })
-                .collect();
-
-            if formatted.is_empty() {
-                Ok("No completions available.".to_string())
-            } else {
-                Ok(formatted.join("\n"))
-            }
+            lsp.completion(&params.file, params.line, params.character)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -318,49 +457,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            let response = lsp
-                .request(
-                    "textDocument/hover",
-                    serde_json::json!({
-                        "textDocument": { "uri": uri },
-                        "position": {
-                            "line": params.line,
-                            "character": params.character
-                        }
-                    }),
-                )
-                .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            let result = response.get("result").cloned().unwrap_or(Value::Null);
-
-            if result.is_null() {
-                return Ok("No hover information available at this position.".to_string());
-            }
-
-            // Extract contents (can be string, MarkupContent, or array).
-            if let Some(contents) = result.get("contents") {
-                if let Some(s) = contents.as_str() {
-                    return Ok(s.to_string());
-                }
-                if let Some(value) = contents.get("value").and_then(|v| v.as_str()) {
-                    return Ok(value.to_string());
-                }
-                // Array of MarkedString.
-                if let Some(arr) = contents.as_array() {
-                    let parts: Vec<String> = arr
-                        .iter()
-                        .filter_map(|item| {
-                            item.as_str()
-                                .map(String::from)
-                                .or_else(|| item.get("value").and_then(|v| v.as_str()).map(String::from))
-                        })
-                        .collect();
-                    return Ok(parts.join("\n\n"));
-                }
-            }
-
-            Ok(serde_json::to_string_pretty(&result).unwrap_or_default())
+            lsp.hover(&params.file, params.line, params.character)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -373,27 +471,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            let response = lsp
-                .request(
-                    "textDocument/definition",
-                    serde_json::json!({
-                        "textDocument": { "uri": uri },
-                        "position": {
-                            "line": params.line,
-                            "character": params.character
-                        }
-                    }),
-                )
-                .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            let result = response.get("result").cloned().unwrap_or(Value::Null);
-
-            if result.is_null() {
-                return Ok("No definition found at this position.".to_string());
-            }
-
-            format_locations(&result)
+            lsp.goto_definition(&params.file, params.line, params.character)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -406,50 +485,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            let response = lsp
-                .request(
-                    "textDocument/documentSymbol",
-                    serde_json::json!({ "textDocument": { "uri": uri } }),
-                )
-                .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            let result = response.get("result").cloned().unwrap_or(Value::Null);
-
-            if result.is_null() {
-                return Ok("No symbols found.".to_string());
-            }
-
-            if let Some(arr) = result.as_array() {
-                let formatted: Vec<String> = arr
-                    .iter()
-                    .map(|sym| {
-                        let name = sym.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-                        let kind = sym
-                            .get("kind")
-                            .and_then(|k| k.as_u64())
-                            .map(symbol_kind_name)
-                            .unwrap_or("unknown");
-                        let line = sym
-                            .get("range")
-                            .or_else(|| sym.get("location").and_then(|l| l.get("range")))
-                            .and_then(|r| r.get("start"))
-                            .and_then(|s| s.get("line"))
-                            .and_then(|l| l.as_u64())
-                            .map(|l| l + 1)
-                            .unwrap_or(0);
-                        format!("  {name} ({kind}) line {line}")
-                    })
-                    .collect();
-
-                if formatted.is_empty() {
-                    Ok("No symbols found.".to_string())
-                } else {
-                    Ok(formatted.join("\n"))
-                }
-            } else {
-                Ok("No symbols found.".to_string())
-            }
+            lsp.document_symbols(&params.file)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -462,25 +499,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            let abs_path = Path::new(uri.strip_prefix("file://").unwrap_or(&uri));
-            let content = std::fs::read_to_string(abs_path)
-                .map_err(|e| ErrorData::internal_error(format!("failed to read {}: {e}", params.file), None))?;
-
-            lsp.notify(
-                "textDocument/didOpen",
-                serde_json::json!({
-                    "textDocument": {
-                        "uri": uri,
-                        "languageId": "4d",
-                        "version": 1,
-                        "text": content
-                    }
-                }),
-            )
-            .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            Ok(format!("Opened {}", params.file))
+            lsp.open_file(&params.file)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?
@@ -493,16 +513,8 @@ impl Tool4dMcpServer {
     ) -> Result<String, ErrorData> {
         let lsp = self.lsp.clone();
         tokio::task::spawn_blocking(move || {
-            let uri = lsp.resolve_uri(&params.file);
-            lsp.notify(
-                "textDocument/didClose",
-                serde_json::json!({
-                    "textDocument": { "uri": uri }
-                }),
-            )
-            .map_err(|e| ErrorData::internal_error(e.to_string(), None))?;
-
-            Ok(format!("Closed {}", params.file))
+            lsp.close_file(&params.file)
+                .map_err(|e| ErrorData::internal_error(e.to_string(), None))
         })
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string(), None))?

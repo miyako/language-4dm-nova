@@ -216,6 +216,201 @@ enum BridgeCommand {
         /// Diagnostic log level passed to tool4d.
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+
+        /// Run over stdio in the foreground instead of daemonizing.
+        ///
+        /// This is the pre-existing default `mcp` behavior, preserved for
+        /// hosts that spawn this command and attach directly to its stdio
+        /// as an MCP transport.
+        #[arg(long)]
+        foreground: bool,
+
+        /// Stop an already-running persistent MCP server for this project.
+        #[arg(long)]
+        stop: bool,
+
+        /// Number of seconds a daemonized server may sit idle (no IPC
+        /// requests) before it shuts itself down automatically.
+        #[arg(long, env = "TOOL4D_MCP_IDLE_TIMEOUT", default_value_t = 600)]
+        idle_timeout: u64,
+
+        /// Internal flag used by the daemonizing parent to re-exec itself
+        /// as the detached persistent-server worker. Not intended for
+        /// direct use.
+        #[arg(long, hide = true)]
+        internal_mcp_worker: bool,
+    },
+
+    /// Show hover information for a position in a .4dm file.
+    ///
+    /// Attaches to an already-running `mcp` server for the current project
+    /// when --project and --workspace are both omitted; otherwise starts a
+    /// private, one-shot tool4d session.
+    Hover {
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+        /// Output structured JSON instead of human-readable text.
+        #[arg(long)]
+        json: bool,
+        /// Zero-based line number.
+        #[arg(long)]
+        line: u32,
+        /// Zero-based character offset.
+        #[arg(long)]
+        character: u32,
+        /// The .4dm file to query.
+        file: PathBuf,
+    },
+
+    /// List completions for a position in a .4dm file.
+    ///
+    /// Attaches to an already-running `mcp` server for the current project
+    /// when --project and --workspace are both omitted; otherwise starts a
+    /// private, one-shot tool4d session.
+    Completion {
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        line: u32,
+        #[arg(long)]
+        character: u32,
+        file: PathBuf,
+    },
+
+    /// Go to the definition of the symbol at a position in a .4dm file.
+    ///
+    /// Attaches to an already-running `mcp` server for the current project
+    /// when --project and --workspace are both omitted; otherwise starts a
+    /// private, one-shot tool4d session.
+    GotoDefinition {
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        line: u32,
+        #[arg(long)]
+        character: u32,
+        file: PathBuf,
+    },
+
+    /// List document symbols for a .4dm file.
+    ///
+    /// Attaches to an already-running `mcp` server for the current project
+    /// when --project and --workspace are both omitted; otherwise starts a
+    /// private, one-shot tool4d session.
+    DocumentSymbols {
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+        #[arg(long)]
+        json: bool,
+        file: PathBuf,
     },
 }
 
@@ -310,6 +505,10 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            foreground,
+            stop,
+            idle_timeout,
+            internal_mcp_worker,
         } => run_mcp_server(
             tool.as_deref(),
             project.as_deref(),
@@ -320,6 +519,126 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            foreground,
+            stop,
+            internal_mcp_worker,
+            Duration::from_secs(idle_timeout),
+        ),
+
+        BridgeCommand::Hover {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            line,
+            character,
+            file,
+        } => hover_command(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            file,
+            line,
+            character,
+        ),
+
+        BridgeCommand::Completion {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            line,
+            character,
+            file,
+        } => completion_command(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            file,
+            line,
+            character,
+        ),
+
+        BridgeCommand::GotoDefinition {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            line,
+            character,
+            file,
+        } => goto_definition_command(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            file,
+            line,
+            character,
+        ),
+
+        BridgeCommand::DocumentSymbols {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            file,
+        } => document_symbols_command(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            file,
         ),
     }
 }
@@ -412,26 +731,30 @@ fn launch(
 }
 
 // ---------------------------------------------------------------------------
-// Validate subcommand
+// Shared tool4d startup + LSP initialization
 // ---------------------------------------------------------------------------
 
-#[allow(clippy::too_many_arguments)]
-#[allow(clippy::too_many_arguments)]
-fn run_mcp_server(
-    requested_tool: Option<&Path>,
-    explicit_project: Option<&Path>,
-    workspace: Option<&Path>,
+/// Common options for starting a private tool4d process and establishing an
+/// initialized LSP session over it. Shared by `validate`, `mcp`, and the
+/// one-shot `hover`/`completion`/`goto-definition`/`document-symbols`
+/// subcommands.
+struct StartOptions<'a> {
+    requested_tool: Option<&'a Path>,
+    explicit_project: Option<&'a Path>,
+    workspace: Option<&'a Path>,
     requested_port: Option<u16>,
     startup_timeout: Duration,
     shutdown_timeout: Duration,
     skip_onstartup: bool,
     dataless: bool,
-    log_level: Option<&str>,
-) -> Result<()> {
-    let tool = resolve_tool(requested_tool)?;
-    let project = resolve_project(explicit_project, workspace)?;
-    let cancellation = install_signal_handlers()?;
+    log_level: Option<&'a str>,
+}
 
+/// Resolves the workspace directory used to make relative file paths
+/// absolute, following the same fallback order used by `validate` and `mcp`:
+/// explicit `--workspace`, else the project's grandparent directory, else
+/// the current directory.
+fn resolve_workspace_dir(explicit_project: Option<&Path>, workspace: Option<&Path>) -> PathBuf {
     let workspace_dir = workspace
         .map(Path::to_path_buf)
         .or_else(|| {
@@ -442,11 +765,25 @@ fn run_mcp_server(
         })
         .unwrap_or_else(|| env::current_dir().unwrap_or_default());
 
-    let workspace_dir = workspace_dir
-        .canonicalize()
-        .unwrap_or(workspace_dir);
+    workspace_dir.canonicalize().unwrap_or(workspace_dir)
+}
 
-    let listener = create_listener(requested_port)?;
+/// Starts a private tool4d process, waits for it to connect over the LSP
+/// bridge, and performs the `initialize`/`initialized` handshake. Returns the
+/// initialized stream, the `ChildGuard` supervising tool4d, the resolved
+/// workspace directory, and the cancellation flag installed for signal
+/// handling. The caller is responsible for shutting down the LSP session and
+/// dropping the `ChildGuard`, which terminates tool4d.
+fn start_lsp_session(
+    options: &StartOptions<'_>,
+) -> Result<(TcpStream, ChildGuard, PathBuf, Arc<AtomicBool>)> {
+    let tool = resolve_tool(options.requested_tool)?;
+    let project = resolve_project(options.explicit_project, options.workspace)?;
+    let cancellation = install_signal_handlers()?;
+
+    let workspace_dir = resolve_workspace_dir(options.explicit_project, options.workspace);
+
+    let listener = create_listener(options.requested_port)?;
     let listener_address = listener
         .local_addr()
         .context("failed to obtain the bridge listener address")?;
@@ -462,15 +799,15 @@ fn run_mcp_server(
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit());
 
-    if skip_onstartup {
+    if options.skip_onstartup {
         command.arg("--skip-onstartup");
     }
 
-    if dataless {
+    if options.dataless {
         command.arg("--dataless");
     }
 
-    if let Some(log_level) = log_level {
+    if let Some(log_level) = options.log_level {
         command.arg(format!("--log-level={log_level}"));
     }
 
@@ -487,7 +824,7 @@ fn run_mcp_server(
         forward_tool4d_stdout(stdout);
     }
 
-    let mut child = match ChildGuard::new(child, shutdown_timeout) {
+    let mut child = match ChildGuard::new(child, options.shutdown_timeout) {
         Ok(child) => child,
         Err((mut child, error)) => {
             let _ = child.kill();
@@ -496,7 +833,8 @@ fn run_mcp_server(
         }
     };
 
-    let mut stream = accept_with_timeout(&listener, &mut child, startup_timeout, &cancellation)?;
+    let mut stream =
+        accept_with_timeout(&listener, &mut child, options.startup_timeout, &cancellation)?;
     drop(listener);
 
     // Perform LSP initialization.
@@ -533,8 +871,8 @@ fn run_mcp_server(
 
     let timeout = Duration::from_secs(60);
     loop {
-        let msg = read_lsp_message(&mut stream, timeout)
-            .context("waiting for initialize response")?;
+        let msg =
+            read_lsp_message(&mut stream, timeout).context("waiting for initialize response")?;
         if msg.get("id") == Some(&serde_json::json!(1)) {
             break;
         }
@@ -544,16 +882,66 @@ fn run_mcp_server(
 
     // Drain any startup notifications briefly.
     let drain_timeout = Duration::from_secs(3);
-    loop {
-        match read_lsp_message(&mut stream, drain_timeout) {
-            Ok(_) => {}
-            Err(_) => break,
-        }
+    while read_lsp_message(&mut stream, drain_timeout).is_ok() {}
+
+    Ok((stream, child, workspace_dir, cancellation))
+}
+
+// ---------------------------------------------------------------------------
+// Mcp subcommand
+// ---------------------------------------------------------------------------
+
+#[allow(clippy::too_many_arguments)]
+fn run_mcp_server(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    foreground: bool,
+    stop: bool,
+    internal_worker: bool,
+    idle_timeout: Duration,
+) -> Result<()> {
+    if stop {
+        return mcp_stop(explicit_project, workspace);
     }
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    if internal_worker {
+        return run_mcp_worker(&options, idle_timeout);
+    }
+
+    if !foreground {
+        return mcp_daemonize(&options, idle_timeout);
+    }
+
+    let (stream, child, workspace_dir, _cancellation) = start_lsp_session(&options)?;
 
     eprintln!("tool4d-lsp-stdio: LSP initialized, starting MCP server on stdio");
 
-    // Build the MCP server and run it.
+    run_mcp_over_stdio(stream, workspace_dir, child)
+}
+
+/// Runs the MCP server over stdio (the pre-existing default `mcp` behavior,
+/// now also the implementation of `--foreground`) until the client
+/// disconnects, then shuts down tool4d.
+fn run_mcp_over_stdio(stream: TcpStream, workspace_dir: PathBuf, child: ChildGuard) -> Result<()> {
     let lsp = std::sync::Arc::new(mcp::LspConnection::new(stream, workspace_dir));
     let server = mcp::Tool4dMcpServer::new(lsp);
 
@@ -581,6 +969,621 @@ fn run_mcp_server(
 
     result
 }
+
+/// `mcp --stop`: locate the lockfile for the resolved project, ask the
+/// persistent server to shut down gracefully (falling back to killing its
+/// PID), and remove the lockfile.
+fn mcp_stop(explicit_project: Option<&Path>, workspace: Option<&Path>) -> Result<()> {
+    let project = resolve_project(explicit_project, workspace)?;
+
+    if tool4d_lsp_stdio::ipc::stop_server(&project)? {
+        eprintln!(
+            "tool4d-lsp-stdio: stopped persistent server for {}",
+            project.display()
+        );
+        Ok(())
+    } else {
+        bail!("no running MCP server found for {}", project.display());
+    }
+}
+
+/// Daemonizes the `mcp` server: re-execs the current binary with an internal
+/// worker flag, detaches it from the current session/console, and waits
+/// only until the worker signals that it has bound its IPC listener and
+/// written its lockfile. Prints `pid=<pid> port=<port>` on stdout and
+/// returns; the worker keeps running independently in the background.
+///
+/// A true `fork()` (as the issue's design sketch describes) is awkward to do
+/// safely from a multi-threaded Rust process and is unavailable on Windows.
+/// Re-exec + detach achieves the same externally-visible behavior (parent
+/// returns immediately with the child's PID) on both platforms using the
+/// process-supervision/detachment primitives this crate already has.
+fn mcp_daemonize(options: &StartOptions<'_>, idle_timeout: Duration) -> Result<()> {
+    let project = resolve_project(options.explicit_project, options.workspace)?;
+
+    if let Some(existing) = tool4d_lsp_stdio::ipc::find_running_server(&project) {
+        println!("pid={} port={}", existing.pid, existing.port);
+        eprintln!(
+            "tool4d-lsp-stdio: a persistent server is already running for {} (pid {})",
+            project.display(),
+            existing.pid
+        );
+        return Ok(());
+    }
+
+    let current_exe = env::current_exe().context("failed to resolve the current executable")?;
+
+    let mut command = Command::new(&current_exe);
+    command.arg("mcp").arg("--internal-mcp-worker");
+    command.arg(format!("--project={}", project.display()));
+
+    if let Some(workspace) = options.workspace {
+        command.arg(format!("--workspace={}", workspace.display()));
+    }
+    if let Some(tool) = options.requested_tool {
+        command.arg(format!("--tool={}", tool.display()));
+    }
+    if let Some(port) = options.requested_port {
+        command.arg(format!("--port={port}"));
+    }
+    command.arg(format!(
+        "--startup-timeout={}",
+        options.startup_timeout.as_secs()
+    ));
+    command.arg(format!(
+        "--shutdown-timeout={}",
+        options.shutdown_timeout.as_secs()
+    ));
+    if options.skip_onstartup {
+        command.arg("--skip-onstartup");
+    }
+    if options.dataless {
+        command.arg("--dataless");
+    }
+    if let Some(log_level) = options.log_level {
+        command.arg(format!("--log-level={log_level}"));
+    }
+    command.arg(format!("--idle-timeout={}", idle_timeout.as_secs()));
+
+    command
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null());
+
+    configure_process_supervision(&mut command);
+    detach_daemon_process(&mut command);
+
+    let mut worker = command
+        .spawn()
+        .context("failed to start the daemonized MCP server")?;
+
+    // The worker writes exactly one line, `pid=<pid> port=<port>`, to its
+    // stdout once it has bound its listener and written its lockfile.
+    let stdout = worker
+        .stdout
+        .take()
+        .context("failed to capture daemon worker stdout")?;
+    let mut reader = BufReader::new(stdout);
+    let mut line = String::new();
+
+    match reader.read_line(&mut line) {
+        Ok(0) | Err(_) => {
+            let _ = worker.wait();
+            bail!("the daemonized MCP server exited before it finished starting up");
+        }
+        Ok(_) => {}
+    }
+
+    // Do not wait for the worker; it continues running independently.
+    print!("{line}");
+    if !line.ends_with('\n') {
+        println!();
+    }
+
+    Ok(())
+}
+
+#[cfg(unix)]
+fn detach_daemon_process(command: &mut Command) {
+    use std::os::unix::process::CommandExt;
+    // SAFETY: setsid() is async-signal-safe and always valid to call in the
+    // post-fork child before exec; it detaches the child into a new session
+    // so it survives the parent's exit and is not tied to a controlling
+    // terminal.
+    unsafe {
+        command.pre_exec(|| {
+            libc::setsid();
+            Ok(())
+        });
+    }
+}
+
+#[cfg(windows)]
+fn detach_daemon_process(command: &mut Command) {
+    use std::os::windows::process::CommandExt;
+    const DETACHED_PROCESS: u32 = 0x0000_0008;
+    const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
+    command.creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP);
+}
+
+#[cfg(not(any(unix, windows)))]
+fn detach_daemon_process(_command: &mut Command) {}
+
+/// The actual persistent-server worker body, run inside the detached child
+/// process spawned by `mcp_daemonize` (`mcp --internal-mcp-worker ...`).
+/// Binds the IPC listener, writes the lockfile, prints its own
+/// `pid=<pid> port=<port>` confirmation line, then serves IPC requests
+/// (dispatching to the same `LspConnection` methods used by the MCP tool
+/// handlers) until stopped or idle for `idle_timeout`.
+fn run_mcp_worker(options: &StartOptions<'_>, idle_timeout: Duration) -> Result<()> {
+    let project = resolve_project(options.explicit_project, options.workspace)?;
+
+    let (stream, child, workspace_dir, cancellation) = start_lsp_session(options)?;
+
+    let ipc_listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+        .context("failed to bind the persistent-server IPC listener")?;
+    let ipc_port = ipc_listener
+        .local_addr()
+        .context("failed to obtain the IPC listener address")?
+        .port();
+    ipc_listener
+        .set_nonblocking(true)
+        .context("failed to configure the IPC listener")?;
+
+    let info = tool4d_lsp_stdio::ipc::ServerInfo {
+        pid: std::process::id(),
+        port: ipc_port,
+        project: project.clone(),
+        started_at: SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0),
+    };
+    tool4d_lsp_stdio::ipc::write_lockfile(&project, &info)?;
+
+    // Signal readiness to the parent process, then continue running.
+    println!("pid={} port={ipc_port}", info.pid);
+    io::stdout().flush().ok();
+
+    let lsp = mcp::LspConnection::new(stream, workspace_dir);
+
+    let mut last_activity = Instant::now();
+    let poll_interval = Duration::from_millis(200);
+
+    let result = 'server: loop {
+        if cancellation.load(Ordering::SeqCst) {
+            break 'server Ok(());
+        }
+
+        if last_activity.elapsed() >= idle_timeout {
+            eprintln!("tool4d-lsp-stdio: idle timeout reached, shutting down");
+            break 'server Ok(());
+        }
+
+        match ipc_listener.accept() {
+            Ok((mut connection, _addr)) => {
+                last_activity = Instant::now();
+                connection
+                    .set_read_timeout(Some(Duration::from_secs(120)))
+                    .ok();
+
+                let cloned = match connection.try_clone() {
+                    Ok(cloned) => cloned,
+                    Err(_) => continue,
+                };
+                let mut reader = BufReader::new(cloned);
+                let mut line = String::new();
+
+                if reader.read_line(&mut line).is_err() || line.is_empty() {
+                    continue;
+                }
+
+                let request: tool4d_lsp_stdio::ipc::IpcRequest = match serde_json::from_str(&line)
+                {
+                    Ok(request) => request,
+                    Err(error) => {
+                        let response = tool4d_lsp_stdio::ipc::IpcResponse::failure(format!(
+                            "invalid IPC request: {error}"
+                        ));
+                        let _ = write_ipc_response(&mut connection, &response);
+                        continue;
+                    }
+                };
+
+                if matches!(request, tool4d_lsp_stdio::ipc::IpcRequest::Stop) {
+                    let response =
+                        tool4d_lsp_stdio::ipc::IpcResponse::success("stopping".to_string());
+                    let _ = write_ipc_response(&mut connection, &response);
+                    break 'server Ok(());
+                }
+
+                let response = dispatch_ipc_request(&lsp, request);
+                let _ = write_ipc_response(&mut connection, &response);
+            }
+
+            Err(error) if error.kind() == io::ErrorKind::WouldBlock => {
+                thread::sleep(poll_interval);
+            }
+
+            Err(error) => {
+                break 'server Err(error).context("failed while accepting an IPC connection");
+            }
+        }
+    };
+
+    eprintln!("tool4d-lsp-stdio: persistent MCP server stopping, shutting down tool4d");
+
+    lsp.shutdown();
+    tool4d_lsp_stdio::ipc::remove_lockfile(&project);
+
+    // ChildGuard ensures tool4d is cleaned up on drop.
+    drop(child);
+
+    result
+}
+
+fn dispatch_ipc_request(
+    lsp: &mcp::LspConnection,
+    request: tool4d_lsp_stdio::ipc::IpcRequest,
+) -> tool4d_lsp_stdio::ipc::IpcResponse {
+    use tool4d_lsp_stdio::ipc::{IpcRequest, IpcResponse};
+
+    let result = match request {
+        IpcRequest::Validate { files } => lsp.validate_files(&files),
+        IpcRequest::Hover {
+            file,
+            line,
+            character,
+        } => lsp.hover(&file, line, character),
+        IpcRequest::Completion {
+            file,
+            line,
+            character,
+        } => lsp.completion(&file, line, character),
+        IpcRequest::GotoDefinition {
+            file,
+            line,
+            character,
+        } => lsp.goto_definition(&file, line, character),
+        IpcRequest::DocumentSymbols { file } => lsp.document_symbols(&file),
+        IpcRequest::Ping => Ok("pong".to_string()),
+        IpcRequest::Stop => unreachable!("Stop is handled before dispatch"),
+    };
+
+    match result {
+        Ok(text) => IpcResponse::success(text),
+        Err(error) => IpcResponse::failure(error.to_string()),
+    }
+}
+
+fn write_ipc_response(
+    stream: &mut TcpStream,
+    response: &tool4d_lsp_stdio::ipc::IpcResponse,
+) -> Result<()> {
+    let mut line = serde_json::to_string(response)?;
+    line.push('\n');
+    stream.write_all(line.as_bytes())?;
+    stream.flush()?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// One-shot capability subcommands (hover, completion, goto-definition,
+// document-symbols)
+//
+// Each subcommand either:
+// - attaches to an already-running persistent server (when both --project
+//   and --workspace are omitted), or
+// - starts a private, self-contained tool4d session, performs one request,
+//   and shuts down (mirroring `validate`'s one-shot design).
+// ---------------------------------------------------------------------------
+
+/// Resolves the single input file argument against the workspace/project,
+/// the same way `validate` resolves its file list, and formats it relative
+/// to the workspace for display and for the LSP call.
+fn resolve_one_shot_file(
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    workspace_dir: &Path,
+    file: &Path,
+) -> (PathBuf, String) {
+    let base_dir = workspace
+        .map(Path::to_path_buf)
+        .or_else(|| {
+            explicit_project
+                .and_then(|p| p.parent())
+                .and_then(|p| p.parent())
+                .map(Path::to_path_buf)
+        })
+        .unwrap_or_else(|| env::current_dir().unwrap_or_default());
+
+    let resolved = if file.is_relative() {
+        base_dir.join(file)
+    } else {
+        file.to_path_buf()
+    };
+
+    let display = resolved
+        .strip_prefix(workspace_dir)
+        .unwrap_or(&resolved)
+        .display()
+        .to_string();
+
+    (resolved, display)
+}
+
+/// Try to serve a one-shot request by attaching to an already-running
+/// persistent server. Walks upward from the current directory looking for a
+/// `.4DProject` file (checking the cwd itself, then each ancestor directory)
+/// and checks whether a live persistent server is registered for it. Only
+/// used when both `--project` and `--workspace` are omitted.
+fn try_attach_and_dispatch(request: tool4d_lsp_stdio::ipc::IpcRequest) -> Result<Option<String>> {
+    let cwd = env::current_dir().context("failed to determine the current directory")?;
+
+    let mut dir = Some(cwd.as_path());
+    while let Some(candidate_dir) = dir {
+        let mut projects = Vec::new();
+        let _ = find_projects(candidate_dir, 0, &mut projects);
+
+        for project in projects {
+            if let Some(server) = tool4d_lsp_stdio::ipc::find_running_server(&project) {
+                let response = tool4d_lsp_stdio::ipc::send_request(server.port, &request)?;
+                return if response.ok {
+                    Ok(Some(response.result.unwrap_or_default()))
+                } else {
+                    bail!(response.error.unwrap_or_else(|| "IPC request failed".to_string()));
+                };
+            }
+        }
+
+        dir = candidate_dir.parent();
+    }
+
+    Ok(None)
+}
+
+/// Runs one `body` capability call against a freshly-started, private LSP
+/// session: opens `display_file`, invokes `body`, closes the file again, and
+/// always attempts a graceful LSP shutdown before the caller drops the
+/// `ChildGuard`.
+fn run_standalone_one_shot(
+    options: &StartOptions<'_>,
+    file: &Path,
+    body: impl FnOnce(&mcp::LspConnection, &str) -> anyhow::Result<String>,
+) -> Result<String> {
+    let (stream, child, workspace_dir, _cancellation) = start_lsp_session(options)?;
+    let (_resolved_file, display_file) = resolve_one_shot_file(
+        options.explicit_project,
+        options.workspace,
+        &workspace_dir,
+        file,
+    );
+
+    let lsp = mcp::LspConnection::new(stream, workspace_dir);
+
+    let opened = lsp.open_file(&display_file);
+    let result = opened.and_then(|_| body(&lsp, &display_file));
+    let _ = lsp.close_file(&display_file);
+
+    lsp.shutdown();
+    drop(child);
+
+    result
+}
+
+const NO_SERVER_ERROR: &str = "no running MCP server found for this project; \
+start one with `mcp`, or pass --project/--workspace to run standalone";
+
+#[allow(clippy::too_many_arguments)]
+fn hover_command(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    file: PathBuf,
+    line: u32,
+    character: u32,
+) -> Result<()> {
+    if explicit_project.is_none() && workspace.is_none() {
+        let file_str = file.display().to_string();
+        if let Some(result) = try_attach_and_dispatch(tool4d_lsp_stdio::ipc::IpcRequest::Hover {
+            file: file_str,
+            line,
+            character,
+        })? {
+            print_one_shot_result(&result, json_output);
+            return Ok(());
+        }
+        bail!(NO_SERVER_ERROR);
+    }
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
+        lsp.hover(display_file, line, character)
+    })?;
+
+    print_one_shot_result(&result, json_output);
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn completion_command(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    file: PathBuf,
+    line: u32,
+    character: u32,
+) -> Result<()> {
+    if explicit_project.is_none() && workspace.is_none() {
+        let file_str = file.display().to_string();
+        if let Some(result) =
+            try_attach_and_dispatch(tool4d_lsp_stdio::ipc::IpcRequest::Completion {
+                file: file_str,
+                line,
+                character,
+            })?
+        {
+            print_one_shot_result(&result, json_output);
+            return Ok(());
+        }
+        bail!(NO_SERVER_ERROR);
+    }
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
+        lsp.completion(display_file, line, character)
+    })?;
+
+    print_one_shot_result(&result, json_output);
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn goto_definition_command(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    file: PathBuf,
+    line: u32,
+    character: u32,
+) -> Result<()> {
+    if explicit_project.is_none() && workspace.is_none() {
+        let file_str = file.display().to_string();
+        if let Some(result) =
+            try_attach_and_dispatch(tool4d_lsp_stdio::ipc::IpcRequest::GotoDefinition {
+                file: file_str,
+                line,
+                character,
+            })?
+        {
+            print_one_shot_result(&result, json_output);
+            return Ok(());
+        }
+        bail!(NO_SERVER_ERROR);
+    }
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
+        lsp.goto_definition(display_file, line, character)
+    })?;
+
+    print_one_shot_result(&result, json_output);
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn document_symbols_command(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    file: PathBuf,
+) -> Result<()> {
+    if explicit_project.is_none() && workspace.is_none() {
+        let file_str = file.display().to_string();
+        if let Some(result) =
+            try_attach_and_dispatch(tool4d_lsp_stdio::ipc::IpcRequest::DocumentSymbols {
+                file: file_str,
+            })?
+        {
+            print_one_shot_result(&result, json_output);
+            return Ok(());
+        }
+        bail!(NO_SERVER_ERROR);
+    }
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
+        lsp.document_symbols(display_file)
+    })?;
+
+    print_one_shot_result(&result, json_output);
+    Ok(())
+}
+
+fn print_one_shot_result(result: &str, json_output: bool) {
+    if json_output {
+        println!("{}", serde_json::json!({ "result": result }));
+    } else {
+        println!("{result}");
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Validate subcommand
+// ---------------------------------------------------------------------------
+
 
 #[allow(clippy::too_many_arguments)]
 fn validate(
