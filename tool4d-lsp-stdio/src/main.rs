@@ -1034,12 +1034,14 @@ fn mcp_daemonize(options: &StartOptions<'_>, idle_timeout: Duration) -> Result<(
         "--shutdown-timeout={}",
         options.shutdown_timeout.as_secs()
     ));
-    if options.skip_onstartup {
-        command.arg("--skip-onstartup");
-    }
-    if options.dataless {
-        command.arg("--dataless");
-    }
+    // Unlike the flags passed to the real tool4d executable elsewhere in
+    // this file, `--skip-onstartup`/`--dataless` here target this same
+    // binary's own CLI (re-exec'd as `mcp --internal-mcp-worker`), where
+    // they are declared with `action = ArgAction::Set` and therefore
+    // require an explicit `=true`/`=false` value rather than being bare
+    // presence flags.
+    command.arg(format!("--skip-onstartup={}", options.skip_onstartup));
+    command.arg(format!("--dataless={}", options.dataless));
     if let Some(log_level) = options.log_level {
         command.arg(format!("--log-level={log_level}"));
     }
@@ -1228,24 +1230,35 @@ fn dispatch_ipc_request(
 ) -> tool4d_lsp_stdio::ipc::IpcResponse {
     use tool4d_lsp_stdio::ipc::{IpcRequest, IpcResponse};
 
+    // Position/file-based capabilities require the file to already be open
+    // in this LSP session (`textDocument/didOpen`); a one-shot standalone
+    // call handles this itself via `run_standalone_one_shot`, but attached
+    // IPC requests hit `LspConnection` methods directly, so open (or
+    // re-open; `open_file` is idempotent) the file here first.
     let result = match request {
         IpcRequest::Validate { files } => lsp.validate_files(&files),
         IpcRequest::Hover {
             file,
             line,
             character,
-        } => lsp.hover(&file, line, character),
+        } => lsp.open_file(&file).and_then(|_| lsp.hover(&file, line, character)),
         IpcRequest::Completion {
             file,
             line,
             character,
-        } => lsp.completion(&file, line, character),
+        } => lsp
+            .open_file(&file)
+            .and_then(|_| lsp.completion(&file, line, character)),
         IpcRequest::GotoDefinition {
             file,
             line,
             character,
-        } => lsp.goto_definition(&file, line, character),
-        IpcRequest::DocumentSymbols { file } => lsp.document_symbols(&file),
+        } => lsp
+            .open_file(&file)
+            .and_then(|_| lsp.goto_definition(&file, line, character)),
+        IpcRequest::DocumentSymbols { file } => {
+            lsp.open_file(&file).and_then(|_| lsp.document_symbols(&file))
+        }
         IpcRequest::Ping => Ok("pong".to_string()),
         IpcRequest::Stop => unreachable!("Stop is handled before dispatch"),
     };
