@@ -21,6 +21,8 @@ use clap::{ArgAction, Parser, Subcommand};
 use tool4d_lsp_stdio::process::{ChildGuard, configure_process_supervision};
 use tool4d_lsp_stdio::relay::{Relay, RelayEvent};
 
+mod mcp;
+
 #[derive(Debug, Parser)]
 #[command(
     name = "tool4d-lsp-stdio",
@@ -162,6 +164,59 @@ enum BridgeCommand {
         #[arg(required = true)]
         files: Vec<PathBuf>,
     },
+
+    /// Start an MCP server that wraps the 4D LSP.
+    ///
+    /// Keeps a persistent tool4d LSP session alive and exposes LSP
+    /// capabilities (validate, completion, hover, goto_definition,
+    /// document_symbols) as MCP tools over stdio.
+    Mcp {
+        /// Path to the tool4d executable.
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+
+        /// Explicit path to a .4DProject file.
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+
+        /// Workspace in which to search for a .4DProject file.
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+
+        /// Local TCP port on which the adapter listens for tool4d.
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+
+        /// Number of seconds to wait for tool4d to connect.
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+
+        /// Number of seconds to wait before force-killing tool4d.
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+
+        /// Prevent execution of project startup database methods.
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+
+        /// Open the project without a data file.
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+
+        /// Diagnostic log level passed to tool4d.
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+    },
 }
 
 fn main() -> ExitCode {
@@ -243,6 +298,28 @@ fn run() -> Result<()> {
             log_level.as_deref(),
             json,
             &files,
+        ),
+
+        BridgeCommand::Mcp {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+        } => run_mcp_server(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
         ),
     }
 }
@@ -337,6 +414,173 @@ fn launch(
 // ---------------------------------------------------------------------------
 // Validate subcommand
 // ---------------------------------------------------------------------------
+
+#[allow(clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
+fn run_mcp_server(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+) -> Result<()> {
+    let tool = resolve_tool(requested_tool)?;
+    let project = resolve_project(explicit_project, workspace)?;
+    let cancellation = install_signal_handlers()?;
+
+    let workspace_dir = workspace
+        .map(Path::to_path_buf)
+        .or_else(|| {
+            explicit_project
+                .and_then(|p| p.parent())
+                .and_then(|p| p.parent())
+                .map(Path::to_path_buf)
+        })
+        .unwrap_or_else(|| env::current_dir().unwrap_or_default());
+
+    let workspace_dir = workspace_dir
+        .canonicalize()
+        .unwrap_or(workspace_dir);
+
+    let listener = create_listener(requested_port)?;
+    let listener_address = listener
+        .local_addr()
+        .context("failed to obtain the bridge listener address")?;
+
+    let port = listener_address.port();
+
+    let mut command = Command::new(&tool);
+
+    command
+        .arg(format!("--project={}", project.display()))
+        .arg(format!("--lsp={port}"))
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit());
+
+    if skip_onstartup {
+        command.arg("--skip-onstartup");
+    }
+
+    if dataless {
+        command.arg("--dataless");
+    }
+
+    if let Some(log_level) = log_level {
+        command.arg(format!("--log-level={log_level}"));
+    }
+
+    configure_process_supervision(&mut command);
+
+    eprintln!("tool4d-lsp-stdio: listening for tool4d on {listener_address}");
+    log_command(&tool, command.get_args());
+
+    let mut child = command
+        .spawn()
+        .with_context(|| format!("failed to start {}", tool.display()))?;
+
+    if let Some(stdout) = child.stdout.take() {
+        forward_tool4d_stdout(stdout);
+    }
+
+    let mut child = match ChildGuard::new(child, shutdown_timeout) {
+        Ok(child) => child,
+        Err((mut child, error)) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error).context("failed to install process supervision for tool4d");
+        }
+    };
+
+    let mut stream = accept_with_timeout(&listener, &mut child, startup_timeout, &cancellation)?;
+    drop(listener);
+
+    // Perform LSP initialization.
+    let project_dir = project
+        .parent()
+        .and_then(|p| p.parent())
+        .unwrap_or(project.parent().unwrap_or(Path::new(".")));
+    let root_path = project_dir
+        .canonicalize()
+        .unwrap_or_else(|_| project_dir.to_path_buf());
+    let root_uri = path_to_file_uri(&root_path);
+
+    let initialize_params = serde_json::json!({
+        "processId": std::process::id(),
+        "capabilities": {
+            "textDocument": {
+                "publishDiagnostics": { "relatedInformation": true }
+            }
+        },
+        "rootUri": root_uri,
+        "workspaceFolders": [{
+            "uri": root_uri,
+            "name": project_dir.file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+        }],
+        "initializationOptions": {
+            "diagnostics": { "enable": true, "scope": "Workspace" },
+            "dependencies": { "enable": true }
+        }
+    });
+
+    send_lsp_request(&mut stream, 1, "initialize", initialize_params)?;
+
+    let timeout = Duration::from_secs(60);
+    loop {
+        let msg = read_lsp_message(&mut stream, timeout)
+            .context("waiting for initialize response")?;
+        if msg.get("id") == Some(&serde_json::json!(1)) {
+            break;
+        }
+    }
+
+    send_lsp_notification(&mut stream, "initialized", serde_json::json!({}))?;
+
+    // Drain any startup notifications briefly.
+    let drain_timeout = Duration::from_secs(3);
+    loop {
+        match read_lsp_message(&mut stream, drain_timeout) {
+            Ok(_) => {}
+            Err(_) => break,
+        }
+    }
+
+    eprintln!("tool4d-lsp-stdio: LSP initialized, starting MCP server on stdio");
+
+    // Build the MCP server and run it.
+    let lsp = std::sync::Arc::new(mcp::LspConnection::new(stream, workspace_dir));
+    let server = mcp::Tool4dMcpServer::new(lsp);
+
+    let rt = tokio::runtime::Runtime::new().context("failed to create tokio runtime")?;
+    let result = rt.block_on(async {
+        use rmcp::ServiceExt;
+
+        let service = server
+            .serve(rmcp::transport::stdio())
+            .await
+            .map_err(|e| anyhow::anyhow!("MCP serve error: {e}"))?;
+
+        service
+            .waiting()
+            .await
+            .map_err(|e| anyhow::anyhow!("MCP server error: {e}"))?;
+
+        Ok(())
+    });
+
+    eprintln!("tool4d-lsp-stdio: MCP server stopped, shutting down tool4d");
+
+    // ChildGuard ensures tool4d is cleaned up on drop.
+    drop(child);
+
+    result
+}
 
 #[allow(clippy::too_many_arguments)]
 fn validate(
