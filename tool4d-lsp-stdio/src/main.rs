@@ -1263,6 +1263,42 @@ fn discover_vscode_analyzer_tool() -> Result<Option<PathBuf>> {
         }
     }
 
+    #[cfg(target_os = "linux")]
+    {
+        let config_dir = env::var_os("XDG_CONFIG_HOME")
+            .map(PathBuf::from)
+            .or_else(|| home_directory().map(|h| h.join(".config")));
+
+        if let Some(config) = config_dir {
+            roots.push(
+                config
+                    .join("Code")
+                    .join("User")
+                    .join("globalStorage")
+                    .join("4d.4d-analyzer")
+                    .join("tool4d"),
+            );
+
+            roots.push(
+                config
+                    .join("Code - Insiders")
+                    .join("User")
+                    .join("globalStorage")
+                    .join("4d.4d-analyzer")
+                    .join("tool4d"),
+            );
+
+            roots.push(
+                config
+                    .join("VSCodium")
+                    .join("User")
+                    .join("globalStorage")
+                    .join("4d.4d-analyzer")
+                    .join("tool4d"),
+            );
+        }
+    }
+
     let mut candidates = Vec::new();
 
     for root in roots {
@@ -1455,7 +1491,57 @@ fn discover_conventional_tool() -> Result<Option<PathBuf>> {
 
     #[cfg(not(target_os = "macos"))]
     {
-        Ok(None)
+        let mut candidates = Vec::new();
+
+        #[cfg(windows)]
+        {
+            // Search Program Files\4D\<version>\tool4d\tool4d.exe
+            for env_key in &["ProgramFiles", "ProgramFiles(x86)"] {
+                if let Some(pf) = env::var_os(env_key) {
+                    let fourd_dir = PathBuf::from(pf).join("4D");
+                    if fourd_dir.is_dir() {
+                        if let Ok(entries) = fs::read_dir(&fourd_dir) {
+                            for entry in entries.flatten() {
+                                let candidate = entry.path().join("tool4d").join("tool4d.exe");
+                                if is_valid_tool_candidate(&candidate) {
+                                    candidates.push(candidate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            // Common locations for manually extracted tool4d on Linux.
+            let fixed_paths = [
+                PathBuf::from("/opt/4d/tool4d"),
+                PathBuf::from("/usr/local/bin/tool4d"),
+            ];
+            for path in &fixed_paths {
+                if is_valid_tool_candidate(path) {
+                    candidates.push(path.clone());
+                }
+            }
+            // Also search /opt/4D*/tool4d for versioned installs.
+            if let Ok(entries) = fs::read_dir("/opt") {
+                for entry in entries.flatten() {
+                    let name = entry.file_name();
+                    let name = name.to_string_lossy();
+                    if name.starts_with("4D") || name.starts_with("4d") {
+                        let candidate = entry.path().join("tool4d");
+                        if is_valid_tool_candidate(&candidate) {
+                            candidates.push(candidate);
+                        }
+                    }
+                }
+            }
+        }
+
+        candidates.sort();
+        Ok(candidates.pop())
     }
 }
 
@@ -1505,7 +1591,7 @@ fn collect_macos_application_candidates(
     Ok(())
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 fn home_directory() -> Option<PathBuf> {
     env::var_os("HOME").map(PathBuf::from)
 }
