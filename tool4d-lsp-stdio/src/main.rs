@@ -165,6 +165,71 @@ enum BridgeCommand {
         files: Vec<PathBuf>,
     },
 
+    /// Run a project-wide compile-check pass and report diagnostics.
+    ///
+    /// Wraps the custom `experimental/checkSyntax` LSP request (the same
+    /// request the 4D Analyzer VS Code extension's "Check workspace syntax"
+    /// command uses). Unlike `validate`, which pulls diagnostics per file,
+    /// this sends a single request and lets tool4d report diagnostics for
+    /// the whole project in one response.
+    CheckSyntax {
+        /// Path to the tool4d executable.
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+
+        /// Explicit path to a .4DProject file.
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+
+        /// Workspace in which to search for a .4DProject file.
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+
+        /// Local TCP port on which the adapter listens for tool4d.
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+
+        /// Number of seconds to wait for tool4d to connect.
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+
+        /// Number of seconds to wait before force-killing tool4d.
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+
+        /// Prevent execution of project startup database methods.
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+
+        /// Open the project without a data file.
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+
+        /// Diagnostic log level passed to tool4d.
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+
+        /// Output raw LSP diagnostics as a JSON array.
+        #[arg(long)]
+        json: bool,
+
+        /// Optional .4dm files to open (via didOpen) before requesting the
+        /// check. Since the check is project-wide, not per-file, this is
+        /// optional; when omitted, any file under the project's `Sources/`
+        /// tree is opened and used as the request's anchor document.
+        files: Vec<PathBuf>,
+    },
+
     /// Start an MCP server that wraps the 4D LSP.
     ///
     /// Keeps a persistent tool4d LSP session alive and exposes LSP
@@ -482,6 +547,32 @@ fn run() -> Result<()> {
             json,
             files,
         } => validate(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            json,
+            &files,
+        ),
+
+        BridgeCommand::CheckSyntax {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            json,
+            files,
+        } => check_syntax(
             tool.as_deref(),
             project.as_deref(),
             workspace.as_deref(),
@@ -1949,6 +2040,296 @@ fn format_diagnostics(all: &[CollectedDiagnostic], json_output: bool) -> Result<
     }
 
     Ok(has_errors)
+}
+
+// ---------------------------------------------------------------------------
+// CheckSyntax subcommand
+// ---------------------------------------------------------------------------
+
+/// Maximum time to wait for the `experimental/checkSyntax` response. This is
+/// a full project compile-check, so it is given much more headroom than the
+/// per-file `textDocument/diagnostic` pulls `validate` uses.
+const CHECK_SYNTAX_TIMEOUT: Duration = Duration::from_secs(300);
+
+#[allow(clippy::too_many_arguments)]
+fn check_syntax(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    json_output: bool,
+    files: &[PathBuf],
+) -> Result<()> {
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+    };
+
+    let (mut stream, child, workspace_dir, _cancellation) = start_lsp_session(&options)?;
+
+    // Resolve any explicitly given files the same way `validate` does.
+    let base_dir = workspace
+        .map(Path::to_path_buf)
+        .or_else(|| {
+            explicit_project
+                .and_then(|p| p.parent())
+                .and_then(|p| p.parent())
+                .map(Path::to_path_buf)
+        })
+        .unwrap_or_else(|| env::current_dir().unwrap_or_default());
+
+    let resolved_files: Vec<(PathBuf, PathBuf)> = files
+        .iter()
+        .map(|f| {
+            let display_path = f.clone();
+            let resolved = if f.is_relative() {
+                base_dir.join(f)
+            } else {
+                f.to_path_buf()
+            };
+            (resolved, display_path)
+        })
+        .collect();
+
+    let result = run_check_syntax_session(&mut stream, &workspace_dir, &resolved_files);
+
+    // Always attempt graceful shutdown.
+    let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
+    let _ = read_lsp_message(&mut stream, Duration::from_secs(5));
+    let _ = send_lsp_notification(&mut stream, "exit", serde_json::json!(null));
+
+    // ChildGuard ensures tool4d is cleaned up on drop.
+    drop(child);
+
+    let all_diagnostics = result.context("LSP checkSyntax session failed")?;
+
+    // Format output using the same shape `validate --json` already uses.
+    let has_errors = format_diagnostics(&all_diagnostics, json_output)?;
+
+    if has_errors {
+        bail!("");
+    }
+
+    Ok(())
+}
+
+fn run_check_syntax_session(
+    stream: &mut TcpStream,
+    workspace_dir: &Path,
+    files: &[(PathBuf, PathBuf)],
+) -> Result<Vec<CollectedDiagnostic>> {
+    // Build a URI list for any explicitly requested files, verifying they
+    // exist, exactly as `validate` does.
+    let mut file_uris: Vec<(String, String)> = Vec::new(); // (uri, display_name)
+    for (file_path, display_path) in files {
+        let canonical = file_path
+            .canonicalize()
+            .with_context(|| format!("file not found: {}", display_path.display()))?;
+        let uri = path_to_file_uri(&canonical);
+        file_uris.push((uri, display_path.display().to_string()));
+    }
+
+    // The check is project-wide, so files are optional. When none were
+    // given, pick any .4dm file under the project's Sources/ tree to use as
+    // the request's anchor document.
+    if file_uris.is_empty() {
+        let sources_dir = workspace_dir.join("Sources");
+        let search_root = if sources_dir.is_dir() {
+            sources_dir
+        } else {
+            workspace_dir.to_path_buf()
+        };
+
+        let anchor = find_first_4dm_file(&search_root).with_context(|| {
+            format!("no .4dm files found under {}", search_root.display())
+        })?;
+
+        let display = uri_display_path(&anchor, workspace_dir);
+        let uri = path_to_file_uri(&anchor);
+        eprintln!("tool4d-lsp-stdio: check-syntax: auto-selected anchor {uri}");
+        file_uris.push((uri, display));
+    }
+
+    // Open each requested/anchor document first, in case tool4d needs at
+    // least one known/open document to accept a valid anchor URI.
+    for (uri, _display) in &file_uris {
+        let file_path = uri.strip_prefix("file://").unwrap_or(uri);
+        let content = std::fs::read_to_string(file_path)
+            .with_context(|| format!("failed to read {file_path}"))?;
+        send_lsp_notification(
+            stream,
+            "textDocument/didOpen",
+            serde_json::json!({
+                "textDocument": {
+                    "uri": uri,
+                    "languageId": "4d",
+                    "version": 1,
+                    "text": content
+                }
+            }),
+        )?;
+        eprintln!("tool4d-lsp-stdio: check-syntax: didOpen {uri}");
+    }
+
+    // Wait briefly for the server to process the newly opened document(s)
+    // (installComponents, etc.) before issuing the project-wide check.
+    let settle_timeout = Duration::from_secs(5);
+    let settle_start = Instant::now();
+    loop {
+        let remaining = settle_timeout.saturating_sub(settle_start.elapsed());
+        if remaining.is_zero() {
+            break;
+        }
+        match read_lsp_message(stream, remaining) {
+            Ok(msg) => log_lsp_incoming(&msg),
+            Err(_) => break,
+        }
+    }
+
+    // Send exactly one experimental/checkSyntax request, anchored at the
+    // first opened document. Per the 4D Analyzer VS Code extension
+    // (commands.ts), this param is just an arbitrary open document, not a
+    // filter: the response covers the whole project regardless of which
+    // document was passed.
+    let (anchor_uri, _) = &file_uris[0];
+    eprintln!(
+        "tool4d-lsp-stdio: check-syntax: requesting experimental/checkSyntax anchored at {anchor_uri}"
+    );
+
+    send_lsp_request(
+        stream,
+        2,
+        "experimental/checkSyntax",
+        serde_json::json!({ "uri": anchor_uri }),
+    )?;
+
+    let response = loop {
+        let msg = read_lsp_message(stream, CHECK_SYNTAX_TIMEOUT)
+            .context("waiting for experimental/checkSyntax response")?;
+        log_lsp_incoming(&msg);
+        if msg.get("id") == Some(&serde_json::json!(2)) {
+            break msg;
+        }
+    };
+
+    // The response is a WorkspaceDiagnosticReport: `{ items: [...] }`, where
+    // each entry is a WorkspaceFullDocumentDiagnosticReport whose own
+    // per-file diagnostics are, confusingly, also named `items`. Normalize
+    // that inner field to `diagnostics` here so `--json` output matches
+    // `validate --json`'s contract exactly.
+    let report_items = response
+        .get("result")
+        .and_then(|r| r.get("items"))
+        .and_then(|i| i.as_array())
+        .cloned()
+        .unwrap_or_default();
+
+    let opened_uris: std::collections::HashSet<&str> =
+        file_uris.iter().map(|(uri, _)| uri.as_str()).collect();
+
+    eprintln!(
+        "tool4d-lsp-stdio: check-syntax: workspace report covers {} file(s) ({} explicitly opened)",
+        report_items.len(),
+        opened_uris.len()
+    );
+
+    let mut all_diagnostics = Vec::with_capacity(report_items.len());
+
+    for item in &report_items {
+        let uri = item
+            .get("uri")
+            .and_then(|u| u.as_str())
+            .unwrap_or_default()
+            .to_string();
+
+        // `kind: "unchanged"` reports carry a `resultId` instead of `items`;
+        // treat those as having no new diagnostics to report.
+        let diagnostics = item
+            .get("items")
+            .and_then(|d| d.as_array())
+            .cloned()
+            .unwrap_or_default();
+
+        let was_opened = opened_uris.contains(uri.as_str());
+        let display = uri_to_display_path(&uri, workspace_dir);
+
+        eprintln!(
+            "tool4d-lsp-stdio: check-syntax: got {} diagnostic(s) for {} (previously opened: {})",
+            diagnostics.len(),
+            display,
+            was_opened
+        );
+
+        all_diagnostics.push(CollectedDiagnostic {
+            file: display,
+            uri,
+            diagnostics,
+        });
+    }
+
+    Ok(all_diagnostics)
+}
+
+/// Recursively finds the first `.4dm` file (by name, sorted per directory
+/// for determinism) under `dir`. Used to pick an anchor document for
+/// `check-syntax` when no files were given on the command line.
+fn find_first_4dm_file(dir: &Path) -> Option<PathBuf> {
+    let mut entries: Vec<_> = fs::read_dir(dir).ok()?.filter_map(|e| e.ok()).collect();
+    entries.sort_by_key(|entry| entry.file_name());
+
+    // Prefer files at this level before descending into subdirectories.
+    for entry in &entries {
+        let path = entry.path();
+        if path.is_file()
+            && path
+                .extension()
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("4dm"))
+        {
+            return Some(path);
+        }
+    }
+
+    for entry in &entries {
+        let path = entry.path();
+        if path.is_dir()
+            && let Some(found) = find_first_4dm_file(&path)
+        {
+            return Some(found);
+        }
+    }
+
+    None
+}
+
+/// Formats an on-disk path for display, relative to `workspace_dir` when
+/// possible.
+fn uri_display_path(path: &Path, workspace_dir: &Path) -> String {
+    path.strip_prefix(workspace_dir)
+        .unwrap_or(path)
+        .display()
+        .to_string()
+}
+
+/// Converts a `file://` URI back to a display path, relative to
+/// `workspace_dir` when possible. Used for entries in the
+/// `experimental/checkSyntax` response that were never explicitly opened by
+/// this process (the anchor's response is project-wide).
+fn uri_to_display_path(uri: &str, workspace_dir: &Path) -> String {
+    let path_str = uri.strip_prefix("file://").unwrap_or(uri);
+    uri_display_path(Path::new(path_str), workspace_dir)
 }
 
 // ---------------------------------------------------------------------------
