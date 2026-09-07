@@ -34,6 +34,37 @@ struct Cli {
     command: BridgeCommand,
 }
 
+/// The non-standard `initializationOptions.diagnostics.scope` value 4D
+/// Analyzer VS Code extension sends (see `editor/package.json`'s
+/// `4D-Analyzer.diagnostics.scope` setting and `LanguageServerManager.ts`,
+/// which spreads the extension's configuration section straight into
+/// `initializationOptions`). `Workspace` checks every method project-wide;
+/// `Document` checks only documents this session explicitly opens.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+enum DiagnosticsScope {
+    Document,
+    Workspace,
+}
+
+impl DiagnosticsScope {
+    /// The exact string tool4d expects for this scope.
+    fn as_lsp_str(self) -> &'static str {
+        match self {
+            DiagnosticsScope::Document => "Document",
+            DiagnosticsScope::Workspace => "Workspace",
+        }
+    }
+}
+
+impl std::fmt::Display for DiagnosticsScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            DiagnosticsScope::Document => "document",
+            DiagnosticsScope::Workspace => "workspace",
+        })
+    }
+}
+
 #[derive(Debug, Subcommand)]
 enum BridgeCommand {
     /// Start tool4d and relay its TCP connection over stdin/stdout.
@@ -156,6 +187,14 @@ enum BridgeCommand {
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
 
+        /// Scope of the non-standard `initializationOptions.diagnostics`
+        /// LSP option (the same option the 4D Analyzer VS Code extension
+        /// sends per its `4D-Analyzer.diagnostics.scope` setting).
+        /// `workspace` checks every method project-wide; `document` checks
+        /// only documents this session explicitly opens.
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
+
         /// Output raw LSP diagnostics as a JSON array.
         #[arg(long)]
         json: bool,
@@ -218,6 +257,14 @@ enum BridgeCommand {
         /// Diagnostic log level passed to tool4d.
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+
+        /// Scope of the non-standard `initializationOptions.diagnostics`
+        /// LSP option (the same option the 4D Analyzer VS Code extension
+        /// sends per its `4D-Analyzer.diagnostics.scope` setting).
+        /// `workspace` checks every method project-wide; `document` checks
+        /// only documents this session explicitly opens.
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
 
         /// Output raw LSP diagnostics as a JSON array.
         #[arg(long)]
@@ -282,6 +329,14 @@ enum BridgeCommand {
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
 
+        /// Scope of the non-standard `initializationOptions.diagnostics`
+        /// LSP option (the same option the 4D Analyzer VS Code extension
+        /// sends per its `4D-Analyzer.diagnostics.scope` setting).
+        /// `workspace` checks every method project-wide; `document` checks
+        /// only documents this session explicitly opens.
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
+
         /// Run over stdio in the foreground instead of daemonizing.
         ///
         /// This is the pre-existing default `mcp` behavior, preserved for
@@ -340,6 +395,13 @@ enum BridgeCommand {
         dataless: bool,
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+        /// Scope of the non-standard `initializationOptions.diagnostics`
+        /// LSP option (the same option the 4D Analyzer VS Code extension
+        /// sends per its `4D-Analyzer.diagnostics.scope` setting).
+        /// `workspace` checks every method project-wide; `document` checks
+        /// only documents this session explicitly opens.
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
         /// Output structured JSON instead of human-readable text.
         #[arg(long)]
         json: bool,
@@ -387,6 +449,8 @@ enum BridgeCommand {
         dataless: bool,
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
         #[arg(long)]
         json: bool,
         #[arg(long)]
@@ -430,6 +494,8 @@ enum BridgeCommand {
         dataless: bool,
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
         #[arg(long)]
         json: bool,
         #[arg(long)]
@@ -473,6 +539,8 @@ enum BridgeCommand {
         dataless: bool,
         #[arg(long, env = "TOOL4D_LOG_LEVEL")]
         log_level: Option<String>,
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
         #[arg(long)]
         json: bool,
         file: PathBuf,
@@ -544,6 +612,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             files,
         } => validate(
@@ -556,6 +625,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             &files,
         ),
@@ -570,6 +640,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             files,
         } => check_syntax(
@@ -582,6 +653,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             &files,
         ),
@@ -596,6 +668,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             foreground,
             stop,
             idle_timeout,
@@ -610,6 +683,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             foreground,
             stop,
             internal_mcp_worker,
@@ -626,6 +700,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             line,
             character,
@@ -640,6 +715,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             file,
             line,
@@ -656,6 +732,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             line,
             character,
@@ -670,6 +747,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             file,
             line,
@@ -686,6 +764,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             line,
             character,
@@ -700,6 +779,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             file,
             line,
@@ -716,6 +796,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level,
+            diagnostics_scope,
             json,
             file,
         } => document_symbols_command(
@@ -728,6 +809,7 @@ fn run() -> Result<()> {
             skip_onstartup,
             dataless,
             log_level.as_deref(),
+            diagnostics_scope,
             json,
             file,
         ),
@@ -839,6 +921,7 @@ struct StartOptions<'a> {
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&'a str>,
+    diagnostics_scope: DiagnosticsScope,
 }
 
 /// Resolves the workspace directory used to make relative file paths
@@ -953,7 +1036,10 @@ fn start_lsp_session(
                 .to_string_lossy()
         }],
         "initializationOptions": {
-            "diagnostics": { "enable": true, "scope": "Workspace" },
+            "diagnostics": {
+                "enable": true,
+                "scope": options.diagnostics_scope.as_lsp_str()
+            },
             "dependencies": { "enable": true }
         }
     });
@@ -993,6 +1079,7 @@ fn run_mcp_server(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     foreground: bool,
     stop: bool,
     internal_worker: bool,
@@ -1012,6 +1099,7 @@ fn run_mcp_server(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     if internal_worker {
@@ -1489,6 +1577,7 @@ fn hover_command(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     file: PathBuf,
     line: u32,
@@ -1517,6 +1606,7 @@ fn hover_command(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
@@ -1538,6 +1628,7 @@ fn completion_command(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     file: PathBuf,
     line: u32,
@@ -1568,6 +1659,7 @@ fn completion_command(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
@@ -1589,6 +1681,7 @@ fn goto_definition_command(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     file: PathBuf,
     line: u32,
@@ -1619,6 +1712,7 @@ fn goto_definition_command(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
@@ -1640,6 +1734,7 @@ fn document_symbols_command(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     file: PathBuf,
 ) -> Result<()> {
@@ -1666,6 +1761,7 @@ fn document_symbols_command(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     let result = run_standalone_one_shot(&options, &file, |lsp, display_file| {
@@ -1700,6 +1796,7 @@ fn validate(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     files: &[PathBuf],
 ) -> Result<()> {
@@ -1785,7 +1882,7 @@ fn validate(
     drop(listener);
 
     // Drive the LSP protocol directly.
-    let result = run_validate_session(&mut stream, &project, &resolved_files);
+    let result = run_validate_session(&mut stream, &project, diagnostics_scope, &resolved_files);
 
     // Always attempt graceful shutdown.
     let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
@@ -1818,6 +1915,7 @@ struct CollectedDiagnostic {
 fn run_validate_session(
     stream: &mut TcpStream,
     project: &Path,
+    diagnostics_scope: DiagnosticsScope,
     files: &[(PathBuf, PathBuf)],
 ) -> Result<Vec<CollectedDiagnostic>> {
     let project_dir = project
@@ -1861,7 +1959,7 @@ fn run_validate_session(
         "initializationOptions": {
             "diagnostics": {
                 "enable": true,
-                "scope": "Workspace"
+                "scope": diagnostics_scope.as_lsp_str()
             },
             "dependencies": {
                 "enable": true
@@ -2062,6 +2160,7 @@ fn check_syntax(
     skip_onstartup: bool,
     dataless: bool,
     log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
     json_output: bool,
     files: &[PathBuf],
 ) -> Result<()> {
@@ -2075,6 +2174,7 @@ fn check_syntax(
         skip_onstartup,
         dataless,
         log_level,
+        diagnostics_scope,
     };
 
     let (mut stream, child, workspace_dir, _cancellation) = start_lsp_session(&options)?;
