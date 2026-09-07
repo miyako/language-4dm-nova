@@ -277,6 +277,81 @@ enum BridgeCommand {
         files: Vec<PathBuf>,
     },
 
+    /// Tell tool4d to load already-downloaded 4D components.
+    ///
+    /// Wraps the custom `dependency/installComponents` LSP notification
+    /// (the same one the 4D Analyzer VS Code extension sends after it
+    /// downloads a project's dependencies via `dependencies.json`). This
+    /// subcommand does **not** fetch or download anything itself: it
+    /// assumes components are already present on disk (e.g. fetched
+    /// out-of-band or by a prior IDE session) and just asks tool4d to
+    /// (re)load them, waiting for the matching
+    /// `dependency/installComponents/done` notification before exiting.
+    InstallComponents {
+        /// Path to the tool4d executable.
+        #[arg(long, env = "TOOL4D_PATH")]
+        tool: Option<PathBuf>,
+
+        /// Explicit path to a .4DProject file.
+        #[arg(long, env = "TOOL4D_PROJECT")]
+        project: Option<PathBuf>,
+
+        /// Workspace in which to search for a .4DProject file.
+        #[arg(long)]
+        workspace: Option<PathBuf>,
+
+        /// Local TCP port on which the adapter listens for tool4d.
+        #[arg(long, env = "TOOL4D_LSP_PORT")]
+        port: Option<u16>,
+
+        /// Number of seconds to wait for tool4d to connect.
+        #[arg(long, env = "TOOL4D_STARTUP_TIMEOUT", default_value_t = 30)]
+        startup_timeout: u64,
+
+        /// Number of seconds to wait before force-killing tool4d.
+        #[arg(long, env = "TOOL4D_SHUTDOWN_TIMEOUT", default_value_t = 5)]
+        shutdown_timeout: u64,
+
+        /// Prevent execution of project startup database methods.
+        #[arg(
+            long,
+            env = "TOOL4D_SKIP_ONSTARTUP",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        skip_onstartup: bool,
+
+        /// Open the project without a data file.
+        #[arg(
+            long,
+            env = "TOOL4D_DATALESS",
+            default_value_t = true,
+            action = ArgAction::Set
+        )]
+        dataless: bool,
+
+        /// Diagnostic log level passed to tool4d.
+        #[arg(long, env = "TOOL4D_LOG_LEVEL")]
+        log_level: Option<String>,
+
+        /// Scope of the non-standard `initializationOptions.diagnostics`
+        /// LSP option (the same option the 4D Analyzer VS Code extension
+        /// sends per its `4D-Analyzer.diagnostics.scope` setting).
+        /// `workspace` checks every method project-wide; `document` checks
+        /// only documents this session explicitly opens.
+        #[arg(long, value_enum, default_value_t = DiagnosticsScope::Workspace)]
+        diagnostics_scope: DiagnosticsScope,
+
+        /// Number of seconds to wait for tool4d to confirm the install via
+        /// `dependency/installComponents/done`.
+        #[arg(long, default_value_t = 300)]
+        install_timeout: u64,
+
+        /// Report the result as a JSON object instead of plain text.
+        #[arg(long)]
+        json: bool,
+    },
+
     /// Start an MCP server that wraps the 4D LSP.
     ///
     /// Keeps a persistent tool4d LSP session alive and exposes LSP
@@ -656,6 +731,34 @@ fn run() -> Result<()> {
             diagnostics_scope,
             json,
             &files,
+        ),
+
+        BridgeCommand::InstallComponents {
+            tool,
+            project,
+            workspace,
+            port,
+            startup_timeout,
+            shutdown_timeout,
+            skip_onstartup,
+            dataless,
+            log_level,
+            diagnostics_scope,
+            install_timeout,
+            json,
+        } => install_components(
+            tool.as_deref(),
+            project.as_deref(),
+            workspace.as_deref(),
+            port,
+            Duration::from_secs(startup_timeout),
+            Duration::from_secs(shutdown_timeout),
+            skip_onstartup,
+            dataless,
+            log_level.as_deref(),
+            diagnostics_scope,
+            Duration::from_secs(install_timeout),
+            json,
         ),
 
         BridgeCommand::Mcp {
@@ -2380,6 +2483,150 @@ fn run_check_syntax_session(
     }
 
     Ok(all_diagnostics)
+}
+
+// ---------------------------------------------------------------------------
+// InstallComponents subcommand
+// ---------------------------------------------------------------------------
+
+#[allow(clippy::too_many_arguments)]
+fn install_components(
+    requested_tool: Option<&Path>,
+    explicit_project: Option<&Path>,
+    workspace: Option<&Path>,
+    requested_port: Option<u16>,
+    startup_timeout: Duration,
+    shutdown_timeout: Duration,
+    skip_onstartup: bool,
+    dataless: bool,
+    log_level: Option<&str>,
+    diagnostics_scope: DiagnosticsScope,
+    install_timeout: Duration,
+    json_output: bool,
+) -> Result<()> {
+    // Resolved independently of `start_lsp_session`, which only returns the
+    // workspace directory: the `dependency/installComponents` notification
+    // needs the `.4DProject` file's own URI, matching what the 4D Analyzer
+    // VS Code extension sends (`fetchProjectForCommand` in commands.ts uses
+    // the `Project/*.4DProject` file, not a source document, as the param).
+    let project_path = resolve_project(explicit_project, workspace)?;
+    let project_uri = path_to_file_uri(&project_path);
+
+    let options = StartOptions {
+        requested_tool,
+        explicit_project,
+        workspace,
+        requested_port,
+        startup_timeout,
+        shutdown_timeout,
+        skip_onstartup,
+        dataless,
+        log_level,
+        diagnostics_scope,
+    };
+
+    let (mut stream, child, _workspace_dir, _cancellation) = start_lsp_session(&options)?;
+
+    let result = run_install_components_session(&mut stream, &project_uri, install_timeout);
+
+    // Always attempt graceful shutdown.
+    let _ = send_lsp_request(&mut stream, 999_999, "shutdown", serde_json::json!(null));
+    let _ = read_lsp_message(&mut stream, Duration::from_secs(5));
+    let _ = send_lsp_notification(&mut stream, "exit", serde_json::json!(null));
+
+    // ChildGuard ensures tool4d is cleaned up on drop.
+    drop(child);
+
+    result.context("LSP installComponents session failed")?;
+
+    if json_output {
+        let stdout = io::stdout();
+        serde_json::to_writer_pretty(
+            stdout.lock(),
+            &serde_json::json!({ "uri": project_uri, "installed": true }),
+        )
+        .context("failed to write JSON output")?;
+        println!();
+    } else {
+        println!("{}: components installed", project_path.display());
+    }
+
+    Ok(())
+}
+
+/// Sends `dependency/installComponents` for `project_uri` and waits for the
+/// matching `dependency/installComponents/done` notification. This assumes
+/// components are already present on disk (e.g. fetched out-of-band or by a
+/// prior IDE session); it does not fetch or download anything itself. If
+/// tool4d asks the client to (re)send the install request via
+/// `dependency/installComponents/before` (as `DependencyManager.ts`'s
+/// notification handler does), this re-sends `installComponents` and keeps
+/// waiting, mirroring that handler's behavior.
+fn run_install_components_session(
+    stream: &mut TcpStream,
+    project_uri: &str,
+    install_timeout: Duration,
+) -> Result<()> {
+    eprintln!(
+        "tool4d-lsp-stdio: install-components: sending dependency/installComponents for {project_uri}"
+    );
+
+    send_lsp_notification(
+        stream,
+        "dependency/installComponents",
+        serde_json::json!({ "uri": project_uri }),
+    )?;
+
+    let start = Instant::now();
+
+    loop {
+        let remaining = install_timeout.saturating_sub(start.elapsed());
+        if remaining.is_zero() {
+            bail!(
+                "timed out waiting for dependency/installComponents/done after {}s",
+                install_timeout.as_secs()
+            );
+        }
+
+        let msg = read_lsp_message(stream, remaining)
+            .context("waiting for dependency/installComponents/done")?;
+
+        let Some(method) = msg.get("method").and_then(|m| m.as_str()) else {
+            log_lsp_incoming(&msg);
+            continue;
+        };
+
+        match method {
+            "dependency/installComponents/before" => {
+                eprintln!(
+                    "tool4d-lsp-stdio: install-components: tool4d requested a re-send; resending installComponents"
+                );
+                send_lsp_notification(
+                    stream,
+                    "dependency/installComponents",
+                    serde_json::json!({ "uri": project_uri }),
+                )?;
+            }
+            "dependency/installComponents/done" => {
+                let done_uri = msg
+                    .get("params")
+                    .and_then(|p| p.get("uri"))
+                    .and_then(|u| u.as_str())
+                    .unwrap_or_default();
+
+                eprintln!("tool4d-lsp-stdio: install-components: done uri={done_uri}");
+
+                // Per DependencyManager.ts's own `installComponents_done`
+                // handler, only treat matching URIs as completion; keep
+                // waiting otherwise (tool4d could in principle report
+                // completion for a different in-flight install first).
+                if done_uri == project_uri || done_uri.is_empty() {
+                    return Ok(());
+                }
+            }
+            _ => log_lsp_incoming(&msg),
+        }
+    }
 }
 
 /// Recursively finds the first `.4dm` file (by name, sorted per directory
