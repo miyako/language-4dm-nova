@@ -1,2 +1,3 @@
 tool4d-lsp-stdio/target/*
 target/
+.DS_Store
