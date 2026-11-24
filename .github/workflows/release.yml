@@ -50,7 +50,11 @@ concurrency:
 
 jobs:
   release:
-    runs-on: macos-14
+    # Not macos-14: the job never starts there. GitHub retired the arm64
+    # configuration of that image, so a dispatch fails in two seconds with
+    # "The configuration 'macos-14-arm64-us-default' is not supported" and no
+    # steps run. macos-15 is the current arm64 macOS image.
+    runs-on: macos-15
     timeout-minutes: 60
 
     steps:
