@@ -49,9 +49,9 @@ env:
   GH_TOKEN: ${{ github.token }}
   # Where the 4D project and the tables live in this repository.
   HEADER: src/builtins.h
-  # --project takes the project *folder*, not the .4DProject file: 4D reads it
-  # as a structure root and finds <root>/Project/<name>.4DProject inside.
-  PROJECT: tools/Builtins
+  # --project takes the .4DProject file: given the folder, 4D answers
+  # "Structure ... doesn't exist" even for a project it created itself.
+  PROJECT: tools/Builtins/Project/Builtins.4DProject
   BRANCH: ci/update-builtins
   # builtins.h carries names with a degree sign; without these, printing them
   # on a Windows console raises UnicodeEncodeError instead of writing the file.
@@ -127,8 +127,14 @@ jobs:
           set -euo pipefail
 
           tool="$RUNNER_TEMP/t4d/tool4d/tool4d.exe"
-          dump=$(cygpath -m "$RUNNER_TEMP/builtins.json")
-          project=$(cygpath -m "$GITHUB_WORKSPACE/$PROJECT")
+          # Backslashes, not cygpath -m's forward slashes: 4D echoes the path
+          # back unnormalized and does not find "D:/a/...". The macOS build
+          # converts the same argument to "Macintosh HD:private:...", which is
+          # how the difference showed up.
+          dump=$(cygpath -w "$RUNNER_TEMP/builtins.json")
+          project=$(cygpath -w "$GITHUB_WORKSPACE/$PROJECT")
+          echo "project=$project"
+          echo "dump=$dump"
           rm -f "$dump"
 
           # tool4d exits on QUIT 4D; the watchdog is for the case where the
