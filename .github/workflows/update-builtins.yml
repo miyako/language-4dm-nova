@@ -91,8 +91,9 @@ jobs:
             # --reinstall because the image ships some of these registered but
             # with their files pruned: apt then answers "0 newly installed" and
             # the soname stays absent.
-            if ! sudo apt-get install -y --reinstall --no-install-recommends "$pkg" 2>&1 | tail -2; then
-              echo "warning: could not install $pkg"
+            if ! out=$(sudo apt-get install -y --reinstall --no-install-recommends "$pkg" 2>&1); then
+              echo "warning: $pkg did not install:"
+              echo "$out" | grep -E "^(E:|The following|Depends|Unable|Package)" | head -4 | sed 's/^/    /'
             fi
           done
           echo "considered: ${candidates[*]:-<none>}"
@@ -112,7 +113,7 @@ jobs:
             for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1; do
               found=$(find /usr/lib /lib -name "$lib" 2>/dev/null | sort -V | tail -1)
               if [ -n "$found" ]; then
-                echo "$lib -> $found"
+                echo "$lib -> $found" >&2
                 dirname "$found"
               else
                 echo "$lib -> MISSING" >&2
