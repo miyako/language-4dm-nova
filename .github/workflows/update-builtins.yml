@@ -49,9 +49,9 @@ env:
   GH_TOKEN: ${{ github.token }}
   # Where the 4D project and the tables live in this repository.
   HEADER: src/builtins.h
-  # 4D resolves a project from its canonical shape -- <root>/Project/<name>.4DProject
-  # with Sources alongside it inside Project/ -- so this is the file, not the folder.
-  PROJECT: tools/Builtins/Project/Builtins.4DProject
+  # --project takes the project *folder*, not the .4DProject file: 4D reads it
+  # as a structure root and finds <root>/Project/<name>.4DProject inside.
+  PROJECT: tools/Builtins
   BRANCH: ci/update-builtins
   # builtins.h carries names with a degree sign; without these, printing them
   # on a Windows console raises UnicodeEncodeError instead of writing the file.

@@ -46,7 +46,7 @@ Manual, if you want to see the data first:
 
 ```bash
 # Windows layout: the archive unpacks to tool4d/tool4d.exe
-tool4d --project tools/Builtins/Project/Builtins.4DProject \
+tool4d --project tools/Builtins \
        --startup-method generate_builtins_dump \
        --user-param /tmp/builtins.json --dataless
 
