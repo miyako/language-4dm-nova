@@ -88,7 +88,10 @@ jobs:
             # Conflicting alternatives exist for the same LLVM version
             # (libunwind-18 and libunwind-18t64); whichever installs first wins,
             # so a failure here is not fatal -- the ldd gate is the real judge.
-            if ! sudo apt-get install -y --no-install-recommends "$pkg" 2>&1 | tail -3; then
+            # --reinstall because the image ships some of these registered but
+            # with their files pruned: apt then answers "0 newly installed" and
+            # the soname stays absent.
+            if ! sudo apt-get install -y --reinstall --no-install-recommends "$pkg" 2>&1 | tail -2; then
               echo "warning: could not install $pkg"
             fi
           done
@@ -100,6 +103,11 @@ jobs:
           # LLVM directory. Find them and hand the directory to the loader
           # rather than depending on where a given release happens to put the
           # symlink.
+          if ! find /usr/lib -name 'libc++.so.1' -print -quit | grep -q .; then
+            echo "libc++.so.1 is still absent; what the libc++ packages claim to own:"
+            dpkg -L libc++1-18 libc++abi1-18 2>/dev/null | grep -E '\.so' || echo "  (no such packages)"
+          fi
+
           libdirs=$(
             for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1; do
               found=$(find /usr/lib /lib -name "$lib" 2>/dev/null | sort -V | tail -1)
