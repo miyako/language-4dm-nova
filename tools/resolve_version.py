@@ -34,23 +34,35 @@ import urllib.error
 import urllib.request
 
 BASE = "https://resources-download.4d.com/release"
-ARCHIVE = "tool4d_linux.tar.xz"
-PLATFORM = "linux"
+
+# The archive name follows the directory, not the usual platform spelling.
+# "win" matters more than it looks: the Windows build is the only one that
+# bundles its dependent libraries (Kernel.dll, xerces-c, icu, libssl), while
+# the Linux one is a bare binary that expects the distribution to provide
+# LLVM's libc++ runtime, and the macOS one is a signed .app.
+# Only these two were verified against the host. No macOS tool4d could be found
+# under any spelling (mac/macos/osx, .tar.xz/.zip), so there is no entry for it
+# rather than a guess that fails at download time.
+PLATFORMS = {
+    "windows": ("win", "tool4d_win.tar.xz"),
+    "linux": ("linux", "tool4d_linux.tar.xz"),
+}
 MIN_BYTES = 1_000_000
 
 R_TRAIN = re.compile(r"^(\d+)\s*R\s*(\d+)$", re.I)
 LTS_TRAIN = re.compile(r"^(\d+)\.(\d+)$")
 
 
-def archive_url(branch: str, version: str) -> str:
+def archive_url(branch: str, version: str, platform: str = "windows") -> str:
+    directory, archive = PLATFORMS[platform]
     quoted_branch = branch.replace(" ", "%20")
     quoted_version = version.replace(" ", "%20")
-    return f"{BASE}/{quoted_branch}/{quoted_version}/latest/{PLATFORM}/{ARCHIVE}"
+    return f"{BASE}/{quoted_branch}/{quoted_version}/latest/{directory}/{archive}"
 
 
-def published(branch: str, version: str) -> bool:
+def published(branch: str, version: str, platform: str = "windows") -> bool:
     """True only when the endpoint really serves the archive, not a stub."""
-    request = urllib.request.Request(archive_url(branch, version), method="HEAD")
+    request = urllib.request.Request(archive_url(branch, version, platform), method="HEAD")
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             length = int(response.headers.get("Content-Length", 0))
@@ -63,15 +75,15 @@ def published(branch: str, version: str) -> bool:
         return False
 
 
-def newest(major: int) -> tuple[str, str]:
+def newest(major: int, platform: str = "windows") -> tuple[str, str]:
     """Newest published version: R-release first, then the LTS minor line."""
     for r in range(9, 0, -1):
         branch, version = f"{major} Rx", f"{major} R{r}"
-        if published(branch, version):
+        if published(branch, version, platform):
             return branch, version
     for minor in range(9, 0, -1):
         branch, version = f"{major}.x", f"{major}.{minor}"
-        if published(branch, version):
+        if published(branch, version, platform):
             return branch, version
     raise SystemExit(
         f"no published tool4d found for 4D {major} on either train; "
@@ -83,6 +95,12 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--request", default="", help="'21 R5', '21.2', or empty for the newest published build")
     parser.add_argument("--major", type=int, default=21, help="major version to scan when --request is empty")
+    parser.add_argument(
+        "--platform",
+        default="windows",
+        choices=sorted(PLATFORMS),
+        help="which tool4d build to resolve (default: windows, the only self-contained one)",
+    )
     args = parser.parse_args(argv)
 
     request = " ".join(args.request.split())
@@ -94,16 +112,16 @@ def main(argv: list[str]) -> int:
         else:
             raise SystemExit(f"cannot interpret {request!r}; expected '21 R5' or '21.2'")
 
-        if not published(branch, version):
+        if not published(branch, version, args.platform):
             raise SystemExit(
-                f"{version} is not published at {archive_url(branch, version)}. "
+                f"{version} is not published at {archive_url(branch, version, args.platform)}. "
                 "Newer R-releases live in beta until 4D publishes them, and a "
                 "branch from one train never pairs with a version from the other."
             )
     else:
-        branch, version = newest(args.major)
+        branch, version = newest(args.major, args.platform)
 
-    url = archive_url(branch, version)
+    url = archive_url(branch, version, args.platform)
     print(f"branch={branch}")
     print(f"version={version}")
     print(f"url={url}")

@@ -45,7 +45,7 @@ on a Mac before releasing, or the shipped dylib keeps the old table.
 Manual, if you want to see the data first:
 
 ```bash
-# macOS layout; on Linux the same archive unpacks to bin/tool4d
+# Windows layout: the archive unpacks to tool4d/tool4d.exe
 tool4d --project tools/Builtins.4DProject \
        --startup-method generate_builtins_dump \
        --user-param /tmp/builtins.json --dataless
@@ -61,12 +61,39 @@ to another build.
 
 ## Checking the table
 
+    python3 tools/check_builtins.py src/builtins.h
+
+Exits 0 when every row is ordered by `fourd_stricmp` and findable by the binary
+search, and when the two computed `#define`s match the data. It re-reads the
+header from disk and re-implements the comparison, so it is independent of the
+script that wrote it, and needs no toolchain -- which is how a Windows runner
+can gate on it.
+
     cc -std=c11 -Wno-unused-function -Isrc -o /tmp/check tools/check_builtins.c
     /tmp/check
 
-Exits 0 when every row is ordered by `fourd_stricmp` and findable by the binary
-search. The workflow runs this after rendering, so a broken table can never
-reach a pull request.
+is the same check against the real inline functions in the header, for machines
+that do have a C compiler; the workflow runs it when one is present, together
+with `cc -fsyntax-only src/scanner.c`.
+
+The workflow runs the gate after rendering, so a broken table can never reach a
+pull request.
+
+## Why the workflow runs on Windows
+
+The three tool4d archives are not interchangeable. `tool4d_win.tar.xz` is
+self-contained -- 27 MB with `Kernel.dll`, `xerces-c`, `icu` and `libssl`
+bundled -- while `tool4d_linux.tar.xz` is a bare ELF binary whose
+`DT_NEEDED` list expects the distribution to provide LLVM's C++ runtime:
+`libc++.so.1`, `libc++abi.so.1` and `libunwind.so.1` (LLVM's libunwind, soname
+1, not GNU's soname 8). On a hosted Ubuntu image those are a trap: Ubuntu
+26.04 registers `libc++1-18` in its package lists with no files on disk, so
+`apt-get install` answers "0 newly installed" and the loader still cannot
+start the binary. The Windows build sidesteps the question, and 4D tests it
+first anyway.
+
+No macOS archive could be found under any spelling (`mac`/`macos`/`osx`,
+`.tar.xz`/`.zip`), so `resolve_version.py` offers `windows` and `linux` only.
 
 ## The pasteboard tools
 

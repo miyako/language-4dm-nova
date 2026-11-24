@@ -1,19 +1,28 @@
 name: Update builtins.h
 
 # Regenerates src/builtins.h from the command and constant tables of a given
-# 4D release, using tool4d to run tools/4dproject against it, and opens a pull
-# request when the table changed.
+# 4D release, using tool4d to run tools/Builtins.4DProject against it, and opens
+# a pull request when the table changed.
 #
 # Why this is possible at all: src/builtins.h is generated data, not hand
 # written C, and the two sources it comes from -- `Command name()` and
 # 4D_ConstantsEN.xlf -- ship inside every tool4d build. tool4d needs no license
 # activation, so the whole pipeline runs unattended.
 #
+# Why Windows: the three tool4d archives are not equivalent. The Windows one is
+# self-contained (Kernel.dll, xerces-c, icu, libssl all bundled, 27 MB), while
+# tool4d_linux.tar.xz is a bare ELF binary that expects the distribution to
+# supply LLVM's C++ runtime -- libc++.so.1, libc++abi.so.1 and libunwind.so.1
+# (LLVM's, soname 1, not GNU's 8). Chasing those on a hosted Ubuntu image was
+# six failed runs: 26.04 registers libc++1-18 without its files, so apt answers
+# "0 newly installed" and the loader still cannot start the binary. The Windows
+# build has no such problem.
+#
 # The two manual tools (tools/generate_command_list.4dm and
 # tools/generate_constant_list.4dm) end at the pasteboard. CI has no
-# pasteboard, so tools/4dproject/Sources/Methods/generate_builtins_dump.4dm
-# writes the same lists to JSON instead; tools/generate_builtins.py owns the
-# rendering and the invariants documented at the top of builtins.h.
+# pasteboard, so tools/Sources/Methods/generate_builtins_dump.4dm writes the
+# same lists to JSON instead; tools/generate_builtins.py owns the rendering and
+# the invariants documented at the top of builtins.h.
 
 on:
   workflow_dispatch:
@@ -42,15 +51,20 @@ env:
   HEADER: src/builtins.h
   PROJECT: tools/Builtins.4DProject
   BRANCH: ci/update-builtins
+  # builtins.h carries names with a degree sign; without these, printing them
+  # on a Windows console raises UnicodeEncodeError instead of writing the file.
+  PYTHONUTF8: '1'
+  PYTHONIOENCODING: utf-8
 
 jobs:
   update:
     name: Regenerate builtins.h
-    # ubuntu-24.04 rather than -latest: the 26.04 image ships libc++1-18
-    # registered but with no files, and apt answers "0 newly installed" while
-    # leaving libc++.so.1 absent, so the loader cannot start tool4d.
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Check out repository
@@ -58,105 +72,46 @@ jobs:
 
       - name: Resolve 4D version
         id: resolve
-        shell: bash
         run: |
           set -euo pipefail
-          python3 tools/resolve_version.py --request "${{ inputs.version }}" | tee "$RUNNER_TEMP/version.env"
+          python tools/resolve_version.py --request "${{ inputs.version }}" | tee "$RUNNER_TEMP/version.env"
           echo "url=$(sed -n 's/^url=//p' "$RUNNER_TEMP/version.env")" >> "$GITHUB_OUTPUT"
           echo "version=$(sed -n 's/^version=//p' "$RUNNER_TEMP/version.env")" >> "$GITHUB_OUTPUT"
 
-      - name: Install tool4d dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # tool4d_linux.tar.xz holds bin/tool4d and bin/Resources, no shared
-          # libraries: on Linux they come from the distribution. Besides
-          # libfreeimage.so.3 the binary needs the LLVM runtime trio --
-          # libc++.so.1, libc++abi.so.1 and libunwind.so.1 -- which is LLVM's
-          # libunwind (soname 1), not the GNU one (soname 8). None are on the
-          # image.
-          #
-          # The names are unpinnable: Ubuntu appends t64 for the 64-bit time_t
-          # migration, and the LLVM packages carry the toolchain version, so
-          # libfreeimage3 stays unsuffixed while libunwind-18 sits next to
-          # libunwind-17t64. Ask apt which of the family exist instead of
-          # hard-coding names that rot at the next LTS.
-          sudo apt-get update -qq || echo "warning: apt-get update failed"
-
-          pattern='^(libfreeimage3(t64)?|libc\+\+(abi)?1(-[0-9]+)?(t64)?|libunwind8?(-?[0-9]+)?(t64)?)$'
-          mapfile -t candidates < <(apt-cache pkgnames | grep -E "$pattern" | sort -V)
-
-          for pkg in "${candidates[@]}"; do
-            # Conflicting alternatives exist for the same LLVM version
-            # (libunwind-18 and libunwind-18t64); whichever installs first wins,
-            # so a failure here is not fatal -- the ldd gate is the real judge.
-            # --reinstall because the image ships some of these registered but
-            # with their files pruned: apt then answers "0 newly installed" and
-            # the soname stays absent.
-            if ! out=$(sudo apt-get install -y --reinstall --no-install-recommends "$pkg" 2>&1); then
-              echo "warning: $pkg did not install:"
-              echo "$out" | grep -E "^(E:|The following|Depends|Unable|Package)" | head -4 | sed 's/^/    /'
-            fi
-          done
-          echo "considered: ${candidates[*]:-<none>}"
-
-          # The packages are installed but their sonames are not all on the
-          # loader path: libunwind.so.1 lands in /usr/lib/x86_64-linux-gnu,
-          # while libc++.so.1 and libc++abi.so.1 stay inside the versioned
-          # LLVM directory. Find them and hand the directory to the loader
-          # rather than depending on where a given release happens to put the
-          # symlink.
-          if ! find /usr/lib -name 'libc++.so.1' -print -quit | grep -q .; then
-            echo "libc++.so.1 is still absent; what the libc++ packages claim to own:"
-            dpkg -L libc++1-18 libc++abi1-18 2>/dev/null | grep -E '\.so' || echo "  (no such packages)"
-          fi
-
-          libdirs=$(
-            for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1; do
-              found=$(find /usr/lib /lib -name "$lib" 2>/dev/null | sort -V | tail -1)
-              if [ -n "$found" ]; then
-                echo "$lib -> $found" >&2
-                dirname "$found"
-              else
-                echo "$lib -> MISSING" >&2
-              fi
-            done | sort -u | paste -sd:
-          )
-          echo "LD_LIBRARY_PATH=$libdirs" >> "$GITHUB_ENV"
-
       - name: Download tool4d
         id: tool4d
-        shell: bash
         run: |
           set -euo pipefail
 
-          curl -fsSL --retry 3 --retry-delay 5 \
-            -o "$RUNNER_TEMP/tool4d.tar.xz" \
-            "${{ steps.resolve.outputs.url }}"
+          archive="$RUNNER_TEMP/tool4d.tar.xz"
+          curl -fsSL --retry 3 --retry-delay 5 -o "$archive" "${{ steps.resolve.outputs.url }}"
 
           # A directory path on this host answers 200 with an 87-byte HTML stub,
           # and there is no listing to browse, so the archive itself is the only
           # evidence that the version exists.
-          size=$(stat -c %s "$RUNNER_TEMP/tool4d.tar.xz")
+          size=$(wc -c < "$archive")
           if [ "$size" -lt 1000000 ]; then
             echo "::error::archive is $size bytes; the URL resolved to a stub, not a tool4d build"
             exit 1
           fi
-          xz -t "$RUNNER_TEMP/tool4d.tar.xz"
 
-          mkdir -p "$RUNNER_TEMP/tool4d"
-          tar -xJf "$RUNNER_TEMP/tool4d.tar.xz" -C "$RUNNER_TEMP/tool4d"
-          chmod +x "$RUNNER_TEMP/tool4d/bin/tool4d"
+          # Git for Windows ships GNU tar, which needs an xz binary to read this;
+          # the image's bsdtar handles xz itself.
+          tar_tool="/c/Windows/System32/tar.exe"
+          [ -x "$tar_tool" ] || tar_tool=tar
+          mkdir -p "$RUNNER_TEMP/t4d"
+          "$tar_tool" -xJf "$archive" -C "$RUNNER_TEMP/t4d"
 
-          # Preflight: prove the binary can actually load and is the version we
-          # asked for, before blaming the project for anything that fails later.
-          missing=$(ldd "$RUNNER_TEMP/tool4d/bin/tool4d" | awk '/not found/ {print $1}' | sort -u || true)
-          if [ -n "$missing" ]; then
-            echo "::error::tool4d cannot load: $(echo $missing)"
+          tool="$RUNNER_TEMP/t4d/tool4d/tool4d.exe"
+          test -x "$tool" || {
+            echo "::error::the archive did not contain tool4d/tool4d.exe"
+            find "$RUNNER_TEMP/t4d" -maxdepth 2 | head -20
             exit 1
-          fi
-          "$RUNNER_TEMP/tool4d/bin/tool4d" --version | tee "$RUNNER_TEMP/tool4d-version.txt"
+          }
+
+          # Preflight: prove the binary starts and is the version we asked for,
+          # before blaming the project for anything that fails later.
+          "$tool" --version | tee "$RUNNER_TEMP/tool4d-version.txt"
           if ! grep -qi "${{ steps.resolve.outputs.version }}" "$RUNNER_TEMP/tool4d-version.txt"; then
             echo "::error::downloaded build does not report ${{ steps.resolve.outputs.version }}"
             exit 1
@@ -166,54 +121,76 @@ jobs:
           echo "build=$build" >> "$GITHUB_OUTPUT"
 
       - name: Dump commands and constants from 4D
-        shell: bash
         run: |
           set -euo pipefail
 
-          rm -f "$RUNNER_TEMP/builtins.json"
+          tool="$RUNNER_TEMP/t4d/tool4d/tool4d.exe"
+          dump=$(cygpath -m "$RUNNER_TEMP/builtins.json")
+          project=$(cygpath -m "$GITHUB_WORKSPACE/$PROJECT")
+          rm -f "$dump"
 
-          # tool4d exits on QUIT 4D; the timeout is for the case where the
-          # startup method fails to reach it, which otherwise hangs the job.
-          timeout 900 "$RUNNER_TEMP/tool4d/bin/tool4d" \
-            --project "$GITHUB_WORKSPACE/$PROJECT" \
-            --startup-method generate_builtins_dump \
-            --user-param "$RUNNER_TEMP/builtins.json" \
-            --dataless
+          # tool4d exits on QUIT 4D; the watchdog is for the case where the
+          # startup method fails to reach it, which would otherwise hold the job
+          # for its full 30 minutes. There is no `timeout` command on Windows.
+          "$tool" --project "$project" \
+                  --startup-method generate_builtins_dump \
+                  --user-param "$dump" \
+                  --dataless &
+          pid=$!
+          deadline=$((SECONDS + 900))
+          while kill -0 "$pid" 2>/dev/null; do
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              kill -9 "$pid" 2>/dev/null || true
+              echo "::error::tool4d did not finish within 15 minutes"
+              exit 1
+            fi
+            sleep 5
+          done
+          rc=0
+          wait "$pid" || rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::tool4d exited with $rc"
+            exit "$rc"
+          fi
 
-          test -s "$RUNNER_TEMP/builtins.json" || {
+          test -s "$dump" || {
             echo "::error::the 4D run produced no builtins.json"
             exit 1
           }
-          python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(len(d['commands']),'commands',len(d['constants']),'constants')" \
-            "$RUNNER_TEMP/builtins.json"
+          python -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(len(d['commands']),'commands',len(d['constants']),'constants')" \
+            "$dump"
 
       - name: Render src/builtins.h
-        shell: bash
         run: |
           set -euo pipefail
-          python3 tools/generate_builtins.py \
+          python tools/generate_builtins.py \
             --dump "$RUNNER_TEMP/builtins.json" \
             --build "${{ steps.tool4d.outputs.build }}" \
             --header "$HEADER" \
             --write
 
       - name: Verify the table is ordered and reachable
-        shell: bash
         run: |
           set -euo pipefail
 
           # The lookup is a binary search, so an unsorted table does not fail --
-          # it silently stops finding names. This is the guard for that.
-          cc -std=c11 -Wno-unused-function -Isrc \
-            -o "$RUNNER_TEMP/check_builtins" tools/check_builtins.c
-          "$RUNNER_TEMP/check_builtins"
+          # it silently stops finding names. This is the guard for that, and it
+          # needs no toolchain.
+          python tools/check_builtins.py "$HEADER"
 
-          # compiler check: the scanner includes the generated header
-          cc -std=c11 -fsyntax-only -Isrc src/scanner.c
+          # On a machine with a C compiler, check the same invariants against the
+          # real inline functions, and that src/scanner.c still compiles against
+          # the new header.
+          if command -v cc >/dev/null 2>&1; then
+            cc -std=c11 -Wno-unused-function -Isrc -o "$RUNNER_TEMP/check_builtins" tools/check_builtins.c
+            "$RUNNER_TEMP/check_builtins"
+            cc -std=c11 -fsyntax-only -Isrc src/scanner.c
+          else
+            echo "no C compiler on PATH; the Python gate above is the check here"
+          fi
 
       - name: Detect changes
         id: changes
-        shell: bash
         run: |
           set -euo pipefail
           if git diff --quiet -- "$HEADER"; then
@@ -226,13 +203,10 @@ jobs:
 
       - name: Open pull request
         if: steps.changes.outputs.changed == 'true'
-        shell: bash
         run: |
           set -euo pipefail
 
           version="${{ steps.resolve.outputs.version }}"
-          slug=$(printf '%s' "$version" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "$BRANCH"
