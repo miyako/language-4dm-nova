@@ -127,11 +127,12 @@ jobs:
           set -euo pipefail
 
           tool="$RUNNER_TEMP/t4d/tool4d/tool4d.exe"
-          # Backslashes, not cygpath -m's forward slashes: 4D echoes the path
-          # back unnormalized and does not find "D:/a/...". The macOS build
-          # converts the same argument to "Macintosh HD:private:...", which is
-          # how the difference showed up.
-          dump=$(cygpath -w "$RUNNER_TEMP/builtins.json")
+          # The two 4D entry points want different separators, which cost a
+          # trace to find out: --project needs backslashes ("D:/a/..." answers
+          # "Structure ... doesn't exist"), while File() needs forward slashes
+          # ("D:\\a\\..." gives exists=False, and a designed test -f on the very
+          # same string passes).
+          dump=$(cygpath -m "$RUNNER_TEMP/builtins.json")
           project=$(cygpath -w "$GITHUB_WORKSPACE/$PROJECT")
           xlf="$RUNNER_TEMP/t4d/tool4d/Resources/en.lproj/4D_ConstantsEN.xlf"
           test -f "$xlf" || {
@@ -140,7 +141,7 @@ jobs:
             exit 1
           }
           config=$(python -c 'import json,sys;print(json.dumps({"dump":sys.argv[1],"xlf":sys.argv[2]}))' \
-            "$dump" "$(cygpath -w "$xlf")")
+            "$dump" "$(cygpath -m "$xlf")")
           echo "project=$project"
           echo "param=$config"
           rm -f "$dump"
