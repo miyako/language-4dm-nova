@@ -67,22 +67,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The Linux archive contains the binary and its resources, no shared
-          # libraries, so they come from the distribution. libfreeimage and libc++
-          # are not on the runner image. Ubuntu renames packages across releases
-          # for the 64-bit time_t migration, so probe for both spellings rather
-          # than pin a name that will rot.
-          wanted=()
-          for pkg in libfreeimage3t64 libfreeimage3 \
-                     libc++1t64 libc++1 libc++abi1t64 libc++abi1 \
-                     libunwind8t64 libunwind8; do
-            if apt-cache show "$pkg" >/dev/null 2>&1; then
-              wanted+=("$pkg")
-            fi
+          # tool4d_linux.tar.xz holds bin/tool4d and bin/Resources, no shared
+          # libraries: on Linux they come from the distribution. Besides
+          # libfreeimage.so.3 the binary needs the LLVM runtime trio --
+          # libc++.so.1, libc++abi.so.1 and libunwind.so.1 -- which is LLVM's
+          # libunwind (soname 1), not the GNU one (soname 8). None are on the
+          # image.
+          #
+          # The names are unpinnable: Ubuntu appends t64 for the 64-bit time_t
+          # migration, and the LLVM packages carry the toolchain version, so
+          # libfreeimage3 stays unsuffixed while libunwind-18 sits next to
+          # libunwind-17t64. Ask apt which of the family exist instead of
+          # hard-coding names that rot at the next LTS.
+          pattern='^(libfreeimage3(t64)?|libc\+\+(abi)?1(-[0-9]+)?(t64)?|libunwind8?(-?[0-9]+)?(t64)?)$'
+          mapfile -t candidates < <(apt-cache pkgnames | grep -E "$pattern" | sort -V)
+
+          for pkg in "${candidates[@]}"; do
+            # Conflicting alternatives exist for the same LLVM version
+            # (libunwind-18 and libunwind-18t64); whichever installs first wins.
+            sudo apt-get install -y --no-install-recommends "$pkg" >/dev/null 2>&1 \
+              || echo "skipped $pkg"
           done
-          if [ ${#wanted[@]} -gt 0 ]; then
-            sudo apt-get install -y --no-install-recommends "${wanted[@]}"
-          fi
+          echo "considered: ${candidates[*]:-<none>}"
 
       - name: Download tool4d
         id: tool4d
