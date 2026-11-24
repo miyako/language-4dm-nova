@@ -26,13 +26,48 @@ files from the 4d / 4d-depot GitHub organizations).
 scanner and grammar in lockstep per the table above. The script compiles
 every `.c` file in `src/`.
 
-On macOS with Xcode command line tools:
+On macOS with Xcode command line tools and a Rust toolchain:
 
     ./compile_parser.sh . /Applications/Nova.app
 
 This produces a universal (arm64 + x86_64) `libtree-sitter-fourd.dylib`
-inside `language-4d.novaextension/Syntaxes/`, linked against Nova's SyntaxKit with the
-rpath Nova requires, and signed (Developer ID Application is hard-coded in build script).
+inside `language-4d.novaextension/Syntaxes/`, links it against Nova's SyntaxKit
+with the rpath Nova requires, rebuilds the universal `tool4d-lsp-stdio` bridge
+in `bin/`, signs both with the Developer ID Application identity in the
+keychain, and packages `language-4d.novaextension.dmg`, notarizes it and
+staples the ticket.
+
+The Nova bundle is optional. It only supplies `SyntaxKit.framework` to the
+link step, and the dylib references no SyntaxKit symbol (only libSystem and
+itself), so a machine without Nova builds the same extension:
+
+    ./compile_parser.sh .                        # no SyntaxKit link
+    SKIP_NOTARIZATION=1 ./compile_parser.sh .    # sign only, no DMG
+
+Credentials come from the environment: `DEVELOPER_ID` picks the signing
+identity (default: the single Developer ID Application identity), and
+notarization uses `NOTARY_PROFILE` or `NOTARYTOOL_APPLE_ID` +
+`NOTARYTOOL_TEAM_ID` + `NOTARYTOOL_PASSWORD`.
+
+## Releasing
+
+The **Release** workflow (`workflow_dispatch`) does the whole thing: it bumps
+the version, rebuilds and signs both products, notarizes and staples the DMG,
+commits the refreshed artifacts, then tags and publishes a GitHub release.
+
+The version lives in `language-4d.novaextension/extension.json` and follows the
+4D release the grammar targets (`21.5.0` is 4D 21.5). Pick `patch`, `minor` or
+`major` in the dispatch form; the tag is that version with a `v` prefix —
+`v21.5.1`, `v21.6.0`, `v22.0.0`.
+
+Repository secrets it reads: `APPLE_DEVELOPER_ID_CERTIFICATE` (base64 `.p12`),
+`APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD`, `KEYCHAIN_PASSWORD`,
+`NOTARYTOOL_APPLE_ID`, `NOTARYTOOL_TEAM_ID`, `NOTARYTOOL_PASSWORD`.
+
+Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
+`libtree-sitter-fourd.dylib`, `tool4d-lsp-stdio` and `SHA256SUMS.txt`. The
+workflow builds `src/` as-is; regenerating the grammar is
+`update-builtins.yml`, a separate pipeline.
 
 ## Installing
 
