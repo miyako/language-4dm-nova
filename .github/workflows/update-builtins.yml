@@ -1,0 +1,201 @@
+name: Update builtins.h
+
+# Regenerates src/builtins.h from the command and constant tables of a given
+# 4D release, using tool4d to run tools/4dproject against it, and opens a pull
+# request when the table changed.
+#
+# Why this is possible at all: src/builtins.h is generated data, not hand
+# written C, and the two sources it comes from -- `Command name()` and
+# 4D_ConstantsEN.xlf -- ship inside every tool4d build. tool4d needs no license
+# activation, so the whole pipeline runs unattended.
+#
+# The two manual tools (tools/generate_command_list.4dm and
+# tools/generate_constant_list.4dm) end at the pasteboard. CI has no
+# pasteboard, so tools/4dproject/Sources/Methods/generate_builtins_dump.4dm
+# writes the same lists to JSON instead; tools/generate_builtins.py owns the
+# rendering and the invariants documented at the top of builtins.h.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '4D version, e.g. "21 R5" or "21.2". Empty means the newest published release.'
+        required: false
+        default: ''
+  schedule:
+    # Weekly, to notice a newly published release. The schedule never targets a
+    # beta: 4D publishes a build here only once it is released, so "newest
+    # published" is exactly what a release update should follow.
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-builtins
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  # Where the 4D project and the tables live in this repository.
+  HEADER: src/builtins.h
+  PROJECT: tools/Builtins.4DProject
+  BRANCH: ci/update-builtins
+
+jobs:
+  update:
+    name: Regenerate builtins.h
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve 4D version
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/resolve_version.py --request "${{ inputs.version }}" | tee "$RUNNER_TEMP/version.env"
+          echo "url=$(sed -n 's/^url=//p' "$RUNNER_TEMP/version.env")" >> "$GITHUB_OUTPUT"
+          echo "version=$(sed -n 's/^version=//p' "$RUNNER_TEMP/version.env")" >> "$GITHUB_OUTPUT"
+
+      - name: Download tool4d
+        id: tool4d
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -fsSL --retry 3 --retry-delay 5 \
+            -o "$RUNNER_TEMP/tool4d.tar.xz" \
+            "${{ steps.resolve.outputs.url }}"
+
+          # A directory path on this host answers 200 with an 87-byte HTML stub,
+          # and there is no listing to browse, so the archive itself is the only
+          # evidence that the version exists.
+          size=$(stat -c %s "$RUNNER_TEMP/tool4d.tar.xz")
+          if [ "$size" -lt 1000000 ]; then
+            echo "::error::archive is $size bytes; the URL resolved to a stub, not a tool4d build"
+            exit 1
+          fi
+          xz -t "$RUNNER_TEMP/tool4d.tar.xz"
+
+          mkdir -p "$RUNNER_TEMP/tool4d"
+          tar -xJf "$RUNNER_TEMP/tool4d.tar.xz" -C "$RUNNER_TEMP/tool4d"
+          chmod +x "$RUNNER_TEMP/tool4d/bin/tool4d"
+
+          # Preflight: prove the binary runs and is the version we asked for
+          # before blaming the project for anything that fails later.
+          "$RUNNER_TEMP/tool4d/bin/tool4d" --version | tee "$RUNNER_TEMP/tool4d-version.txt"
+          if ! grep -qi "${{ steps.resolve.outputs.version }}" "$RUNNER_TEMP/tool4d-version.txt"; then
+            echo "::error::downloaded build does not report ${{ steps.resolve.outputs.version }}"
+            exit 1
+          fi
+
+          build=$(sed -n 's/.*build \([A-Za-z0-9._]*\).*/\1/p' "$RUNNER_TEMP/tool4d-version.txt")
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+      - name: Dump commands and constants from 4D
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f "$RUNNER_TEMP/builtins.json"
+
+          # tool4d exits on QUIT 4D; the timeout is for the case where the
+          # startup method fails to reach it, which otherwise hangs the job.
+          timeout 900 "$RUNNER_TEMP/tool4d/bin/tool4d" \
+            --project "$GITHUB_WORKSPACE/$PROJECT" \
+            --startup-method generate_builtins_dump \
+            --user-param "$RUNNER_TEMP/builtins.json" \
+            --dataless
+
+          test -s "$RUNNER_TEMP/builtins.json" || {
+            echo "::error::the 4D run produced no builtins.json"
+            exit 1
+          }
+          python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(len(d['commands']),'commands',len(d['constants']),'constants')" \
+            "$RUNNER_TEMP/builtins.json"
+
+      - name: Render src/builtins.h
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/generate_builtins.py \
+            --dump "$RUNNER_TEMP/builtins.json" \
+            --build "${{ steps.tool4d.outputs.build }}" \
+            --header "$HEADER" \
+            --write
+
+      - name: Verify the table is ordered and reachable
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # The lookup is a binary search, so an unsorted table does not fail --
+          # it silently stops finding names. This is the guard for that.
+          cc -std=c11 -Wno-unused-function -Isrc \
+            -o "$RUNNER_TEMP/check_builtins" tools/check_builtins.c
+          "$RUNNER_TEMP/check_builtins"
+
+          # compiler check: the scanner includes the generated header
+          cc -std=c11 -fsyntax-only -Isrc src/scanner.c
+
+      - name: Detect changes
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- "$HEADER"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "builtins.h is already current for ${{ steps.resolve.outputs.version }}"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- "$HEADER"
+          fi
+
+      - name: Open pull request
+        if: steps.changes.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.resolve.outputs.version }}"
+          slug=$(printf '%s' "$version" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add "$HEADER"
+          git commit -m "Update builtins.h for 4D $version"
+          git push --force-with-lease origin "$BRANCH"
+
+          body=$(mktemp)
+          {
+            echo "Regenerated \`$HEADER\` from tool4d **$version** (build \`${{ steps.tool4d.outputs.build }}\`)."
+            echo
+            echo "Source: ${{ steps.resolve.outputs.url }}"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| commands + constants | $(grep -c '^    { "' "$HEADER") |"
+            echo
+            echo 'The table is sorted by `fourd_stricmp`, which the lookup depends on: it is a'
+            echo 'binary search, so an unsorted table silently stops finding names. The old table'
+            echo 'left 401 of 3944 rows unreachable. Rows that move without changing are that fix.'
+            echo
+            echo 'Still to do after merge: `./compile_parser.sh . /Applications/Nova.app` on macOS,'
+            echo 'because the committed dylib embeds the old table.'
+          } > "$body"
+
+          if gh pr list --head "$BRANCH" --state open --json number --jq 'length > 0' | grep -q true; then
+            gh pr edit "$BRANCH" --title "Update builtins.h for 4D $version" --body-file "$body"
+          else
+            gh pr create \
+              --head "$BRANCH" \
+              --base "${{ github.event.repository.default_branch }}" \
+              --title "Update builtins.h for 4D $version" \
+              --body-file "$body"
+          fi
