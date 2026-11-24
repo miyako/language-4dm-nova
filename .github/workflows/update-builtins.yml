@@ -46,7 +46,10 @@ env:
 jobs:
   update:
     name: Regenerate builtins.h
-    runs-on: ubuntu-latest
+    # ubuntu-24.04 rather than -latest: the 26.04 image ships libc++1-18
+    # registered but with no files, and apt answers "0 newly installed" while
+    # leaving libc++.so.1 absent, so the loader cannot start tool4d.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
