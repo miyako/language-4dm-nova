@@ -1,3 +1,9 @@
 tool4d-lsp-stdio/target/*
 target/
 .DS_Store
+
+# 4D runtime leftovers from opening or running the tools/ project locally
+tools/Data/
+tools/Logs/
+tools/DerivedData/
+tools/.git/
