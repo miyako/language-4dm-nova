@@ -79,16 +79,25 @@ jobs:
           # libfreeimage3 stays unsuffixed while libunwind-18 sits next to
           # libunwind-17t64. Ask apt which of the family exist instead of
           # hard-coding names that rot at the next LTS.
+          sudo apt-get update -qq || echo "warning: apt-get update failed"
+
           pattern='^(libfreeimage3(t64)?|libc\+\+(abi)?1(-[0-9]+)?(t64)?|libunwind8?(-?[0-9]+)?(t64)?)$'
           mapfile -t candidates < <(apt-cache pkgnames | grep -E "$pattern" | sort -V)
 
           for pkg in "${candidates[@]}"; do
             # Conflicting alternatives exist for the same LLVM version
-            # (libunwind-18 and libunwind-18t64); whichever installs first wins.
-            sudo apt-get install -y --no-install-recommends "$pkg" >/dev/null 2>&1 \
-              || echo "skipped $pkg"
+            # (libunwind-18 and libunwind-18t64); whichever installs first wins,
+            # so a failure here is not fatal -- the ldd gate is the real judge.
+            if ! sudo apt-get install -y --no-install-recommends "$pkg" 2>&1 | tail -3; then
+              echo "warning: could not install $pkg"
+            fi
           done
           echo "considered: ${candidates[*]:-<none>}"
+
+          for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1 libfreeimage.so.3; do
+            found=$(ldconfig -p | awk -v l="$lib" '$1 == l {print $NF; exit}')
+            echo "$lib -> ${found:-MISSING}"
+          done
 
       - name: Download tool4d
         id: tool4d
