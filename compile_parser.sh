@@ -319,6 +319,20 @@ hdiutil create \
     -srcfolder "${DMG_STAGING_DIR}" \
     "${PRODUCT_DMG_PATH}"
 
+# Gatekeeper assesses the disk image itself, not only what is inside it.
+# Without a Developer ID signature on the container, `spctl --assess --type
+# open --context context:primary-signature` rejects a perfectly notarized and
+# stapled DMG as "source=no usable signature", so sign the image too. The
+# hardened runtime is a property of executables and does not apply here.
+echo "Signing ${PRODUCT_DMG_PATH}"
+codesign \
+    --timestamp \
+    --force \
+    --sign "${DEVELOPER_ID}" \
+    "${PRODUCT_DMG_PATH}"
+
+codesign --verify --strict --verbose=2 "${PRODUCT_DMG_PATH}"
+
 echo "Submitting ${PRODUCT_DMG_PATH} for notarization"
 xcrun notarytool submit \
     "${PRODUCT_DMG_PATH}" \
