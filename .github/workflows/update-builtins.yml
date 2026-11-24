@@ -94,10 +94,24 @@ jobs:
           done
           echo "considered: ${candidates[*]:-<none>}"
 
-          for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1 libfreeimage.so.3; do
-            found=$(ldconfig -p | awk -v l="$lib" '$1 == l {print $NF; exit}')
-            echo "$lib -> ${found:-MISSING}"
-          done
+          # The packages are installed but their sonames are not all on the
+          # loader path: libunwind.so.1 lands in /usr/lib/x86_64-linux-gnu,
+          # while libc++.so.1 and libc++abi.so.1 stay inside the versioned
+          # LLVM directory. Find them and hand the directory to the loader
+          # rather than depending on where a given release happens to put the
+          # symlink.
+          libdirs=$(
+            for lib in libc++.so.1 libc++abi.so.1 libunwind.so.1; do
+              found=$(find /usr/lib /lib -name "$lib" 2>/dev/null | sort -V | tail -1)
+              if [ -n "$found" ]; then
+                echo "$lib -> $found"
+                dirname "$found"
+              else
+                echo "$lib -> MISSING" >&2
+              fi
+            done | sort -u | paste -sd:
+          )
+          echo "LD_LIBRARY_PATH=$libdirs" >> "$GITHUB_ENV"
 
       - name: Download tool4d
         id: tool4d
