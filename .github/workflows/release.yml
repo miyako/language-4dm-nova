@@ -155,6 +155,30 @@ jobs:
           echo "keychain=${KEYCHAIN_PATH}" >> "${GITHUB_OUTPUT}"
           security find-identity -v -p codesigning "${KEYCHAIN_PATH}"
 
+      - name: Check the notary credentials
+        env:
+          NOTARYTOOL_APPLE_ID: ${{ secrets.NOTARYTOOL_APPLE_ID }}
+          NOTARYTOOL_TEAM_ID: ${{ secrets.NOTARYTOOL_TEAM_ID }}
+          NOTARYTOOL_PASSWORD: ${{ secrets.NOTARYTOOL_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # Apple answers 401 for a wrong Apple ID, a wrong team, or anything
+          # that is not an app-specific password; find that out in seconds
+          # rather than after a build and a staged DMG.
+          APPLE_ID="$(printf '%s' "${NOTARYTOOL_APPLE_ID}" | tr -d '[:space:]')"
+          TEAM_ID="$(printf '%s' "${NOTARYTOOL_TEAM_ID}" | tr -d '[:space:]')"
+          PASSWORD="$(printf '%s' "${NOTARYTOOL_PASSWORD}" | tr -d '[:space:]')"
+          echo "Signing in as ${APPLE_ID} (team ${TEAM_ID})"
+          if ! OUTPUT="$(xcrun notarytool history \
+                --apple-id "${APPLE_ID}" \
+                --team-id "${TEAM_ID}" \
+                --password "${PASSWORD}" 2>&1)"; then
+            echo "${OUTPUT}"
+            echo "::error::Apple rejected these notary credentials. NOTARYTOOL_PASSWORD must be an app-specific password created at appleid.apple.com (xxxx-xxxx-xxxx-xxxx) for the same Apple ID as NOTARYTOOL_APPLE_ID, and NOTARYTOOL_TEAM_ID its team."
+            exit 1
+          fi
+          echo "Notary credentials accepted."
+
       - name: Build, sign, notarize and staple
         env:
           NOTARYTOOL_APPLE_ID: ${{ secrets.NOTARYTOOL_APPLE_ID }}

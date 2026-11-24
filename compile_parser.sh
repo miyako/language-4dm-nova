@@ -132,6 +132,13 @@ fi
 
 NOTARY_ARGS=()
 NOTARIZE=1
+# A secret pasted with a trailing newline makes notarytool answer 401 Invalid
+# credentials, so trim whitespace off the values before they are used. A value
+# that is only whitespace then counts as unset, which gives the clearer message
+# below instead of an authentication failure after the build.
+NOTARYTOOL_APPLE_ID="$(printf '%s' "${NOTARYTOOL_APPLE_ID:-}" | tr -d '[:space:]')"
+NOTARYTOOL_TEAM_ID="$(printf '%s' "${NOTARYTOOL_TEAM_ID:-}" | tr -d '[:space:]')"
+NOTARYTOOL_PASSWORD="$(printf '%s' "${NOTARYTOOL_PASSWORD:-}" | tr -d '[:space:]')"
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then
     NOTARY_ARGS=(--keychain-profile "${NOTARY_PROFILE}")
 elif [[ -n "${NOTARYTOOL_APPLE_ID:-}" && -n "${NOTARYTOOL_TEAM_ID:-}" \
@@ -311,6 +318,20 @@ hdiutil create \
     -format UDBZ \
     -srcfolder "${DMG_STAGING_DIR}" \
     "${PRODUCT_DMG_PATH}"
+
+# Gatekeeper assesses the disk image itself, not only what is inside it.
+# Without a Developer ID signature on the container, `spctl --assess --type
+# open --context context:primary-signature` rejects a perfectly notarized and
+# stapled DMG as "source=no usable signature", so sign the image too. The
+# hardened runtime is a property of executables and does not apply here.
+echo "Signing ${PRODUCT_DMG_PATH}"
+codesign \
+    --timestamp \
+    --force \
+    --sign "${DEVELOPER_ID}" \
+    "${PRODUCT_DMG_PATH}"
+
+codesign --verify --strict --verbose=2 "${PRODUCT_DMG_PATH}"
 
 echo "Submitting ${PRODUCT_DMG_PATH} for notarization"
 xcrun notarytool submit \
