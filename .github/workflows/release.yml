@@ -1,0 +1,288 @@
+name: Release
+
+# Cuts a signed and notarized release of the extension.
+#
+# One manual dispatch: it bumps the extension version, rebuilds both native
+# products, signs them with the Developer ID Application certificate held in
+# the repository secrets, notarizes and staples the DMG, commits the refreshed
+# artifacts, then tags `X.Y.Z` and publishes the DMG, the dylib, the bridge and
+# their checksums.
+#
+# The version is `language-4d.novaextension/extension.json`, which follows the
+# 4D release the grammar targets (21.5.0 is 4D 21.5). `bump` moves one
+# component of it and the tag is that version, as the existing tags here are:
+# patch -> 21.5.1, minor -> 21.6.0, major -> 22.0.0. Patch is the default
+# because minor and major claim support for a newer 4D line than the grammar
+# was generated from.
+#
+# Required repository secrets:
+#   APPLE_DEVELOPER_ID_CERTIFICATE           base64 of a Developer ID Application
+#                                            .p12 exported with its private key
+#   APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD  password of that .p12
+#   KEYCHAIN_PASSWORD                        any password for the temporary keychain
+#   NOTARYTOOL_APPLE_ID                      Apple account email for notarization
+#   NOTARYTOOL_TEAM_ID                       team id, e.g. Y69CWUC25B
+#   NOTARYTOOL_PASSWORD                      app-specific password for notarization
+#
+# `src/` is a matched set generated from one 4D release; this workflow builds it
+# as-is. It does not regenerate the grammar or src/builtins.h -- that is
+# update-builtins.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version component to increment'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-14
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require the default branch
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [ "${REF}" != "refs/heads/main" ]; then
+            echo "::error::Release from main, not ${REF}."
+            exit 1
+          fi
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::The checked-out tree is not clean."
+            git status --short
+            exit 1
+          fi
+
+      - name: Bump the extension version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          set -euo pipefail
+          python3 tools/bump_extension_version.py \
+            --root . \
+            --bump "${BUMP}" \
+            --github-output "${GITHUB_OUTPUT}"
+
+      - name: Refuse to replace an existing tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::Tag ${TAG} already exists locally."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG} already exists on origin."
+            exit 1
+          fi
+
+      # Cache only the crate registry, not target/: a release build must not
+      # reuse object files from an older toolchain or an older grammar.
+      - name: Cache the crate registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('tool4d-lsp-stdio/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+
+      - name: Import the signing certificate
+        id: signing
+        env:
+          CERTIFICATE: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEYCHAIN_PATH="${RUNNER_TEMP}/signing.keychain-db"
+          CERTIFICATE_PATH="${RUNNER_TEMP}/certificate.p12"
+
+          if [ -z "${CERTIFICATE}" ] || [ -z "${CERTIFICATE_PASSWORD}" ] \
+             || [ -z "${KEYCHAIN_PASSWORD}" ]; then
+            echo "::error::The signing certificate secrets are not set."
+            exit 1
+          fi
+
+          # The secret may hold the base64 on one line or folded; strip line
+          # breaks before decoding so both work.
+          printf '%s' "${CERTIFICATE}" | tr -d '\n' \
+            | openssl base64 -d -A -out "${CERTIFICATE_PATH}"
+
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+          security set-keychain-settings -lut 21600 "${KEYCHAIN_PATH}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+          security import "${CERTIFICATE_PATH}" \
+            -k "${KEYCHAIN_PATH}" \
+            -P "${CERTIFICATE_PASSWORD}" \
+            -A -t cert -f pkcs12
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s -k "${KEYCHAIN_PASSWORD}" \
+            "${KEYCHAIN_PATH}"
+          security list-keychain -d user -s "${KEYCHAIN_PATH}" \
+            $(security list-keychains -d user | sed 's/[ "]//g')
+
+          rm -f "${CERTIFICATE_PATH}"
+
+          echo "keychain=${KEYCHAIN_PATH}" >> "${GITHUB_OUTPUT}"
+          security find-identity -v -p codesigning "${KEYCHAIN_PATH}"
+
+      - name: Build, sign, notarize and staple
+        env:
+          NOTARYTOOL_APPLE_ID: ${{ secrets.NOTARYTOOL_APPLE_ID }}
+          NOTARYTOOL_TEAM_ID: ${{ secrets.NOTARYTOOL_TEAM_ID }}
+          NOTARYTOOL_PASSWORD: ${{ secrets.NOTARYTOOL_PASSWORD }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          echo "Building 4D Language for Nova ${VERSION}"
+          # No Nova bundle on a hosted runner: the dylib is linked without
+          # SyntaxKit (it references no SyntaxKit symbol) and Nova supplies the
+          # framework at load time.
+          ./compile_parser.sh .
+
+      - name: Verify the signed artifacts
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          DYLIB=language-4d.novaextension/Syntaxes/libtree-sitter-fourd.dylib
+          BRIDGE=language-4d.novaextension/bin/tool4d-lsp-stdio
+          DMG=language-4d.novaextension.dmg
+
+          for binary in "${DYLIB}" "${BRIDGE}"; do
+            for architecture in arm64 x86_64; do
+              # `lipo -verify_arch` takes exactly one architecture per call.
+              lipo "${binary}" -verify_arch "${architecture}"
+            done
+            codesign --verify --strict --verbose=2 "${binary}"
+            details="$(codesign -dv --verbose=4 "${binary}" 2>&1)"
+            echo "${details}" | grep -q 'Authority=Developer ID Application'
+            echo "${details}" | grep -q 'flags=.*runtime'
+            echo "${details}" | grep -q '^Timestamp='
+          done
+
+          if ! grep -q "\"version\": \"${VERSION}\"" language-4d.novaextension/extension.json; then
+            echo "::error::extension.json does not carry version ${VERSION}."
+            grep '"version"' language-4d.novaextension/extension.json
+            exit 1
+          fi
+
+          xcrun stapler validate "${DMG}"
+          spctl --assess --type open --context context:primary-signature --verbose "${DMG}"
+
+          # Check what actually ships: mount the DMG and read the manifest and
+          # the two binaries out of it, not out of the working tree.
+          MOUNT_POINT="$(mktemp -d)"
+          hdiutil attach -quiet -readonly -nobrowse -mountpoint "${MOUNT_POINT}" "${DMG}"
+          trap 'hdiutil detach -quiet "${MOUNT_POINT}" >/dev/null 2>&1 || true' EXIT
+          # The volume carries the bundle folder itself; accept the bundle's
+          # contents directly too so a layout change cannot hide a bad package.
+          if [ -f "${MOUNT_POINT}/extension.json" ]; then
+            BUNDLE="${MOUNT_POINT}"
+          else
+            BUNDLE="${MOUNT_POINT}/language-4d.novaextension"
+          fi
+          grep -q "\"version\": \"${VERSION}\"" "${BUNDLE}/extension.json"
+          codesign --verify --strict "${BUNDLE}/Syntaxes/libtree-sitter-fourd.dylib"
+          codesign --verify --strict "${BUNDLE}/bin/tool4d-lsp-stdio"
+          echo "DMG content: ${VERSION}, both binaries signed"
+          hdiutil detach -quiet "${MOUNT_POINT}"
+          trap - EXIT
+          rmdir "${MOUNT_POINT}"
+
+          shasum -a 256 "${DMG}" "${DYLIB}" "${BRIDGE}" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Commit the version and the refreshed artifacts
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add language-4d.novaextension language-4d.novaextension.dmg SHA256SUMS.txt
+          git commit -m "release: ${VERSION}"
+          git push origin "HEAD:main"
+
+      - name: Tag and publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+          CURRENT: ${{ steps.version.outputs.current }}
+        run: |
+          set -euo pipefail
+
+          NOTES="$(mktemp)"
+          {
+            cat <<EOF
+          4D Language for Nova ${VERSION}
+
+          Syntax highlighting, folds, symbols and tool4d language-server
+          integration for 4D project files in Nova.
+
+          Version ${CURRENT} -> ${VERSION} (tag ${TAG}).
+
+          ## Install
+
+          Open \`language-4d.novaextension.dmg\` and add the extension to Nova.
+
+          ## Assets
+
+          | File | What it is |
+          |---|---|
+          | \`language-4d.novaextension.dmg\` | the extension, notarized and stapled |
+          | \`libtree-sitter-fourd.dylib\` | the grammar, universal, signed |
+          | \`tool4d-lsp-stdio\` | the language-server bridge, universal, signed |
+          | \`SHA256SUMS.txt\` | checksums of the three above |
+
+          All three binaries carry a Developer ID Application signature with the
+          hardened runtime and are notarized with Apple.
+          EOF
+          } > "${NOTES}"
+
+          git tag -a "${TAG}" -m "4D Language for Nova ${TAG}"
+          git push origin "refs/tags/${TAG}"
+
+          gh release create "${TAG}" \
+            --title "4D Language for Nova ${TAG}" \
+            --notes-file "${NOTES}" \
+            --verify-tag \
+            language-4d.novaextension.dmg \
+            language-4d.novaextension/Syntaxes/libtree-sitter-fourd.dylib \
+            language-4d.novaextension/bin/tool4d-lsp-stdio \
+            SHA256SUMS.txt
+
+      - name: Remove the signing keychain
+        if: always()
+        env:
+          KEYCHAIN_PATH: ${{ steps.signing.outputs.keychain }}
+        run: |
+          if [ -n "${KEYCHAIN_PATH:-}" ] && [ -f "${KEYCHAIN_PATH}" ]; then
+            security delete-keychain "${KEYCHAIN_PATH}" || true
+          fi
