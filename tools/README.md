@@ -46,9 +46,9 @@ Manual, if you want to see the data first:
 
 ```bash
 # Windows layout: the archive unpacks to tool4d/tool4d.exe
-tool4d --project tools/Builtins \
+tool4d --project tools/Builtins/Project/Builtins.4DProject \
        --startup-method generate_builtins_dump \
-       --user-param /tmp/builtins.json --dataless
+       --user-param '{"dump":"/tmp/builtins.json","xlf":"/Applications/tool4d/tool4d/21R4/tool4d.app/Contents/Resources/en.lproj/4D_ConstantsEN.xlf"}' --dataless
 
 python3 tools/generate_builtins.py --dump /tmp/builtins.json --header src/builtins.h          # preview
 python3 tools/generate_builtins.py --dump /tmp/builtins.json --header src/builtins.h --write  # apply

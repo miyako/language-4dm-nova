@@ -8,15 +8,22 @@
 //
 //   * commands come from Command name(i), minus the SQL bounds, the wildcard
 //     stubs (_4D@, C_@, ARRAY @) and the bare aliases (4D, ds, cs);
-//   * constants come from 4D_ConstantsEN.xlf, which ships inside tool4d.app on
-//     macOS and inside bin/Resources on Linux.
+//   * constants come from 4D_ConstantsEN.xlf, which ships inside the tool4d
+//     build (tool4d.app/Contents/Resources on macOS, Resources/ on Linux and
+//     Windows).
 //
 // Differs on purpose: names keep their embedded spaces (the pasteboard tools
 // strip them for the regex generator) because builtins.h stores `ARRAY INTEGER`
 // and `Attribute published SQL` verbatim, and duplicates are dropped, because
 // the XLF repeats a few entries across theme groups.
 //
-// --user-param = path of the JSON file to write.
+// --user-param = {"dump": "<path to write>", "xlf": "<path to 4D_ConstantsEN.xlf>"}
+// The caller passes the XLF path because it already knows where it unpacked
+// tool4d. Discovering it from inside the run needs `Application file`, which
+// answers with an empty path under tool4d -- Folder(""; fk platform path) then
+// raises "A valid posix path was expected" before anything can be logged. A
+// bare path is accepted as --user-param too, but then there is no XLF to read
+// and the run stops with that as the reason.
 
 var $param : Text
 
@@ -24,16 +31,39 @@ $param:=""
 Get database parameter(User param value; $param)
 
 If ($param="")
-	LOG EVENT(Into system standard outputs; "generate_builtins_dump: pass --user-param=<path/to/builtins.json>"; Error message)
+	LOG EVENT(Into system standard outputs; "generate_builtins_dump: pass --user-param with {\"dump\": ..., \"xlf\": ...}"; Error message)
+	QUIT 4D(1)
+End if 
+
+// A command that fails must name itself: an empty exit code says nothing about
+// which of the calls below tool4d did not like.
+ON ERR CALL("dump_on_err")
+
+var $config : Object
+var $dumpPath : Text
+var $xlfPath : Text
+
+$config:=New object
+$dumpPath:=$param
+$xlfPath:=""
+
+If (Position("{"@; $param; 1)=1)
+	$config:=JSON Parse($param)
+	$dumpPath:=String($config.dump)
+	$xlfPath:=String($config.xlf)
+End if 
+
+LOG EVENT(Into system standard outputs; "generate_builtins_dump: dump="+$dumpPath+" xlf="+$xlfPath; Information message)
+
+If ($dumpPath="")
+	LOG EVENT(Into system standard outputs; "generate_builtins_dump: no output path in --user-param"; Error message)
 	QUIT 4D(1)
 End if 
 
 // ---------------------------------------------------------------- constants
 
 var $constants : Collection
-var $appFolder : 4D.Folder
 var $file : 4D.File
-var $path : Text
 var $found : Boolean
 var $constant : Text
 var $i : Integer
@@ -41,21 +71,20 @@ var $i : Integer
 $constants:=New collection
 $found:=False
 
-$appFolder:=Folder(Application file; fk platform path)
-
-// macOS (tool4d.app) keeps resources under Contents/Resources; the Linux
-// archive lays them out beside the binary as bin/Resources.
-For Each ($path; New collection("Contents/Resources/en.lproj/4D_ConstantsEN.xlf"; "Resources/en.lproj/4D_ConstantsEN.xlf"; "../Resources/en.lproj/4D_ConstantsEN.xlf"))
-	If (Not($found))
-		$file:=$appFolder.file($path)
-		$found:=$file.exists
-	End if 
-End for each 
-
-If (Not($found))
-	LOG EVENT(Into system standard outputs; "generate_builtins_dump: 4D_ConstantsEN.xlf not found under "+$appFolder.platformPath; Error message)
+If ($xlfPath="")
+	LOG EVENT(Into system standard outputs; "generate_builtins_dump: --user-param has no \"xlf\"; point it at 4D_ConstantsEN.xlf inside the tool4d build"; Error message)
 	QUIT 4D(1)
 End if 
+
+$file:=File($xlfPath)
+$found:=$file.exists
+
+If (Not($found))
+	LOG EVENT(Into system standard outputs; "generate_builtins_dump: no such file: "+$xlfPath; Error message)
+	QUIT 4D(1)
+End if 
+
+LOG EVENT(Into system standard outputs; "generate_builtins_dump: xlf "+$file.platformPath; Information message)
 
 // DOM refs stay untagged: the commands return Longint refs in older builds and
 // Text refs in current ones, and a wrong annotation is a compile error.
@@ -130,8 +159,7 @@ $json.version:=Application version
 $json.commands:=$commands
 $json.constants:=$constants
 
-$out:=File($param)
-$out.parent.create()
+$out:=File($dumpPath)
 
 TEXT TO DOCUMENT($out.platformPath; JSON Stringify($json; *))
 

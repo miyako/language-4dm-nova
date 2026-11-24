@@ -133,8 +133,16 @@ jobs:
           # how the difference showed up.
           dump=$(cygpath -w "$RUNNER_TEMP/builtins.json")
           project=$(cygpath -w "$GITHUB_WORKSPACE/$PROJECT")
+          xlf="$RUNNER_TEMP/t4d/tool4d/Resources/en.lproj/4D_ConstantsEN.xlf"
+          test -f "$xlf" || {
+            echo "::error::the Windows archive no longer carries $xlf"
+            find "$RUNNER_TEMP/t4d" -name "*.xlf" | head -5
+            exit 1
+          }
+          config=$(python -c 'import json,sys;print(json.dumps({"dump":sys.argv[1],"xlf":sys.argv[2]}))' \
+            "$dump" "$(cygpath -w "$xlf")")
           echo "project=$project"
-          echo "dump=$dump"
+          echo "param=$config"
           rm -f "$dump"
 
           # tool4d exits on QUIT 4D; the watchdog is for the case where the
@@ -142,7 +150,7 @@ jobs:
           # for its full 30 minutes. There is no `timeout` command on Windows.
           "$tool" --project "$project" \
                   --startup-method generate_builtins_dump \
-                  --user-param "$dump" \
+                  --user-param "$config" \
                   --dataless &
           pid=$!
           deadline=$((SECONDS + 900))
