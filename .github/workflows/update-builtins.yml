@@ -206,6 +206,16 @@ jobs:
             echo "no C compiler on PATH; the Python gate above is the check here"
           fi
 
+      - name: Upload the dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: builtins-dump
+          path: |
+            ${{ runner.temp }}/builtins.json
+            ${{ runner.temp }}/tool4d-version.txt
+          if-no-files-found: ignore
+
       - name: Detect changes
         id: changes
         run: |
@@ -229,6 +239,9 @@ jobs:
           git checkout -B "$BRANCH"
           git add "$HEADER"
           git commit -m "Update builtins.h for 4D $version"
+          # The lease needs a local ref to compare against; a fresh checkout has
+          # none, and pushing then fails as "stale info".
+          git fetch --quiet origin "$BRANCH" || true
           git push --force-with-lease origin "$BRANCH"
 
           body=$(mktemp)
