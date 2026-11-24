@@ -57,8 +57,9 @@ commits the refreshed artifacts, then tags and publishes a GitHub release.
 
 The version lives in `language-4d.novaextension/extension.json` and follows the
 4D release the grammar targets (`21.5.0` is 4D 21.5). Pick `patch`, `minor` or
-`major` in the dispatch form; the tag is that version with a `v` prefix —
-`v21.5.1`, `v21.6.0`, `v22.0.0`.
+`major` in the dispatch form; the tag is that version, matching the existing
+tags here — `21.5.1`, `21.6.0`, `22.0.0`. `patch` is the default: `minor` and
+`major` claim support for a newer 4D line than the grammar was generated from.
 
 Repository secrets it reads: `APPLE_DEVELOPER_ID_CERTIFICATE` (base64 `.p12`),
 `APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD`, `KEYCHAIN_PASSWORD`,

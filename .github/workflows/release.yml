@@ -5,13 +5,15 @@ name: Release
 # One manual dispatch: it bumps the extension version, rebuilds both native
 # products, signs them with the Developer ID Application certificate held in
 # the repository secrets, notarizes and staples the DMG, commits the refreshed
-# artifacts, then tags `vX.Y.Z` and publishes the DMG, the dylib, the bridge
-# and their checksums.
+# artifacts, then tags `X.Y.Z` and publishes the DMG, the dylib, the bridge and
+# their checksums.
 #
 # The version is `language-4d.novaextension/extension.json`, which follows the
 # 4D release the grammar targets (21.5.0 is 4D 21.5). `bump` moves one
-# component of it and the tag is that version with a `v` prefix: patch ->
-# v21.5.1, minor -> v21.6.0, major -> v22.0.0.
+# component of it and the tag is that version, as the existing tags here are:
+# patch -> 21.5.1, minor -> 21.6.0, major -> 22.0.0. Patch is the default
+# because minor and major claim support for a newer 4D line than the grammar
+# was generated from.
 #
 # Required repository secrets:
 #   APPLE_DEVELOPER_ID_CERTIFICATE           base64 of a Developer ID Application
@@ -224,7 +226,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add language-4d.novaextension language-4d.novaextension.dmg SHA256SUMS.txt
-          git commit -m "release: v${VERSION}"
+          git commit -m "release: ${VERSION}"
           git push origin "HEAD:main"
 
       - name: Tag and publish the release
@@ -244,7 +246,7 @@ jobs:
           Syntax highlighting, folds, symbols and tool4d language-server
           integration for 4D project files in Nova.
 
-          Version ${CURRENT} -> ${VERSION} (${TAG}).
+          Version ${CURRENT} -> ${VERSION} (tag ${TAG}).
 
           ## Install
 

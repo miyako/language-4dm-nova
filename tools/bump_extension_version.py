@@ -10,7 +10,9 @@ component of that same number:
     --bump minor   21.5.0 -> 21.6.0
     --bump major   21.5.0 -> 22.0.0
 
-The tag is the version with a ``v`` prefix (``v21.5.1``). The grammar's own
+The tag is the version itself (``21.5.1``), matching the tags this repository
+already carries (``21.4.0``, ``21.5.0``) and the 4D convention of naming a
+component release after the 4D release it supports. The grammar's own
 ``package.json`` version and the bridge's ``Cargo.toml`` version are separate
 artifact versions and are not touched.
 
@@ -28,7 +30,7 @@ from pathlib import Path
 
 MANIFEST = Path("language-4d.novaextension/extension.json")
 VERSION_PATTERN = re.compile(r'^(\d+)\.(\d+)\.(\d+)$')
-TAG_PREFIX = "v"
+TAG_PREFIX = ""  # tags match the 4D release version, without a v prefix
 
 
 def read_version(manifest: Path) -> str:
