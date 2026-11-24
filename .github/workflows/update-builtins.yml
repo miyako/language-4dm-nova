@@ -1,7 +1,7 @@
 name: Update builtins.h
 
 # Regenerates src/builtins.h from the command and constant tables of a given
-# 4D release, using tool4d to run tools/Builtins.4DProject against it, and opens
+# 4D release, using tool4d to run tools/Builtins against it, and opens
 # a pull request when the table changed.
 #
 # Why this is possible at all: src/builtins.h is generated data, not hand
@@ -20,7 +20,7 @@ name: Update builtins.h
 #
 # The two manual tools (tools/generate_command_list.4dm and
 # tools/generate_constant_list.4dm) end at the pasteboard. CI has no
-# pasteboard, so tools/Sources/Methods/generate_builtins_dump.4dm writes the
+# pasteboard, so tools/Builtins/Project/Sources/Methods/generate_builtins_dump.4dm writes the
 # same lists to JSON instead; tools/generate_builtins.py owns the rendering and
 # the invariants documented at the top of builtins.h.
 
@@ -49,7 +49,9 @@ env:
   GH_TOKEN: ${{ github.token }}
   # Where the 4D project and the tables live in this repository.
   HEADER: src/builtins.h
-  PROJECT: tools/Builtins.4DProject
+  # 4D resolves a project from its canonical shape -- <root>/Project/<name>.4DProject
+  # with Sources alongside it inside Project/ -- so this is the file, not the folder.
+  PROJECT: tools/Builtins/Project/Builtins.4DProject
   BRANCH: ci/update-builtins
   # builtins.h carries names with a degree sign; without these, printing them
   # on a Windows console raises UnicodeEncodeError instead of writing the file.

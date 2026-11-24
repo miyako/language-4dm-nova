@@ -14,7 +14,7 @@ family never matched in the scanner.
 
 | | owns | lives in |
 |---|---|---|
-| **4D** | which names exist | `tools/Sources/Methods/generate_builtins_dump.4dm` |
+| **4D** | which names exist | `tools/Builtins/Project/Sources/Methods/generate_builtins_dump.4dm` |
 | **Python** | how they are written | `tools/generate_builtins.py` |
 
 The 4D side only enumerates and writes JSON. It never decides order, escaping
@@ -46,7 +46,7 @@ Manual, if you want to see the data first:
 
 ```bash
 # Windows layout: the archive unpacks to tool4d/tool4d.exe
-tool4d --project tools/Builtins.4DProject \
+tool4d --project tools/Builtins/Project/Builtins.4DProject \
        --startup-method generate_builtins_dump \
        --user-param /tmp/builtins.json --dataless
 
