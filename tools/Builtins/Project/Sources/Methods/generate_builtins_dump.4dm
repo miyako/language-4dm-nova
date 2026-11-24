@@ -159,6 +159,18 @@ End for
 
 LOG EVENT(Into system standard outputs; "generate_builtins_dump t10 commands="+String($commands.length); Information message)
 
+// Command name() reports the two declaration families as single wildcards --
+// "ARRAY @" and "C_@" -- so their members have to be named here. Leaving them
+// out would drop ARRAY INTEGER, C_TEXT and 24 others that 4D code is written
+// with, which is exactly what the table is for. This is the one place the
+// list is not read from 4D; it is 26 stable names, checked against the
+// previous table.
+For Each ($command; New collection("ARRAY BLOB"; "ARRAY BOOLEAN"; "ARRAY DATE"; "ARRAY INTEGER"; "ARRAY LONGINT"; "ARRAY OBJECT"; "ARRAY PICTURE"; "ARRAY POINTER"; "ARRAY REAL"; "ARRAY TEXT"; "ARRAY TIME"; "ARRAY TO COLLECTION"; "ARRAY TO LIST"; "ARRAY TO SELECTION"; "C_BLOB"; "C_BOOLEAN"; "C_COLLECTION"; "C_DATE"; "C_LONGINT"; "C_OBJECT"; "C_PICTURE"; "C_POINTER"; "C_REAL"; "C_TEXT"; "C_TIME"; "C_VARIANT"))
+	If ($commands.indexOf($command)=-1)
+		$commands.push($command)
+	End if 
+End for each 
+
 If ($commands.length=0)
 	LOG EVENT(Into system standard outputs; "generate_builtins_dump: Command name() returned nothing"; Error message)
 	QUIT 4D(1)
