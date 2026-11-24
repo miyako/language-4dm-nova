@@ -35,13 +35,9 @@ If ($param="")
 	QUIT 4D(1)
 End if 
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t01 param chars="+String(Length($param)); Information message)
-
 // A command that fails must name itself: an empty exit code says nothing about
 // which of the calls below tool4d did not like.
 ON ERR CALL("dump_on_err")
-
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t02 error handler installed"; Information message)
 
 var $config : Object
 var $dumpPath : Text
@@ -53,14 +49,13 @@ $xlfPath:=""
 
 If ($param[[1]]="{")
 	$config:=JSON Parse($param)
-	LOG EVENT(Into system standard outputs; "generate_builtins_dump t03 parsed "+JSON Stringify($config); Information message)
 	$dumpPath:=String($config.dump)
 	$xlfPath:=String($config.xlf)
 Else 
 	$dumpPath:=$param
 End if 
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t04 dump="+$dumpPath+" xlf="+$xlfPath; Information message)
+LOG EVENT(Into system standard outputs; "generate_builtins_dump: dumping to "+$dumpPath+" xlf="+$xlfPath; Information message)
 
 If ($dumpPath="")
 	LOG EVENT(Into system standard outputs; "generate_builtins_dump: no output path in --user-param"; Error message)
@@ -84,16 +79,14 @@ If ($xlfPath="")
 End if 
 
 $file:=File($xlfPath)
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t05 file object made"; Information message)
 $found:=$file.exists
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t06 exists="+String($found); Information message)
 
 If (Not($found))
 	LOG EVENT(Into system standard outputs; "generate_builtins_dump: no such file: "+$xlfPath; Error message)
 	QUIT 4D(1)
 End if 
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t07 xlf "+$file.platformPath; Information message)
+LOG EVENT(Into system standard outputs; "generate_builtins_dump: constants from "+$file.platformPath; Information message)
 
 // DOM refs stay untagged: the commands return Longint refs in older builds and
 // Text refs in current ones, and a wrong annotation is a compile error.
@@ -103,8 +96,6 @@ If (OK#1)
 	LOG EVENT(Into system standard outputs; "generate_builtins_dump: cannot parse "+$file.platformPath; Error message)
 	QUIT 4D(1)
 End if 
-
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t08 xml parsed"; Information message)
 
 ARRAY TEXT($nodes; 0)
 
@@ -120,8 +111,6 @@ For ($i; 1; Size of array($nodes))
 End for 
 
 DOM CLOSE XML($dom)
-
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t09 constants="+String($constants.length); Information message)
 
 If ($constants.length=0)
 	LOG EVENT(Into system standard outputs; "generate_builtins_dump: no constants found in "+$file.platformPath; Error message)
@@ -157,8 +146,6 @@ For ($i; 1; 4000)
 	End case 
 End for 
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t10 commands="+String($commands.length); Information message)
-
 // Command name() reports the two declaration families as single wildcards --
 // "ARRAY @" and "C_@" -- so their members have to be named here. Leaving them
 // out would drop ARRAY INTEGER, C_TEXT and 24 others that 4D code is written
@@ -186,12 +173,10 @@ $json.version:=Application version
 $json.commands:=$commands
 $json.constants:=$constants
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t11 writing "+$dumpPath; Information message)
-
 $out:=File($dumpPath)
 
 TEXT TO DOCUMENT($out.platformPath; JSON Stringify($json; *))
 
-LOG EVENT(Into system standard outputs; "generate_builtins_dump t12 wrote "+$out.platformPath+" commands="+String($commands.length)+" constants="+String($constants.length); Information message)
+LOG EVENT(Into system standard outputs; "generate_builtins_dump: wrote "+$out.platformPath+" commands="+String($commands.length)+" constants="+String($constants.length); Information message)
 
 QUIT 4D(0)
