@@ -92,6 +92,11 @@ The entry is copied into the bundle as `language-4d.novaextension/CHANGELOG.md`
 along with `README.md` and `LICENSE`, because Nova presents an installed
 extension from the package's own files; the release verifies all three are in
 the DMG and that the packaged changelog carries the version being published.
+That copy leaves out the `## [Unreleased]` heading — the repository keeps it for
+commits that are not released yet, but the installed package should start at the
+version the reader has:
+
+    python3 tools/changelog.py --package-copy language-4d.novaextension/CHANGELOG.md
 
 Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
 `libtree-sitter-fourd.dylib`, `tool4d-lsp-stdio` and `SHA256SUMS.txt`. The
