@@ -47,9 +47,11 @@ HEADER = """\
 # Changelog
 
 All notable changes to this project are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the version
-number tracks the 4D release this extension targets: `21.5.1` is the second
-release against 4D 21.5, `21.6.0` would claim 4D 21.6.
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The version number is
+SemVer read against 4D: the major is the 4D major the module targets, the minor
+counts features added to the module, the patch counts fixes -- so `20.5.1` is a
+patch on the module's fifth feature milestone for 4D 20, not a claim about 4D
+20.5.
 
 Entries are generated from the commit history by `tools/changelog.py`. The
 conventional-commit prefix picks the section (`feat:` → Added, `fix:` → Fixed,

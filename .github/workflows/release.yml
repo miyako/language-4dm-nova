@@ -11,12 +11,12 @@ name: Release
 # It writes the `CHANGELOG.md` entry for the release from the commits in it
 # (tools/changelog.py) and reuses that entry as the release body.
 #
-# The version is `language-4d.novaextension/extension.json`, which follows the
-# 4D release the grammar targets (21.5.0 is 4D 21.5). `bump` moves one
-# component of it and the tag is that version, as the existing tags here are:
-# patch -> 21.5.1, minor -> 21.6.0, major -> 22.0.0. Patch is the default
-# because minor and major claim support for a newer 4D line than the grammar
-# was generated from.
+# The version is `language-4d.novaextension/extension.json`, SemVer read against
+# 4D: the major is the 4D major the module targets, the minor counts features
+# added to the module, the patch counts fixes. `bump` moves one component of it
+# and the tag is that version, as the existing tags here are: patch -> 21.5.1,
+# minor -> 21.6.0 (a feature, not 4D 21.6), major -> 22.0.0 (4D 22). Patch is
+# the default, for a rebuild or a fix.
 #
 # Required repository secrets:
 #   APPLE_DEVELOPER_ID_CERTIFICATE           base64 of a Developer ID Application

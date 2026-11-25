@@ -5,8 +5,9 @@ Syntax highlighting, structure folding, symbols, and SQL injection for
 tree-sitter-fourd grammar (validated at 99.7% against 11,172 real-world
 files from the 4d / 4d-depot GitHub organizations).
 
-Releases are tagged with the 4D release they target — `21.5.1`, `21.6.0` — and
-published as a notarized, stapled DMG on the
+Versions are SemVer read against 4D: the major is the 4D major the module
+targets, the minor counts features added to the module, the patch counts fixes.
+Releases are published as a notarized, stapled DMG on the
 [Releases](https://github.com/miyako/language-4dm-nova/releases) page. What
 changed in each one is in [CHANGELOG.md](CHANGELOG.md).
 
@@ -65,11 +66,14 @@ The **Release** workflow (`workflow_dispatch`) does the whole thing: it bumps
 the version, rebuilds and signs both products, notarizes and staples the DMG,
 commits the refreshed artifacts, then tags and publishes a GitHub release.
 
-The version lives in `language-4d.novaextension/extension.json` and follows the
-4D release the grammar targets (`21.5.0` is 4D 21.5). Pick `patch`, `minor` or
-`major` in the dispatch form; the tag is that version, matching the existing
-tags here — `21.5.1`, `21.6.0`, `22.0.0`. `patch` is the default: `minor` and
-`major` claim support for a newer 4D line than the grammar was generated from.
+The version lives in `language-4d.novaextension/extension.json`. It is SemVer
+read against 4D: `major` is the 4D major the module targets, `minor` counts
+features added to the module, `patch` counts fixes — so `20.5.1` is a patch on
+the module's fifth feature milestone for 4D 20, not a claim about 4D 20.5. Pick
+the component in the dispatch form; the tag is that version, matching the
+existing tags here (`21.4.0`, `21.5.0`, `21.5.4`). `patch` is the default, for a
+rebuild or a fix; choose `minor` only when the release adds a feature to the
+module, and `major` when it moves to a different 4D major.
 
 Repository secrets it reads: `APPLE_DEVELOPER_ID_CERTIFICATE` (base64 `.p12`),
 `APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD`, `KEYCHAIN_PASSWORD`,
