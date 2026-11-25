@@ -14,6 +14,9 @@ changed in each one is in [CHANGELOG.md](CHANGELOG.md).
 
     language-4d.novaextension/       the extension bundle (needs the dylib, see below)
       extension.json
+      README.md             the user-facing docs Nova shows for the extension
+      CHANGELOG.md          a copy of the top-level changelog, rewritten at release
+      LICENSE
       Syntaxes/fourd.xml    syntax definition: detection, indentation, comments
       Queries/              Nova tree-sitter queries
         highlights.scm      theme selectors for every token class
@@ -84,6 +87,11 @@ to write a version that already has an entry:
 
     python3 tools/changelog.py --version 21.5.1 --previous-tag 21.5.0           # read it
     python3 tools/changelog.py --version 21.5.1 --previous-tag 21.5.0 --write   # record it
+
+The entry is copied into the bundle as `language-4d.novaextension/CHANGELOG.md`
+along with `README.md` and `LICENSE`, because Nova presents an installed
+extension from the package's own files; the release verifies all three are in
+the DMG and that the packaged changelog carries the version being published.
 
 Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
 `libtree-sitter-fourd.dylib`, `tool4d-lsp-stdio` and `SHA256SUMS.txt`. The
