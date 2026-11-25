@@ -5,6 +5,11 @@ Syntax highlighting, structure folding, symbols, and SQL injection for
 tree-sitter-fourd grammar (validated at 99.7% against 11,172 real-world
 files from the 4d / 4d-depot GitHub organizations).
 
+Releases are tagged with the 4D release they target — `21.5.1`, `21.6.0` — and
+published as a notarized, stapled DMG on the
+[Releases](https://github.com/miyako/language-4dm-nova/releases) page. What
+changed in each one is in [CHANGELOG.md](CHANGELOG.md).
+
 ## Layout
 
     language-4d.novaextension/       the extension bundle (needs the dylib, see below)
@@ -18,6 +23,8 @@ files from the 4d / 4d-depot GitHub organizations).
         injections.scm      SQL inside Begin SQL ... End SQL
     src/                    C sources compiled into the parser dylib
     compile_parser.sh       builds and installs the dylib (macOS only)
+    tools/                  release helpers: version bump, changelog entry
+    CHANGELOG.md            what shipped in each release
 
 ## Building the parser
 
@@ -65,6 +72,19 @@ Repository secrets it reads: `APPLE_DEVELOPER_ID_CERTIFICATE` (base64 `.p12`),
 `APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD`, `KEYCHAIN_PASSWORD`,
 `NOTARYTOOL_APPLE_ID`, `NOTARYTOOL_TEAM_ID`, `NOTARYTOOL_PASSWORD`.
 
+The release also writes the `CHANGELOG.md` entry for that version out of the
+commits since the previous tag (`tools/changelog.py`) and uses the same entry as
+the body of the GitHub release, so the page and the file cannot drift apart. The
+section a change lands in comes from the conventional-commit prefix of its
+subject (`feat:` → Added, `fix:` → Fixed, `docs:` → Documentation, `build:` and
+`ci:` → Build, …), then from the wording of the subject, then from the files it
+touches — write the prefix when you want it filed precisely. The workflow does
+that itself, so the tool is only for a release cut by hand; note that it refuses
+to write a version that already has an entry:
+
+    python3 tools/changelog.py --version 21.5.1 --previous-tag 21.5.0           # read it
+    python3 tools/changelog.py --version 21.5.1 --previous-tag 21.5.0 --write   # record it
+
 Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
 `libtree-sitter-fourd.dylib`, `tool4d-lsp-stdio` and `SHA256SUMS.txt`. The
 workflow builds `src/` as-is; regenerating the grammar is
@@ -72,8 +92,14 @@ workflow builds `src/` as-is; regenerating the grammar is
 
 ## Installing
 
-Double-click `language-4d.novaextension`, or open the folder in Nova and use
-Extensions → Activate Project as Extension for development. 
+Download `language-4d.novaextension.dmg` from the
+[latest release](https://github.com/miyako/language-4dm-nova/releases/latest),
+open it, and add the extension to Nova. The image and both binaries are signed
+with a Developer ID Application certificate and notarized with Apple, so
+Gatekeeper assesses them without an override.
+
+For development, open the folder in Nova and use Extensions → Activate Project
+as Extension.
 
 ## Design notes
 
