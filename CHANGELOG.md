@@ -13,6 +13,12 @@ before 21.5.1 predate this file and are not listed.
 
 ## [Unreleased]
 
+## [21.5.2](https://github.com/miyako/language-4dm-nova/compare/21.5.1...21.5.2) - 2026-11-25
+
+### Added
+
+- generate CHANGELOG.md from the commits in each release (#52) ([`fdbb48d`](https://github.com/miyako/language-4dm-nova/commit/fdbb48d))
+
 ## [21.5.1](https://github.com/miyako/language-4dm-nova/compare/21.5.0...21.5.1) - 2026-11-24
 
 ### Added
