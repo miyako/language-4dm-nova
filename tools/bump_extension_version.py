@@ -2,19 +2,19 @@
 """Bump the Nova extension version and report the release tag.
 
 `language-4d.novaextension/extension.json` holds the version Nova displays and
-the one the release tag carries. It follows the 4D release the grammar and
-builtins target -- ``21.5.0`` is the 4D 21.5 line -- so a bump moves one
-component of that same number:
+the one the release tag carries. It is SemVer read against 4D, so a bump moves
+one component of that same number:
 
-    --bump patch   21.5.0 -> 21.5.1
-    --bump minor   21.5.0 -> 21.6.0
-    --bump major   21.5.0 -> 22.0.0
+    --bump patch   21.5.0 -> 21.5.1     a fix
+    --bump minor   21.5.0 -> 21.6.0     a feature added to the module
+    --bump major   21.5.0 -> 22.0.0     a different 4D major
 
-The tag is the version itself (``21.5.1``), matching the tags this repository
-already carries (``21.4.0``, ``21.5.0``) and the 4D convention of naming a
-component release after the 4D release it supports. The grammar's own
-``package.json`` version and the bridge's ``Cargo.toml`` version are separate
-artifact versions and are not touched.
+The major tracks the 4D major the module targets, the minor counts features
+added to the module -- not 4D minor releases -- and the patch counts fixes. The
+tag is the version itself (``21.5.1``), matching the tags this repository
+already carries (``21.4.0``, ``21.5.0``). The grammar's own ``package.json``
+version and the bridge's ``Cargo.toml`` version are separate artifact versions
+and are not touched.
 
 Only the version string is rewritten, so the manifest keeps its formatting and
 the diff stays one line.
