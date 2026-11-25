@@ -13,6 +13,12 @@ before 21.5.1 predate this file and are not listed.
 
 ## [Unreleased]
 
+## [21.5.3](https://github.com/miyako/language-4dm-nova/compare/21.5.2...21.5.3) - 2026-11-25
+
+### Documentation
+
+- ship README, changelog and licence inside the package (#53) ([`a35d7ef`](https://github.com/miyako/language-4dm-nova/commit/a35d7ef))
+
 ## [21.5.2](https://github.com/miyako/language-4dm-nova/compare/21.5.1...21.5.2) - 2026-11-25
 
 ### Added
