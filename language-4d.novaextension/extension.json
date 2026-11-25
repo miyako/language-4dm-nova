@@ -8,7 +8,7 @@
     "license": "MIT",
     "min_runtime": "10.0",
     "repository": "https://github.com/miyako/language-4dm-nova",
-    "bugs": "https://github.com/your-account/language-4dm-nova/issues",
+    "bugs": "https://github.com/miyako/language-4dm-nova/issues",
     "main": "main.js",
     "activationEvents": [
         "onLanguage:fourd",
