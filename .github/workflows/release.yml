@@ -118,6 +118,9 @@ jobs:
             --version "${VERSION}" \
             --notes-file "${ENTRY}" \
             --write
+          # Nova presents an installed extension from the package's own README,
+          # changelog and licence, so the bundle carries a copy of each.
+          cp CHANGELOG.md language-4d.novaextension/CHANGELOG.md
           {
             echo "### Changes since ${CURRENT}"
             echo
@@ -257,6 +260,19 @@ jobs:
             BUNDLE="${MOUNT_POINT}/language-4d.novaextension"
           fi
           grep -q "\"version\": \"${VERSION}\"" "${BUNDLE}/extension.json"
+          # The docs ship inside the package; a missing or stale changelog means
+          # the release would present itself with the wrong history.
+          for doc in README.md CHANGELOG.md LICENSE; do
+            test -f "${BUNDLE}/${doc}" || {
+              echo "::error::${doc} is missing from the package."
+              exit 1
+            }
+          done
+          grep -q "^## \[${VERSION}\]" "${BUNDLE}/CHANGELOG.md" || {
+            echo "::error::The packaged CHANGELOG.md has no ${VERSION} entry."
+            exit 1
+          }
+          echo "Package docs: README.md, CHANGELOG.md (${VERSION}), LICENSE"
           codesign --verify --strict "${BUNDLE}/Syntaxes/libtree-sitter-fourd.dylib"
           codesign --verify --strict "${BUNDLE}/bin/tool4d-lsp-stdio"
           echo "DMG content: ${VERSION}, both binaries signed"
