@@ -13,6 +13,10 @@ before 21.5.1 predate this file and are not listed.
 
 ## [Unreleased]
 
+## [21.5.4](https://github.com/miyako/language-4dm-nova/compare/21.5.3...21.5.4) - 2026-11-25
+
+_No changes beyond the version bump; the signed artifacts were rebuilt against the same sources._
+
 ## [21.5.3](https://github.com/miyako/language-4dm-nova/compare/21.5.2...21.5.3) - 2026-11-25
 
 ### Documentation
