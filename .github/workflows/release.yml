@@ -27,9 +27,10 @@ name: Release
 #   NOTARYTOOL_TEAM_ID                       team id, e.g. Y69CWUC25B
 #   NOTARYTOOL_PASSWORD                      app-specific password for notarization
 #
-# `src/` is a matched set generated from one 4D release; this workflow builds it
-# as-is. It does not regenerate the grammar or src/builtins.h -- that is
-# update-builtins.yml.
+# The parser it builds is the `tree-sitter-fourd` submodule, at the revision
+# pinned here. It does not regenerate the grammar or src/builtins.h -- both are
+# generated in miyako/tree-sitter-fourd, whose pushes are what this repository
+# pins. Moving the pin is the only way the parser changes here.
 
 on:
   workflow_dispatch:
@@ -65,6 +66,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # The parser is built from the tree-sitter-fourd submodule, at the
+          # revision this repository pins; without this the build has no src/.
+          submodules: recursive
 
       - name: Require the default branch
         env:
