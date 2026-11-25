@@ -23,6 +23,13 @@ Usage:
     tools/changelog.py --version 21.5.2 \\
         --previous-tag 21.5.1 \\
         --notes-file /tmp/entry.md --write
+    tools/changelog.py --package-copy language-4d.novaextension/CHANGELOG.md
+
+`--package-copy` generates nothing: it copies the changelog to the file Nova
+presents to someone who installed the extension, dropping the
+`## [Unreleased]` placeholder. The repository needs that section so unreleased
+commits have somewhere to go; the installed package does not, and an empty
+heading on top would be the first thing a reader meets.
 """
 
 from __future__ import annotations
@@ -258,6 +265,27 @@ def write_changelog(root: Path, version: str, entry: str) -> None:
     path.write_text("\n".join(lines).rstrip("\n") + "\n")
 
 
+def write_package_copy(root: Path, destination: Path) -> None:
+    """Copy the changelog to the extension bundle without the Unreleased heading."""
+    text = (root / CHANGELOG).read_text()
+    kept: list[str] = []
+    dropped = False
+    skipping = False
+    for line in text.splitlines():
+        if line.startswith("## [Unreleased]"):
+            skipping = True
+            dropped = True
+            continue
+        if skipping:
+            if not line.strip():
+                continue
+            skipping = False
+        kept.append(line)
+    if not dropped:
+        sys.stderr.write("note: CHANGELOG.md has no `## [Unreleased]` heading\n")
+    destination.write_text("\n".join(kept).rstrip("\n") + "\n")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=Path("."), help="repository root")
@@ -266,9 +294,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--date", type=str, help="entry date, YYYY-MM-DD (default: today, UTC)")
     parser.add_argument("--notes-file", type=Path, help="write the entry here as well")
     parser.add_argument("--write", action="store_true", help="prepend the entry to CHANGELOG.md")
+    parser.add_argument(
+        "--package-copy",
+        type=Path,
+        metavar="PATH",
+        help="copy CHANGELOG.md there without the Unreleased heading, and stop",
+    )
     args = parser.parse_args(argv)
 
     root = args.root.resolve()
+    if args.package_copy:
+        write_package_copy(root, args.package_copy)
+        sys.stdout.write(f"wrote {args.package_copy}\n")
+        return 0
+
     if args.version:
         version = args.version
     else:

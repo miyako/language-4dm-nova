@@ -119,8 +119,13 @@ jobs:
             --notes-file "${ENTRY}" \
             --write
           # Nova presents an installed extension from the package's own README,
-          # changelog and licence, so the bundle carries a copy of each.
-          cp CHANGELOG.md language-4d.novaextension/CHANGELOG.md
+          # changelog and licence, so the bundle carries a copy of each. The copy
+          # drops `## [Unreleased]`: the repository needs that heading as a place
+          # for pending commits, but in the installed package it is empty and
+          # would be the first heading a reader meets.
+          python3 tools/changelog.py \
+            --root . \
+            --package-copy language-4d.novaextension/CHANGELOG.md
           {
             echo "### Changes since ${CURRENT}"
             echo
@@ -272,6 +277,11 @@ jobs:
             echo "::error::The packaged CHANGELOG.md has no ${VERSION} entry."
             exit 1
           }
+          # The released version must be the first entry a reader meets.
+          if grep -q "^## \[Unreleased\]" "${BUNDLE}/CHANGELOG.md"; then
+            echo "::error::The packaged CHANGELOG.md still carries an Unreleased heading."
+            exit 1
+          fi
           echo "Package docs: README.md, CHANGELOG.md (${VERSION}), LICENSE"
           codesign --verify --strict "${BUNDLE}/Syntaxes/libtree-sitter-fourd.dylib"
           codesign --verify --strict "${BUNDLE}/bin/tool4d-lsp-stdio"
