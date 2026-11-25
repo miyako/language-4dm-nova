@@ -13,6 +13,12 @@ conventional-commit prefix picks the section (`feat:` → Added, `fix:` → Fixe
 is read for its verb, and the files it touches decide in the end. Releases
 before 21.5.1 predate this file and are not listed.
 
+## [21.5.5](https://github.com/miyako/language-4dm-nova/compare/21.5.4...21.5.5) - 2026-11-25
+
+### Fixed
+
+- start the packaged changelog at the released version (#54) ([`3d93a4e`](https://github.com/miyako/language-4dm-nova/commit/3d93a4e))
+
 ## [21.5.4](https://github.com/miyako/language-4dm-nova/compare/21.5.3...21.5.4) - 2026-11-25
 
 _No changes beyond the version bump; the signed artifacts were rebuilt against the same sources._
