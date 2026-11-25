@@ -297,18 +297,18 @@ jobs:
           shasum -a 256 "${DMG}" "${DYLIB}" "${BRIDGE}" > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Commit the version and the refreshed artifacts
+      - name: Commit the version
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            CHANGELOG.md \
-            language-4d.novaextension \
-            language-4d.novaextension.dmg \
-            SHA256SUMS.txt
+          # Text only. The dylib, the bridge and the DMG are release assets: they
+          # are build outputs of a source tree that already pins what they were
+          # built from, and committing them would add ~16 MB to history per
+          # release for a blob nothing can review or compare.
+          git add CHANGELOG.md language-4d.novaextension
           git commit -m "release: ${VERSION}"
           git push origin "HEAD:main"
 
@@ -324,6 +324,7 @@ jobs:
           # The body is the changelog entry, so the release page and
           # CHANGELOG.md cannot drift apart, plus the install and asset notes
           # that do not belong in a changelog.
+          PARSER_REV="$(git -C tree-sitter-fourd rev-parse --short=12 HEAD)"
           NOTES="$(mktemp)"
           {
             echo "4D Language for Nova ${VERSION}"
@@ -350,6 +351,10 @@ jobs:
           All three binaries carry a Developer ID Application signature with the
           hardened runtime and are notarized with Apple.
           EOF
+            echo
+            echo "The parser in all of them is \`tree-sitter-fourd\` at"
+            echo "[\`${PARSER_REV}\`](https://github.com/miyako/tree-sitter-fourd/commit/${PARSER_REV}),"
+            echo "the revision this repository's submodule pins."
           } > "${NOTES}"
 
           git tag -a "${TAG}" -m "4D Language for Nova ${TAG}"

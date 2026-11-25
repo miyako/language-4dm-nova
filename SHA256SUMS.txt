@@ -1,3 +1,0 @@
-c3f6e29e8639a203d11a4370708d50f9a29c8cfebdd42e0b90068dc29ea68fa2  language-4d.novaextension.dmg
-ac4b9c5e9d39769e39184aed5181023437f9fbc19bc300c8685c94955ac23baf  language-4d.novaextension/Syntaxes/libtree-sitter-fourd.dylib
-9b48076fb92af27abcea9f0dac2655a28f902fd1614508071e0b4d54ee372989  language-4d.novaextension/bin/tool4d-lsp-stdio
