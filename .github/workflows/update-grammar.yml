@@ -1,0 +1,202 @@
+name: Update grammar pin
+
+# Moves the tree-sitter-fourd submodule -- the parser this extension compiles
+# and ships -- and opens a pull request when the pin moves.
+#
+# Why a pin decides everything: compile_parser.sh builds parser.c, scanner.c and
+# the generated builtins.h out of tree-sitter-fourd/src. The submodule pointer
+# is therefore the only thing that chooses which builtins table an installed
+# extension recognises. A builtins.h regenerated upstream does not reach a user
+# until this pointer moves and a release is published from it.
+#
+# Why this workflow and not the grammar repository: fourd regenerates its own
+# src/ and merges that with review (update-builtins.yml, regenerate-parser.yml).
+# What it cannot know is when this extension wants to adopt the result -- that is
+# a decision made here, by merging a pin bump. Two repositories, two runners, no
+# cross-repository tokens.
+#
+# The bump is verified before the PR is opened:
+#   * the commit carries src/parser.c, src/scanner.c, src/builtins.h and
+#     src/tree_sitter/parser.h -- a grammar, not an empty or partial tree;
+#   * that parser.c and scanner.c compile;
+#   * the builtins table at that commit passes the grammar repository's own
+#     check, which is the thing that can fail silently: scanner.c binary-searches
+#     it, so a table out of fourd_stricmp order stops finding names without
+#     reporting anything.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rev:
+        description: 'Commit SHA in miyako/tree-sitter-fourd. Empty means the tip of its default branch.'
+        required: false
+        default: ''
+  schedule:
+    # Weekly, an hour after the extension repository's own bump, so the two
+    # pointers usually move in the same morning.
+    - cron: '20 4 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  GRAMMAR_REPOSITORY: https://github.com/miyako/tree-sitter-fourd.git
+  BRANCH: ci/update-grammar-rev
+
+jobs:
+  bump:
+    name: Bump the grammar pin
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # The submodule clone is what gets moved, so it has to be a real
+          # repository here rather than the empty directory a plain checkout
+          # leaves behind.
+          submodules: recursive
+
+      - name: Resolve the revision
+        id: rev
+        # Values reach the script through the environment: GitHub expands
+        # ${{ }} into the script text, so a value is code as well as data.
+        env:
+          REQUESTED: ${{ inputs.rev }}
+        run: |
+          set -euo pipefail
+
+          requested="${REQUESTED:-}"
+          if [ -n "$requested" ]; then
+            if ! printf '%s' "$requested" | grep -Eq '^[0-9a-f]{40}$'; then
+              echo "::error::'$requested' is not a full 40-character commit SHA"
+              exit 1
+            fi
+            rev="$requested"
+          else
+            rev=$(git ls-remote "$GRAMMAR_REPOSITORY" HEAD | awk '{print $1}')
+            test -n "$rev" || { echo "::error::could not resolve $GRAMMAR_REPOSITORY HEAD"; exit 1; }
+          fi
+
+          current=$(git ls-tree HEAD tree-sitter-fourd | awk '{print $3}')
+          test -n "$current" || { echo "::error::tree-sitter-fourd is not a submodule of this repository"; exit 1; }
+
+          echo "current=$current"
+          echo "rev=$rev"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+          echo "new=$([ "$current" != "$rev" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          if [ "$current" = "$rev" ]; then
+            echo "::notice::the pin already names $rev"
+          fi
+
+      - name: Verify the commit is a usable parser
+        if: steps.rev.outputs.new == 'true'
+        env:
+          REV: ${{ steps.rev.outputs.rev }}
+        run: |
+          set -euo pipefail
+
+          git -C tree-sitter-fourd fetch --quiet origin
+          if ! git -C tree-sitter-fourd cat-file -e "${REV}^{commit}" 2>/dev/null; then
+            echo "::error::$REV is not a commit in the grammar repository"
+            exit 1
+          fi
+          git -C tree-sitter-fourd checkout --quiet "$REV"
+
+          missing=""
+          for required in src/parser.c src/scanner.c src/builtins.h src/tree_sitter/parser.h; do
+            if [ ! -f "tree-sitter-fourd/$required" ]; then
+              missing="$missing $required"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::$REV is missing:${missing}"
+            exit 1
+          fi
+
+          # The grammar repository's own check, run from the pin being adopted:
+          # it proves every row of the table is reachable by the binary search
+          # in scanner.c. Its own output carries the counts that go in the PR.
+          summary=$(python3 tree-sitter-fourd/tools/check_builtins.py tree-sitter-fourd/src/builtins.h)
+          echo "$summary"
+          echo "builtins=$summary" >> "$GITHUB_OUTPUT"
+
+          # The real compile, not a mock: these are the two files the extension
+          # builds, and -Isrc resolves the tree_sitter/parser.h that ships here.
+          cc -std=c11 -fsyntax-only -Itree-sitter-fourd/src tree-sitter-fourd/src/parser.c
+          cc -std=c11 -fsyntax-only -Itree-sitter-fourd/src tree-sitter-fourd/src/scanner.c
+          echo "parser.c and scanner.c compile at $REV"
+        # The step needs the id to publish the summary, and outputs require it.
+        id: verify
+
+      - name: Open pull request
+        if: steps.rev.outputs.new == 'true'
+        env:
+          CURRENT: ${{ steps.rev.outputs.current }}
+          REV: ${{ steps.rev.outputs.rev }}
+          BUILTINS: ${{ steps.verify.outputs.builtins }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          current="$CURRENT"
+          rev="$REV"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add tree-sitter-fourd
+          git commit -m "Bump the grammar to ${rev:0:12}"
+          git fetch --quiet origin "$BRANCH" || true
+          # This push uses GITHUB_TOKEN, and GitHub does not run workflows for
+          # events that token causes. This repository has no pull_request
+          # workflow, so nothing is left looking failed; the verification above
+          # is what makes the bump mergeable.
+          git push --force-with-lease origin "$BRANCH"
+
+          # Commits between the two revisions, for the reader: what the adopted
+          # builtins table and grammar actually changed.
+          log=$(git -C tree-sitter-fourd log --oneline --no-merges "${current}..${rev}" | head -20 || true)
+
+          body=$(mktemp)
+          {
+            echo "Moves the parser this extension builds from \`${current:0:12}\` to \`${rev:0:12}\`."
+            echo
+            echo "Compare: $GRAMMAR_REPOSITORY/compare/${current}...${rev}"
+            echo
+            if [ -n "$log" ]; then
+              echo "In between:"
+              echo '```'
+              echo "$log"
+              echo '```'
+              echo
+            fi
+            echo "Builtins at the adopted revision:"
+            echo
+            echo '```'
+            echo "$BUILTINS"
+            echo '```'
+            echo
+            echo "Verified before this PR was opened: the commit carries \`parser.c\`, \`scanner.c\`,"
+            echo "\`builtins.h\` and \`src/tree_sitter/parser.h\`; that table passes the grammar"
+            echo "repository's own reachability check; and both C files compile against it."
+            echo
+            echo "Merging this moves the pin only. The shipped binaries change at the next"
+            echo "**Release** dispatch, which rebuilds and re-notarizes them from this pointer."
+          } > "$body"
+
+          # Captured rather than piped into `grep -q`, which can close the pipe
+          # under `set -o pipefail` and fail the step on a successful lookup.
+          existing=$(gh pr list --head "$BRANCH" --state open --json number --jq 'length')
+          if [ "$existing" != "0" ]; then
+            gh pr edit "$BRANCH" --title "Bump the grammar to ${rev:0:12}" --body-file "$body"
+          else
+            gh pr create \
+              --head "$BRANCH" \
+              --base "$BASE_BRANCH" \
+              --title "Bump the grammar to ${rev:0:12}" \
+              --body-file "$body"
+          fi
