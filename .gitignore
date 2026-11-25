@@ -1,3 +1,13 @@
 tool4d-lsp-stdio/target/*
 target/
 .DS_Store
+
+# Build outputs. The release workflow uploads these as release assets and does
+# not commit them: a binary in git is a second source of truth that nothing
+# compares against the submodule pin, and each release would add ~16 MB to
+# history permanently. `build/` is where compile_parser_only.sh leaves a copy.
+build/
+*.dmg
+language-4d.novaextension/Syntaxes/*.dylib
+language-4d.novaextension/bin/tool4d-lsp-stdio
+SHA256SUMS.txt

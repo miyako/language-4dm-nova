@@ -13,7 +13,7 @@ changed in each one is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Layout
 
-    language-4d.novaextension/       the extension bundle (needs the dylib, see below)
+    language-4d.novaextension/       the extension bundle (binaries are not in git)
       extension.json
       README.md             the user-facing docs Nova shows for the extension
       CHANGELOG.md          a copy of the top-level changelog, rewritten at release
@@ -49,7 +49,13 @@ To take a newer grammar, move the pin:
 
     git -C tree-sitter-fourd fetch origin
     git -C tree-sitter-fourd checkout <rev>
-    git add tree-sitter-fourd && git commit -m "Bump the grammar" && git commit -m "Bump the grammar"  git commit -m "Bump the grammar"
+    git add tree-sitter-fourd && git commit -m "Bump the grammar"
+
+A clone has no parser dylib and no bridge: `Syntaxes/libtree-sitter-fourd.dylib`
+and `bin/tool4d-lsp-stdio` are build outputs, published as release assets and
+deliberately not committed. Building once is what makes the bundle loadable in
+Nova; nothing else here needs them, and the release notes name the grammar
+revision the published ones were built from.&& git commit -m "Bump the grammar"  git commit -m "Bump the grammar"
 
 On macOS with Xcode command line tools and a Rust toolchain:
 
@@ -121,7 +127,10 @@ Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
 workflow checks out the grammar submodule and builds it as-is. Regenerating the
 grammar -- and `src/builtins.h` with it -- happens in
 [miyako/tree-sitter-fourd](https://github.com/miyako/tree-sitter-fourd); a
-release here picks up whatever revision this repository pins.
+release here picks up whatever revision this repository pins. The `release:`
+commit it pushes carries the version and the changelog, not the binaries -- a
+binary in git is a second source of truth that nothing compares against the pin,
+and every release would add about 16 MB to history for it.
 
 ## Installing
 
