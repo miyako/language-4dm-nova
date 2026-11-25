@@ -8,6 +8,9 @@ name: Release
 # artifacts, then tags `X.Y.Z` and publishes the DMG, the dylib, the bridge and
 # their checksums.
 #
+# It writes the `CHANGELOG.md` entry for the release from the commits in it
+# (tools/changelog.py) and reuses that entry as the release body.
+#
 # The version is `language-4d.novaextension/extension.json`, which follows the
 # 4D release the grammar targets (21.5.0 is 4D 21.5). `bump` moves one
 # component of it and the tag is that version, as the existing tags here are:
@@ -102,6 +105,24 @@ jobs:
             echo "::error::Tag ${TAG} already exists on origin."
             exit 1
           fi
+
+      - name: Write the changelog entry
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          CURRENT: ${{ steps.version.outputs.current }}
+        run: |
+          set -euo pipefail
+          ENTRY="${RUNNER_TEMP}/changelog-entry.md"
+          python3 tools/changelog.py \
+            --root . \
+            --version "${VERSION}" \
+            --notes-file "${ENTRY}" \
+            --write
+          {
+            echo "### Changes since ${CURRENT}"
+            echo
+            cat "${ENTRY}"
+          } >> "${GITHUB_STEP_SUMMARY}"
 
       # Cache only the crate registry, not target/: a release build must not
       # reuse object files from an older toolchain or an older grammar.
@@ -253,7 +274,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add language-4d.novaextension language-4d.novaextension.dmg SHA256SUMS.txt
+          git add \
+            CHANGELOG.md \
+            language-4d.novaextension \
+            language-4d.novaextension.dmg \
+            SHA256SUMS.txt
           git commit -m "release: ${VERSION}"
           git push origin "HEAD:main"
 
@@ -266,28 +291,31 @@ jobs:
         run: |
           set -euo pipefail
 
+          # The body is the changelog entry, so the release page and
+          # CHANGELOG.md cannot drift apart, plus the install and asset notes
+          # that do not belong in a changelog.
           NOTES="$(mktemp)"
           {
-            cat <<EOF
-          4D Language for Nova ${VERSION}
-
-          Syntax highlighting, folds, symbols and tool4d language-server
-          integration for 4D project files in Nova.
-
-          Version ${CURRENT} -> ${VERSION} (tag ${TAG}).
-
+            echo "4D Language for Nova ${VERSION}"
+            echo
+            echo "Syntax highlighting, folds, symbols and tool4d language-server"
+            echo "integration for 4D project files in Nova."
+            echo
+            cat "${RUNNER_TEMP}/changelog-entry.md"
+            echo
+            cat <<'EOF'
           ## Install
 
-          Open \`language-4d.novaextension.dmg\` and add the extension to Nova.
+          Open `language-4d.novaextension.dmg` and add the extension to Nova.
 
           ## Assets
 
           | File | What it is |
           |---|---|
-          | \`language-4d.novaextension.dmg\` | the extension, notarized and stapled |
-          | \`libtree-sitter-fourd.dylib\` | the grammar, universal, signed |
-          | \`tool4d-lsp-stdio\` | the language-server bridge, universal, signed |
-          | \`SHA256SUMS.txt\` | checksums of the three above |
+          | `language-4d.novaextension.dmg` | the extension, notarized and stapled |
+          | `libtree-sitter-fourd.dylib` | the grammar, universal, signed |
+          | `tool4d-lsp-stdio` | the language-server bridge, universal, signed |
+          | `SHA256SUMS.txt` | checksums of the three above |
 
           All three binaries carry a Developer ID Application signature with the
           hardened runtime and are notarized with Apple.
