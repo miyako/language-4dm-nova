@@ -7,7 +7,8 @@
 #
 #   ./compile_parser.sh BASEDIR [/Applications/Nova.app]
 #
-# BASEDIR is the repository root. The Nova bundle is optional: it supplies
+# BASEDIR is the repository root; the parser itself is the `tree-sitter-fourd`
+# submodule there. The Nova bundle is optional: it supplies
 # SyntaxKit.framework for the link step, and hosted runners have no Nova. The
 # built dylib references no SyntaxKit symbol (only libSystem and itself -- check
 # `otool -L` and `nm -u`), so linking without the framework changes nothing at
@@ -163,17 +164,20 @@ echo "Signing identity: ${DEVELOPER_ID}"
 # Build the Tree-sitter syntax library
 ###############################################################################
 
-TREE_SITTER_BUILD_DIR="${TMP_BUILD_DIR}/tree-sitter"
-mkdir -p "${TREE_SITTER_BUILD_DIR}/src"
+TREE_SITTER_SRC_DIR="${BASEDIR}/tree-sitter-fourd/src"
 
-# Build from a copy of src/ and Makefile, never in place: the repository tracks
-# a prebuilt libtree-sitter-nova.dylib and object files, so `make install` in
-# the checkout can decide there is nothing to do and install an old dylib as if
-# it had just been built.
-cp -R "${BASEDIR}/src/." "${TREE_SITTER_BUILD_DIR}/src/"
-# src/ tracks its own object files; a copied .o would be linked as-is.
-rm -f "${TREE_SITTER_BUILD_DIR}/src/"*.o
-cp "${BASEDIR}/Makefile" "${TREE_SITTER_BUILD_DIR}/Makefile"
+# The parser is the `tree-sitter-fourd` submodule. This repository used to carry
+# its own copy of src/ and the generated Makefile, and the copy drifted: the
+# grammar moved on upstream while the copy did not, which is why the parser here
+# and the one in the Zed extension had diverged while both looked maintained.
+# `parser.c` and `scanner.c` are the whole parser -- no C++, and nothing for a
+# Makefile to do -- so this is one clang call over two files. Nothing is written
+# inside the submodule, so its checkout stays exactly as git left it.
+if [[ ! -f "${TREE_SITTER_SRC_DIR}/parser.c" ]]; then
+    echo "Missing ${TREE_SITTER_SRC_DIR}/parser.c." >&2
+    echo "The grammar submodule is not checked out: git submodule update --init" >&2
+    exit 1
+fi
 
 # Build both arm64 and x86_64 and require macOS 11. The Nova bundle contributes
 # SyntaxKit only; without it the link is a plain tree-sitter dylib.
@@ -181,26 +185,24 @@ BUILD_FLAGS=(
     -arch arm64
     -arch x86_64
     -mmacosx-version-min="${MACOS_DEPLOYMENT_TARGET}"
-    -I"${TREE_SITTER_BUILD_DIR}/src"
+    -O3
+    -I"${TREE_SITTER_SRC_DIR}"
+    -rpath @loader_path/../Frameworks
 )
 
-LINK_FLAGS=("${BUILD_FLAGS[@]}" -rpath @loader_path/../Frameworks)
 if [[ -n "${APPBUNDLE}" ]]; then
     FRAMEWORKS_PATH="${APPBUNDLE}/Contents/Frameworks"
     require_directory "${APPBUNDLE}"
     require_directory "${FRAMEWORKS_PATH}"
-    LINK_FLAGS+=(-F "${FRAMEWORKS_PATH}" -framework SyntaxKit)
+    BUILD_FLAGS+=(-F "${FRAMEWORKS_PATH}" -framework SyntaxKit)
     echo "SyntaxKit: ${FRAMEWORKS_PATH}"
 else
     echo "SyntaxKit: not linked (no Nova bundle given)"
 fi
 
-CFLAGS="${BUILD_FLAGS[*]} -O3" \
-CXXFLAGS="${BUILD_FLAGS[*]} -O3" \
-LDFLAGS="${LINK_FLAGS[*]}" \
-make -C "${TREE_SITTER_BUILD_DIR}" PARSER_NAME=fourd
-
-TREE_SITTER_PRODUCT="${TREE_SITTER_BUILD_DIR}/${SYNTAX_LIBRARY_NAME}"
+TREE_SITTER_PRODUCT="${TMP_BUILD_DIR}/${SYNTAX_LIBRARY_NAME}"
+xcrun clang -dynamiclib -o "${TREE_SITTER_PRODUCT}" "${BUILD_FLAGS[@]}" \
+    "${TREE_SITTER_SRC_DIR}/parser.c" "${TREE_SITTER_SRC_DIR}/scanner.c"
 TREE_SITTER_DESTINATION="${EXTENSION_DIR}/Syntaxes/${SYNTAX_LIBRARY_NAME}"
 
 require_file "${TREE_SITTER_PRODUCT}"

@@ -25,17 +25,31 @@ changed in each one is in [CHANGELOG.md](CHANGELOG.md).
         symbols.scm         class functions (+arguments), properties, superclass
         arguments.scm       parameter subquery for signature help
         injections.scm      SQL inside Begin SQL ... End SQL
-    src/                    C sources compiled into the parser dylib
-    compile_parser.sh       builds and installs the dylib (macOS only)
+    tree-sitter-fourd/      the grammar -- a git submodule, pinned to a revision
+      grammar.js            the grammar itself; it is edited there, not here
+      src/                  its parser.c, scanner.c and generated builtins.h
+    compile_parser.sh       builds the dylib from the submodule (macOS only)
     tools/                  release helpers: version bump, changelog entry
     CHANGELOG.md            what shipped in each release
 
 ## Building the parser
 
-**`src/` is already a matched set — build it as-is.** If the grammar evolves, regenerate
-(`tree-sitter generate`) and copy the new `src/parser.c` over — but keep
-scanner and grammar in lockstep per the table above. The script compiles
-every `.c` file in `src/`.
+**The parser comes from the `tree-sitter-fourd` submodule.** That repository
+owns `grammar.js`, the generated `src/` (parser, scanner, `builtins.h`) and the
+tooling that regenerates them; this one pins a revision of it and compiles the
+two C files there. Nothing is generated here, so there is nothing here that can
+fall out of step with upstream -- the two editors cannot drift, they can only
+pin different revisions.
+
+After a fresh clone:
+
+    git submodule update --init
+
+To take a newer grammar, move the pin:
+
+    git -C tree-sitter-fourd fetch origin
+    git -C tree-sitter-fourd checkout <rev>
+    git add tree-sitter-fourd && git commit -m "Bump the grammar" && git commit -m "Bump the grammar"  git commit -m "Bump the grammar"
 
 On macOS with Xcode command line tools and a Rust toolchain:
 
@@ -104,8 +118,10 @@ version the reader has:
 
 Each release publishes `language-4d.novaextension.dmg` (notarized, stapled),
 `libtree-sitter-fourd.dylib`, `tool4d-lsp-stdio` and `SHA256SUMS.txt`. The
-workflow builds `src/` as-is; regenerating the grammar is
-`update-builtins.yml`, a separate pipeline.
+workflow checks out the grammar submodule and builds it as-is. Regenerating the
+grammar -- and `src/builtins.h` with it -- happens in
+[miyako/tree-sitter-fourd](https://github.com/miyako/tree-sitter-fourd); a
+release here picks up whatever revision this repository pins.
 
 ## Installing
 
