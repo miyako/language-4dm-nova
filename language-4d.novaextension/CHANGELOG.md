@@ -13,6 +13,17 @@ conventional-commit prefix picks the section (`feat:` → Added, `fix:` → Fixe
 is read for its verb, and the files it touches decide in the end. Releases
 before 21.5.1 predate this file and are not listed.
 
+## [21.5.6](https://github.com/miyako/language-4dm-nova/compare/21.5.5...21.5.6) - 2026-11-25
+
+### Changed
+
+- Bump the grammar to 89b0e7f (#57) ([`b87f0b6`](https://github.com/miyako/language-4dm-nova/commit/b87f0b6))
+
+### Build
+
+- take the parser from the tree-sitter-fourd submodule (#55) ([`2b502f5`](https://github.com/miyako/language-4dm-nova/commit/2b502f5))
+- stop committing the built binaries (#56) ([`eafe103`](https://github.com/miyako/language-4dm-nova/commit/eafe103))
+
 ## [21.5.5](https://github.com/miyako/language-4dm-nova/compare/21.5.4...21.5.5) - 2026-11-25
 
 ### Fixed
